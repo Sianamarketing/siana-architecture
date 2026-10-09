@@ -55,7 +55,15 @@ values
    'The birthplace of the skyscraper.',
    'Steel, glass, and the long shadow of Mies.',
    'https://picsum.photos/seed/siana-chicago/1200/1500',
-   41.8781, -87.6298, 11, 'published')
+   41.8781, -87.6298, 11, 'published'),
+
+  -- Slug `newyork` matches the existing city record. ON CONFLICT leaves that
+  -- row untouched and the projects below attach to it.
+  ('New York', 'newyork', 'USA',
+   'The city that nevers sleeps',
+   'New York is the city that taught the modern world how to build vertically.',
+   'https://picsum.photos/seed/siana-newyork/1200/1500',
+   40.712749, -74.005994, 12, 'published')
 on conflict (slug) do nothing;
 
 -- ---------- Projects (linked to cities by slug) ----------
@@ -88,4 +96,64 @@ from (
     ('Robie House',             'robie-house',            'Frank Lloyd Wright',           'Residential', 1910, 41.7896,         -87.5959,         'chicago',     false)
 ) as p(name, slug, architect, category, year_completed, latitude, longitude, city_slug, featured)
 join public.cities c on c.slug = p.city_slug
+on conflict (slug) do nothing;
+
+-- ---------- New York projects ----------
+-- Same table and conflict rule as the catalogue above. Pins are NYC MapPLUTO
+-- tax-lot centroids, which sit on the building footprints:
+--   Hugh O'Neill Building        40.741427, -73.994319
+--   Manhattan Savings Institution 40.726482, -73.995415
+--   Bayard-Condict Building       40.726360, -73.994996
+-- Neighborhood lives in `address` (there is no neighborhood column), in the
+-- same "street, neighborhood, city" shape as other edited projects.
+insert into public.projects
+  (name, slug, architect, category, year_completed,
+   address, latitude, longitude, tagline, description,
+   cover_image_url, hero_image_url,
+   city_id, status, featured)
+select p.name, p.slug, p.architect, p.category, p.year_completed,
+       p.address, p.latitude, p.longitude, p.tagline, p.description,
+       'https://picsum.photos/seed/siana-' || p.slug || '/1200/1500',
+       'https://picsum.photos/seed/siana-' || p.slug || '-hero/2000/1200',
+       c.id, 'published', false
+from (
+  values
+    (
+      'Hugh O''Neill Building',
+      'hugh-o-neill-building',
+      'Mortimer C. Merritt',
+      'Commercial',
+      1890,
+      '655 Sixth Avenue at W 20th St, Chelsea, New York',
+      40.741427::float8,
+      -73.994319::float8,
+      'Mortimer C. Merritt''s dry goods store on the Ladies'' Mile.',
+      $oneill$<p>Hugh O'Neill Building, 655 Sixth Avenue at W 20th St (the white one with gold domes). Mortimer C. Merritt designed it as Hugh O'Neill's Dry Goods Store. It went up in two stages between 1887 and 1890 so the old store could stay open during construction.</p><p>It was one of the big department stores on the "Ladies' Mile," the 19th-century shopping strip where women with money and free time bought ready-made goods. The front is cast iron, which made it easy to grow: in 1895 the owners added a fifth floor by lifting the pediment and domes and setting them back on top.</p><p>The domes were removed in 1917. During a condo conversion in the 2000s, the architects at CetraRuddy rebuilt them. No original drawings survived, so they worked from old city photos taken to document the Sixth Avenue elevated train next door.</p>$oneill$
+    ),
+    (
+      'Manhattan Savings Institution',
+      'manhattan-savings-institution',
+      'Stephen Decatur Hatch',
+      'Civic',
+      1891,
+      '644 Broadway at Bleecker, NoHo, New York',
+      40.726482::float8,
+      -73.995415::float8,
+      'Stephen Decatur Hatch''s bank at Broadway and Bleecker.',
+      $msi$<p>Manhattan Savings Institution, 644 Broadway at Bleecker (red brick and sandstone, green copper turret). Look for "MSI" in the copper pediment. Stephen Decatur Hatch designed it, and it was finished in 1891.</p><p>The best story belongs to the building it replaced. In 1878 a gang led by George Leonidas Leslie, a trained architect turned master bank robber, hit the bank's earlier building on this corner. They got away with more than $2.8 million in cash and securities, one of the largest bank robberies in US history.</p><p>The bank moved out in the early 1940s, and the building has held residential lofts since the 1970s. Kith now occupies the ground floor.</p>$msi$
+    ),
+    (
+      'Bayard–Condict Building',
+      'bayard-condict-building',
+      'Louis Sullivan / Lyndon P. Smith',
+      'Office',
+      1899,
+      '65 Bleecker St, NoHo, New York',
+      40.726360::float8,
+      -73.994996::float8,
+      'Louis Sullivan''s only building in New York.',
+      $bayard$<p>Bayard–Condict Building, 65 Bleecker St (the cream terracotta tower). This is Louis Sullivan's only building in New York, designed with Lyndon P. Smith and built 1897 to 1899. Sullivan is the Chicago architect behind "form follows function," and this was one of the city's first true steel-frame skyscrapers.</p><p>The Buildings Department filed 35 objections to the plans because the code was written for buildings with load-bearing walls. Six winged angels hold up the cornice. A popular story says owner Silas Condict demanded them over Sullivan's objection, but historians doubt it, because the angels appeared in a June 1898 magazine illustration before the Condicts owned the building.</p><p>The photo was taken from Crosby Street, which ends right at its front door, so it is the classic view.</p>$bayard$
+    )
+) as p(name, slug, architect, category, year_completed, address, latitude, longitude, tagline, description)
+join public.cities c on c.slug = 'newyork'
 on conflict (slug) do nothing;

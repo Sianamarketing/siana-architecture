@@ -253,8 +253,10 @@ export default function CityDetail() {
 function buildCenterMarkerEl(): HTMLElement {
   const wrap = document.createElement("div");
   // Sized to the pin only so Mapbox's "bottom" anchor places the tip on
-  // the coord; the label is absolutely positioned out of flow below.
-  wrap.style.cssText = "position:relative;width:28px;height:38px;pointer-events:none;";
+  // the coord. Do not set position, transform, or transition on this
+  // element — Mapbox positions it with those, and overriding them makes
+  // the tip leave the saved coordinate as the map zooms.
+  wrap.style.cssText = "width:28px;height:38px;pointer-events:none;line-height:0;";
 
   const pin = document.createElement("div");
   pin.innerHTML =

@@ -7,6 +7,7 @@ import Navbar from "@/components/site/Navbar";
 import SEO from "@/components/site/SEO";
 import { ChevronDown, X, Search, SlidersHorizontal } from "lucide-react";
 import { getMapboxToken, TOKEN_KEY } from "@/lib/mapbox";
+import { buildProjectMarkerElement, buildTeardropMarkerElement } from "@/lib/mapMarkers";
 import { tagsFor } from "@/lib/atlasFilters";
 import { useTaxonomies } from "@/hooks/useTaxonomies";
 
@@ -626,7 +627,6 @@ export default function Atlas() {
     hoverPopupRef.current = hoverPopup;
     const esc = (s: string) =>
       s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
-    const dot = "#bf3a18";
 
     // ─── World-view: no pins (unfiltered) ────────────────────────────
     // At low zoom, individual project pins from the same city collapse to
@@ -641,46 +641,10 @@ export default function Atlas() {
     filtered.forEach((p) => {
       if (p.latitude == null || p.longitude == null) return;
       const on = selected?.id === p.id;
-      // The anchor element IS the visible dot — sized exactly like what the
-      // user sees, so Mapbox's `anchor: "center"` lands the dot's geometric
-      // centre on the lat/lng. The pulse ring is a child centred on the dot
-      // via top/left 50% + translate, so it can't drift relative to the dot.
-      const el = document.createElement("button");
-      el.setAttribute("aria-label", p.name);
-      el.style.cssText = [
-        "all:unset",
-        "cursor:pointer",
-        "display:block",
-        "box-sizing:border-box",
-        "width:11px",
-        "height:11px",
-        "border-radius:9999px",
-        `background:${dot}`,
-        "border:2px solid #fff",
-        `box-shadow:0 0 0 2px ${dot}`,
-        `transform:${on ? "scale(1.35)" : "scale(1)"}`,
-        "transition:transform .18s ease",
-        "position:relative",
-      ].join(";");
-      // Pulse ring: tighter than before so the pin's geometric centre
-      // reads precisely at any zoom. Starts at 16 px and the keyframe
-      // peaks at scale(1.3), so the halo never exceeds ~21 px — close
-      // to the dot without "haloing" the wrong block at low zoom.
-      const pulse = document.createElement("span");
-      pulse.style.cssText = [
-        "position:absolute",
-        "top:50%",
-        "left:50%",
-        "width:16px",
-        "height:16px",
-        "border-radius:9999px",
-        `border:1px solid ${dot}`,
-        "opacity:.3",
-        "transform:translate(-50%,-50%)",
-        "animation:siana-pulse 2.2s infinite",
-        "pointer-events:none",
-      ].join(";");
-      el.appendChild(pulse);
+      // Root stays free of transform / transition / position so Mapbox's
+      // translate keeps the dot's centre on the lat/lng at every zoom.
+      // Scale and the pulse live on inner nodes (see buildProjectMarkerElement).
+      const el = buildProjectMarkerElement(p.name, on);
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
         selectProject(p);
@@ -864,14 +828,7 @@ export default function Atlas() {
       placedMarkerRef.current.remove();
       placedMarkerRef.current = null;
     }
-    const el = document.createElement("div");
-    el.style.cssText = "width:18px;height:26px;position:relative;pointer-events:none;";
-    // Editorial drop-pin: terracotta teardrop with a white dot inside.
-    el.innerHTML = `
-      <svg viewBox="0 0 18 26" width="18" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.18));">
-        <path d="M9 0C4.03 0 0 4.03 0 9c0 6.75 9 17 9 17s9-10.25 9-17c0-4.97-4.03-9-9-9z" fill="#bf3a18"/>
-        <circle cx="9" cy="9" r="3" fill="#ffffff"/>
-      </svg>`;
+    const el = buildTeardropMarkerElement();
     // No text label is drawn on the pin: the name already shows in the
     // project card / "Projects in …" list, and the map renders its own city
     // labels — so a marker label would just sit superimposed over the map.

@@ -198,6 +198,15 @@ export type Database = {
           tagline: string | null
           updated_at: string
           year_completed: number | null
+          siana_pick: string | null
+          analysis: string | null
+          tldr: string | null
+          curious_facts: Json
+          why_section: Json
+          stats: Json
+          condition: string | null
+          heritage_status: string | null
+          year_listed: number | null
         }
         Insert: {
           address?: string | null
@@ -226,6 +235,15 @@ export type Database = {
           tagline?: string | null
           updated_at?: string
           year_completed?: number | null
+          siana_pick?: string | null
+          analysis?: string | null
+          tldr?: string | null
+          curious_facts?: Json
+          why_section?: Json
+          stats?: Json
+          condition?: string | null
+          heritage_status?: string | null
+          year_listed?: number | null
         }
         Update: {
           address?: string | null
@@ -254,6 +272,15 @@ export type Database = {
           tagline?: string | null
           updated_at?: string
           year_completed?: number | null
+          siana_pick?: string | null
+          analysis?: string | null
+          tldr?: string | null
+          curious_facts?: Json
+          why_section?: Json
+          stats?: Json
+          condition?: string | null
+          heritage_status?: string | null
+          year_listed?: number | null
         }
         Relationships: [
           {
@@ -261,6 +288,186 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_images: {
+        Row: {
+          alt: string
+          attribution: string
+          author: string
+          caption: string | null
+          created_at: string
+          height: number | null
+          id: string
+          is_hero: boolean
+          kind: string | null
+          license: string
+          license_url: string | null
+          original_url: string | null
+          permission_status: string
+          position: number
+          project_id: string
+          source_url: string
+          storage_path: string | null
+          width: number | null
+        }
+        Insert: {
+          alt: string
+          attribution: string
+          author: string
+          caption?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          is_hero?: boolean
+          kind?: string | null
+          license: string
+          license_url?: string | null
+          original_url?: string | null
+          permission_status?: string
+          position?: number
+          project_id: string
+          source_url: string
+          storage_path?: string | null
+          width?: number | null
+        }
+        Update: {
+          alt?: string
+          attribution?: string
+          author?: string
+          caption?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          is_hero?: boolean
+          kind?: string | null
+          license?: string
+          license_url?: string | null
+          original_url?: string | null
+          permission_status?: string
+          position?: number
+          project_id?: string
+          source_url?: string
+          storage_path?: string | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_images_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_links: {
+        Row: {
+          category: string
+          id: string
+          language: string | null
+          last_checked_at: string | null
+          last_status: number | null
+          note: string | null
+          position: number
+          project_id: string
+          published_on: string | null
+          publisher: string | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          category: string
+          id?: string
+          language?: string | null
+          last_checked_at?: string | null
+          last_status?: number | null
+          note?: string | null
+          position?: number
+          project_id: string
+          published_on?: string | null
+          publisher?: string | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          category?: string
+          id?: string
+          language?: string | null
+          last_checked_at?: string | null
+          last_status?: number | null
+          note?: string | null
+          position?: number
+          project_id?: string
+          published_on?: string | null
+          publisher?: string | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_graphics: {
+        Row: {
+          alt: string | null
+          caption: string | null
+          created_at: string
+          download_label: string | null
+          download_path: string | null
+          downloadable: boolean
+          id: string
+          kind: string
+          position: number
+          project_id: string
+          slug: string | null
+          storage_path: string | null
+          svg_path: string | null
+        }
+        Insert: {
+          alt?: string | null
+          caption?: string | null
+          created_at?: string
+          download_label?: string | null
+          download_path?: string | null
+          downloadable?: boolean
+          id?: string
+          kind?: string
+          position?: number
+          project_id: string
+          slug?: string | null
+          storage_path?: string | null
+          svg_path?: string | null
+        }
+        Update: {
+          alt?: string | null
+          caption?: string | null
+          created_at?: string
+          download_label?: string | null
+          download_path?: string | null
+          downloadable?: boolean
+          id?: string
+          kind?: string
+          position?: number
+          project_id?: string
+          slug?: string | null
+          storage_path?: string | null
+          svg_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_graphics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

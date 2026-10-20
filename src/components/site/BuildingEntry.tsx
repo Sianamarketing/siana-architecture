@@ -4,6 +4,7 @@ import EditorialButton from "@/components/site/EditorialButton";
 import PlanSet from "@/components/site/PlanSet";
 import Reveal from "@/components/site/Reveal";
 import RichHtml from "@/components/site/RichHtml";
+import { buildPlanSheets } from "@/lib/planSet";
 import {
   buildStatRows,
   collectImages,
@@ -24,6 +25,7 @@ import {
   resolveMediaUrl,
   splitProse,
   statEvents,
+  whyLead,
   type BuildingGraphic,
   type BuildingImage,
   type BuildingLink,
@@ -393,26 +395,21 @@ function HeroCarousel({
   );
 }
 
-function Diagram({ graphic, supabaseUrl }: { graphic: BuildingGraphic; supabaseUrl?: string | null }) {
+function PlainDiagram({ graphic, supabaseUrl }: { graphic: BuildingGraphic; supabaseUrl?: string | null }) {
   const svg = resolveMediaUrl(graphic.svgPath, { supabaseUrl });
   const png = resolveMediaUrl(graphic.storagePath, { supabaseUrl });
   const [src, setSrc] = useState(svg || png);
   if (!src) return null;
   return (
-    <figure className="mt-8 md:mt-10">
+    <figure className="why-figure md:sticky md:top-[132px] self-start bg-paper-warm border border-ink/10 p-3 md:p-4">
       <img
         src={src}
-        alt={graphic.alt || ""}
-        className="block w-full h-auto"
+        alt={graphic.alt || graphic.caption || ""}
+        className="block w-full max-h-[200px] md:max-h-[480px] object-contain"
         onError={() => {
           if (png && src !== png) setSrc(png);
         }}
       />
-      {graphic.caption && (
-        <figcaption className="mt-3 text-ink-soft font-body text-[14px] leading-relaxed max-w-[46rem]">
-          {graphic.caption}
-        </figcaption>
-      )}
     </figure>
   );
 }
@@ -587,6 +584,7 @@ export default function BuildingEntry({
     intro: writtenOverview.intro,
     facts: writtenOverview.facts ?? overviewFacts(project.stats, { ...project, city: project.city?.name ?? null }),
   };
+  const whySheets = buildPlanSheets(graphics, why.sections, planSetOverview);
   const stats = buildStatRows(project.stats, project);
   const events = statEvents(project.stats);
   const poster = posterGraphic(graphics);
@@ -640,6 +638,31 @@ export default function BuildingEntry({
     const left = link.offsetLeft - parent.clientWidth / 2 + link.clientWidth / 2;
     parent.scrollTo({ left: Math.max(0, left) });
   }, [activeNav]);
+
+  useEffect(() => {
+    const openPart = (hash: string) => {
+      const id = String(hash || "").replace(/^#/, "");
+      if (!id.startsWith("why-")) return;
+      const details = document.getElementById(id)?.querySelector("details");
+      if (details instanceof HTMLDetailsElement) details.open = true;
+    };
+    const onHash = () => openPart(window.location.hash);
+    const onClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest("a[href^='#why-']");
+      if (!link) return;
+      const href = link.getAttribute("href");
+      if (href) openPart(href);
+    };
+    openPart(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    document.addEventListener("click", onClick);
+    return () => {
+      window.removeEventListener("hashchange", onHash);
+      document.removeEventListener("click", onClick);
+    };
+  }, [why.sections.length]);
 
   const jump = (id: string) => (event: ReactMouseEvent<HTMLAnchorElement>) => {
     const target = document.getElementById(id);
@@ -841,29 +864,61 @@ export default function BuildingEntry({
 
       {present.why && (
         <section id="why" className={`bg-background py-14 md:py-24 ${SECTION_OFFSET}`}>
-          <div className="mx-auto max-w-[760px] px-6 lg:px-10">
+          <div className="mx-auto max-w-[1100px] px-6 lg:px-10">
             <Eyebrow>Why it looks like this</Eyebrow>
             <SectionTitle>The brief, on the facade</SectionTitle>
-            {why.intro && <p className="font-body text-ink-soft text-[15px] leading-relaxed mb-12">{why.intro}</p>}
-            <div className="space-y-16 md:space-y-20">
-              {why.sections.map((section) => {
+            {why.intro && (
+              <p className="font-body text-ink-soft text-[15px] leading-relaxed mb-10 md:mb-14 max-w-[46rem]">
+                {why.intro}
+              </p>
+            )}
+            <div className="space-y-14 md:space-y-20">
+              {why.sections.map((section, index) => {
                 const graphic = graphicBySlug(graphics, section.graphicSlug);
+                const sheet = section.graphicSlug
+                  ? whySheets.find((item) => item.whyHash === `why-${section.graphicSlug}`)
+                  : null;
+                const { lead, more } = whyLead(section.paragraphs);
+                const partId = section.graphicSlug ? `why-${section.graphicSlug}` : undefined;
+                const linkCls = "font-mono uppercase text-ink border-b border-ink/40 hover:border-ink pb-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]";
                 return (
-                  <div key={section.heading || section.paragraphs[0]} id={section.graphicSlug ? `why-${section.graphicSlug}` : undefined} className={SECTION_OFFSET}>
-                    {section.heading && (
-                      <h3 className="text-ink mb-4" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(1.45rem, 2.2vw, 1.9rem)", lineHeight: 1.15 }}>
-                        {section.heading}
-                      </h3>
-                    )}
-                    <div className="space-y-5">
-                      {section.paragraphs.map((paragraph) => (
-                        <p key={paragraph.slice(0, 48)} className="font-body text-ink text-[17px] leading-[1.75]">
-                          {paragraph}
-                        </p>
-                      ))}
+                  <article key={section.heading || lead} id={partId} className={SECTION_OFFSET}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start">
+                      {graphic && (
+                        <PlainDiagram graphic={graphic} supabaseUrl={supabaseUrl} />
+                      )}
+                      <div className={index % 2 === 1 ? "md:order-first" : undefined}>
+                        {section.heading && (
+                          <h3 className="text-ink mb-4" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(1.45rem, 2.2vw, 1.9rem)", lineHeight: 1.15 }}>
+                            {section.heading}
+                          </h3>
+                        )}
+                        {lead && (
+                          <p className="font-body text-ink text-[17px] leading-[1.75]">{lead}</p>
+                        )}
+                        {more.length > 0 && (
+                          <details className="why-more mt-4">
+                            <summary className={`${linkCls} cursor-pointer font-normal`} style={{ fontSize: 12, letterSpacing: "0.14em" }}>
+                              <span className="why-more-label">Read more</span>
+                              <span className="why-less">Show less</span>
+                            </summary>
+                            <div className="mt-5 space-y-5">
+                              {more.map((paragraph) => (
+                                <p key={paragraph.slice(0, 48)} className="font-body text-ink text-[17px] leading-[1.75]">
+                                  {paragraph}
+                                </p>
+                              ))}
+                            </div>
+                          </details>
+                        )}
+                        {sheet && (
+                          <a href={`#${sheet.id}`} className={`${linkCls} inline-block mt-4 text-warm-gray hover:text-ink`} style={{ fontSize: 12, letterSpacing: "0.14em" }}>
+                            See sheet {sheet.code}
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    {graphic && <Diagram graphic={graphic} supabaseUrl={supabaseUrl} />}
-                  </div>
+                  </article>
                 );
               })}
             </div>

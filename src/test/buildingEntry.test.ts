@@ -13,6 +13,7 @@ import {
   posterGraphic,
   resolveMediaUrl,
   splitProse,
+  whyLead,
   type BuildingGraphic,
   type BuildingLink,
 } from "@/lib/buildingEntry";
@@ -222,6 +223,25 @@ describe("building entry helpers", () => {
     expect(html).toContain("Leonhard Lenz");
     expect(html).toContain("Denkmaldatenbank");
     expect(html).toContain("Field guide");
+  });
+
+  it("keeps the first why paragraph visible and the rest behind Read more", () => {
+    expect(whyLead(["First sentence. Second sentence."])).toEqual({
+      lead: "First sentence.",
+      more: ["Second sentence."],
+    });
+    expect(whyLead([
+      "Nine levels stack, starting at 1.OG. The technical floors are lower.",
+      "Each lab takes its air from the technical floor above or below.",
+    ])).toEqual({
+      lead: "Nine levels stack, starting at 1.OG. The technical floors are lower.",
+      more: ["Each lab takes its air from the technical floor above or below."],
+    });
+    expect(whyLead(["Only one sentence."])).toEqual({ lead: "Only one sentence.", more: [] });
+    expect(whyLead(["Levels run through 1.OG and 2.OG. The technical floors sit between them."])).toEqual({
+      lead: "Levels run through 1.OG and 2.OG.",
+      more: ["The technical floors sit between them."],
+    });
   });
 
   it("builds the hero line from the construction span", () => {

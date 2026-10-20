@@ -100,6 +100,8 @@ describe("plan set", () => {
     expect(html).toContain("Ninety-four intakes.");
     expect(html).toContain("Read the full explanation");
     expect(html).toContain('href="#why-pipes"');
+    expect(html).toContain("See sheet A-02");
+    expect(html).toContain('href="#sheet-a02"');
     expect(html).toContain("Concept illustration");
     expect(html).not.toContain("—");
   });

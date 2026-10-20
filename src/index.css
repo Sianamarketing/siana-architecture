@@ -651,3 +651,19 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+.why-more > summary {
+  list-style: none;
+}
+.why-more > summary::-webkit-details-marker {
+  display: none;
+}
+.why-more > summary .why-less {
+  display: none;
+}
+.why-more[open] > summary .why-more-label {
+  display: none;
+}
+.why-more[open] > summary .why-less {
+  display: inline;
+}

@@ -48,6 +48,36 @@ function sheetCode(index) {
   return `A-${String(index + 1).padStart(2, "0")}`;
 }
 
+function orderedPlanGraphics(graphics, sections) {
+  const list = Array.isArray(graphics) ? graphics : [];
+  const posters = list.filter((graphic) => graphic.kind === "poster" || graphic.downloadable);
+  const poster = posters[0] || null;
+  const drawings = list.filter((graphic) => !posters.includes(graphic));
+  const order = (sections || []).map((section) => section.graphic_slug || section.graphicSlug).filter(Boolean);
+  drawings.sort((a, b) => {
+    const ai = a.slug ? order.indexOf(a.slug) : -1;
+    const bi = b.slug ? order.indexOf(b.slug) : -1;
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+  return poster ? [poster, ...drawings] : drawings;
+}
+
+function sheetBySlug(graphics, sections) {
+  const map = new Map();
+  orderedPlanGraphics(graphics, sections).forEach((graphic, index) => {
+    const posterSheet = graphic.kind === "poster" || graphic.downloadable;
+    if (posterSheet || !graphic.slug) return;
+    map.set(graphic.slug, {
+      code: sheetCode(index),
+      id: `sheet-a${String(index + 1).padStart(2, "0")}`,
+    });
+  });
+  return map;
+}
+
 function overviewFrom(project) {
   const why = project?.why_section && typeof project.why_section === "object" && !Array.isArray(project.why_section)
     ? project.why_section
@@ -66,21 +96,9 @@ function overviewFrom(project) {
 
 /** Crawlable plan set. The viewer animates these same titles and paragraphs. */
 export function planSetHtml(projectName, graphics, sections, overview = {}) {
-  const list = Array.isArray(graphics) ? graphics : [];
-  const posters = list.filter((graphic) => graphic.kind === "poster" || graphic.downloadable);
-  const poster = posters[0] || null;
-  const drawings = list.filter((graphic) => !posters.includes(graphic));
-  const order = (sections || []).map((section) => section.graphic_slug || section.graphicSlug).filter(Boolean);
-  drawings.sort((a, b) => {
-    const ai = a.slug ? order.indexOf(a.slug) : -1;
-    const bi = b.slug ? order.indexOf(b.slug) : -1;
-    if (ai === -1 && bi === -1) return 0;
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
-  const sequence = poster ? [poster, ...drawings] : drawings;
+  const sequence = orderedPlanGraphics(graphics, sections);
   if (!sequence.length) return "";
+  const poster = sequence.find((graphic) => graphic.kind === "poster" || graphic.downloadable) || null;
   const items = sequence.map((graphic, index) => {
     const code = sheetCode(index);
     const id = `sheet-a${String(index + 1).padStart(2, "0")}`;
@@ -140,10 +158,14 @@ export function buildingContentHtml(project, related = {}) {
   if (sections.length) {
     bits.push(`<h2>Why it looks like this</h2>`);
     if (why?.intro) bits.push(`<p>${esc(why.intro)}</p>`);
+    const sheets = sheetBySlug(graphics, sections);
     for (const section of sections) {
       if (section?.heading) bits.push(`<h3>${esc(section.heading)}</h3>`);
       const body = Array.isArray(section?.paragraphs) ? section.paragraphs.filter(Boolean) : [];
       for (const paragraph of body) bits.push(`<p>${esc(paragraph)}</p>`);
+      const slug = section?.graphic_slug || section?.graphicSlug;
+      const sheet = slug ? sheets.get(slug) : null;
+      if (sheet) bits.push(`<a href="#${sheet.id}">See sheet ${esc(sheet.code)}</a>`);
     }
   }
 

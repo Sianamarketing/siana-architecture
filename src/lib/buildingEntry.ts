@@ -103,6 +103,19 @@ export function paragraphsOf(value: string | null | undefined): string[] {
     .filter(Boolean);
 }
 
+/** The part opens on its first paragraph. Later paragraphs stay in the page behind Read more. */
+export function whyLead(paragraphs: string[]): { lead: string; more: string[] } {
+  const body = paragraphs.map((paragraph) => paragraph.trim()).filter(Boolean);
+  if (body.length === 0) return { lead: "", more: [] };
+  if (body.length > 1) return { lead: body[0], more: body.slice(1) };
+  const text = body[0];
+  const match = text.match(/^([\s\S]+?[.!?])\s+(?=[A-ZÄÖÜ])/);
+  if (!match) return { lead: text, more: [] };
+  const rest = text.slice(match[0].length).trim();
+  if (!rest) return { lead: text, more: [] };
+  return { lead: match[1], more: [rest] };
+}
+
 export function formatThousands(n: number): string {
   return Math.round(n)
     .toString()

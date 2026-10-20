@@ -54,6 +54,8 @@ export interface BuildingGraphic {
   downloadable: boolean;
   downloadPath: string | null;
   downloadLabel: string | null;
+  /** Terracotta menu card. The plain diagram stays on `storagePath` / `svgPath`. */
+  cardPath?: string | null;
 }
 
 export interface BuildingLink {
@@ -340,6 +342,83 @@ export function heroMeta(
   return parts.length ? parts.join(" · ") : null;
 }
 
+export interface GlanceItem {
+  label: string;
+  value: string;
+}
+
+function glanceMeasure(value: unknown): string | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  const rounded = value >= 100 ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${rounded} m`;
+}
+
+function shortArchitect(stats: unknown, project?: FallbackFacts): string | null {
+  if (project?.architect?.trim()) return project.architect.trim();
+  const value = asStats(stats).architects?.value;
+  if (Array.isArray(value)) {
+    const names = value
+      .map((item) => String(item).replace(/\s*\([^)]*\)/g, "").trim())
+      .filter(Boolean);
+    return names.length ? names.join(", ") : null;
+  }
+  return lines(value);
+}
+
+function shortHeritage(stats: unknown, project?: FallbackFacts): string | null {
+  const s = asStats(stats);
+  const raw = lines(s.heritage_status?.value) || project?.heritage_status || null;
+  if (!raw) return null;
+  const name = raw.split("(")[0].split(",")[0].trim();
+  const listed = typeof s.year_listed?.value === "number" ? s.year_listed.value : project?.year_listed;
+  return listed ? `${name}, ${listed}` : name;
+}
+
+/** Four to six short facts for the strip under the hero. Older projects use whatever columns they have. */
+export function glanceItems(stats: unknown, project?: FallbackFacts): GlanceItem[] {
+  const s = asStats(stats);
+  const start = yearOf(s.construction_start);
+  const end = yearOf(s.completion) ?? project?.year_completed ?? null;
+  const years = start && end ? `${start}–${end}` : end ? String(end) : null;
+  const candidates: GlanceItem[] = [];
+  const add = (label: string, value: string | null | undefined) => {
+    const clean = value?.replace(/\s+/g, " ").trim();
+    if (!clean) return;
+    candidates.push({ label, value: clean });
+  };
+  add("Architect", shortArchitect(stats, project));
+  add("Years", years);
+  add("Length", glanceMeasure(s.length_m?.value));
+  add("Height", glanceMeasure(s.height_m?.value));
+  add("Heritage", shortHeritage(stats, project));
+  add("Condition", lines(s.condition?.value) || project?.condition || null);
+  add("Style", lines(s.style?.value) || project?.style || null);
+  add("Floors", lines(s.floors?.value));
+  add("Category", project?.category || null);
+  const seen = new Set<string>();
+  return candidates.filter((item) => {
+    if (seen.has(item.label)) return false;
+    seen.add(item.label);
+    return true;
+  }).slice(0, 6);
+}
+
+/** First paragraph stays visible; the rest can collapse. HTML keeps its tags. */
+export function splitProse(value: string | null | undefined): { lead: string; rest: string; html: boolean } {
+  const html = isHtml(value);
+  if (!value || !value.trim()) return { lead: "", rest: "", html };
+  if (html) {
+    const matches = value.match(/<p\b[^>]*>[\s\S]*?<\/p>/gi);
+    if (matches && matches.length > 1) {
+      return { lead: matches[0], rest: value.slice(value.indexOf(matches[0]) + matches[0].length).trim(), html: true };
+    }
+    return { lead: value.trim(), rest: "", html: true };
+  }
+  const parts = paragraphsOf(value);
+  if (parts.length <= 1) return { lead: parts[0] || "", rest: "", html: false };
+  return { lead: parts[0], rest: parts.slice(1).join("\n\n"), html: false };
+}
+
 export function parseFacts(facts: unknown): string[] {
   if (!Array.isArray(facts)) return [];
   return facts
@@ -502,6 +581,7 @@ interface DbGraphic {
   downloadable: boolean;
   download_path: string | null;
   download_label: string | null;
+  card_path?: string | null;
   position: number;
 }
 
@@ -520,6 +600,7 @@ export function graphicsFromRows(rows: DbGraphic[] | null | undefined): Building
       downloadable: row.downloadable,
       downloadPath: row.download_path,
       downloadLabel: row.download_label,
+      cardPath: row.card_path ?? null,
     }));
 }
 

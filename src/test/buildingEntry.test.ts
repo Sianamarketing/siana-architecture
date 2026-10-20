@@ -1,15 +1,18 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { buildingContentHtml } from "../../scripts/buildingPrerender.mjs";
 import {
   buildStatRows,
   collectImages,
+  glanceItems,
   groupLinks,
   heroMeta,
   parseFacts,
   parseWhy,
   posterGraphic,
   resolveMediaUrl,
+  splitProse,
   type BuildingGraphic,
   type BuildingLink,
 } from "@/lib/buildingEntry";
@@ -21,6 +24,7 @@ const seedSql = readFileSync(
 
 describe("Mäusebunker seed", () => {
   it("places the pin on the published coordinates", () => {
+    expect(seedSql).toContain("/buildings/maeusebunker/menu/the-shape.png");
     expect(seedSql).toContain("52.436778");
     expect(seedSql).toContain("13.317075");
   });
@@ -141,6 +145,78 @@ describe("building entry helpers", () => {
       { id: "p", slug: "poster", kind: "poster", storagePath: "/poster.png", svgPath: null, alt: "Poster", caption: null, downloadable: true, downloadPath: "/poster.pdf", downloadLabel: "PDF" },
     ];
     expect(posterGraphic(graphics)?.downloadPath).toBe("/poster.pdf");
+  });
+
+  it("keeps the glance strip to six short facts", () => {
+    const items = glanceItems(
+      {
+        architects: { value: ["Gerd Hänska (1927–1996)", "Magdalena Hänska (1924–1986)"] },
+        construction_start: { value: 1971 },
+        completion: { year: 1982, value: "February 1982" },
+        length_m: { value: 117.35 },
+        height_m: { value: 23.7 },
+        heritage_status: { value: "Baudenkmal (listed monument), Obj.-Dok.-Nr. 09070102" },
+        year_listed: { value: 2023 },
+        condition: { value: "Vacant" },
+        style: { value: "Brutalist" },
+      },
+      { architect: "Gerd Hänska, Magdalena Hänska, with Kurt Schmersow", year_completed: 1981 },
+    );
+    expect(items.map((item) => item.label)).toEqual(["Architect", "Years", "Length", "Height", "Heritage", "Condition"]);
+    expect(items[0].value).toBe("Gerd Hänska, Magdalena Hänska, with Kurt Schmersow");
+    expect(items[1].value).toBe("1971–1982");
+    expect(items[2].value).toBe("117 m");
+    expect(items[3].value).toBe("23.7 m");
+    expect(items[4].value).toBe("Baudenkmal, 2023");
+    expect(items).toHaveLength(6);
+  });
+
+  it("falls back to a short glance when a building has no stats sheet", () => {
+    expect(glanceItems({}, { architect: "Álvaro Siza", year_completed: 1999, style: "Contemporary", category: "Museum" }).map((item) => item.label)).toEqual([
+      "Architect",
+      "Years",
+      "Style",
+      "Category",
+    ]);
+    expect(glanceItems(null, {})).toEqual([]);
+  });
+
+  it("splits a long story after the first paragraph", () => {
+    expect(splitProse("First.\n\nSecond.\n\nThird.")).toEqual({ lead: "First.", rest: "Second.\n\nThird.", html: false });
+    expect(splitProse("<p>Only</p>").rest).toBe("");
+    expect(splitProse("<p>One</p><p>Two</p>").rest).toContain("Two");
+    expect(splitProse("")).toEqual({ lead: "", rest: "", html: false });
+  });
+
+  it("prerenders the full entry, including the sections the page collapses", () => {
+    const html = buildingContentHtml(
+      {
+        name: "Mäusebunker",
+        tagline: "Zentrale Tierlaboratorien",
+        architect: "Gerd Hänska",
+        year_completed: 1982,
+        tldr: "A sealed concrete lab.",
+        siana_pick: "Walk the canal path.",
+        description: "First paragraph.\n\nSecond paragraph.",
+        analysis: "<p>The analysis.</p>",
+        curious_facts: ["The nickname stuck."],
+        why_section: { intro: "The brief shows.", sections: [{ heading: "The blue pipes", paragraphs: ["Ninety-four intakes."] }] },
+        stats: { construction_stop: { value: "Stopped in autumn 1975" }, events: [{ value: "1982: opening" }] },
+      },
+      {
+        images: [{ caption: "Flank", author: "Leonhard Lenz", license: "CC0", source_url: "https://commons.wikimedia.org/wiki/File:Example" }],
+        links: [{ title: "Denkmaldatenbank", url: "https://example.com/denkmal" }],
+        graphics: [{ kind: "diagram", caption: "The cross-section" }, { kind: "poster", caption: "Field guide" }],
+      },
+    );
+    expect(html).toContain("A sealed concrete lab.");
+    expect(html).toContain("Second paragraph.");
+    expect(html).toContain("The analysis.");
+    expect(html).toContain("The blue pipes");
+    expect(html).toContain("Stopped in autumn 1975");
+    expect(html).toContain("Leonhard Lenz");
+    expect(html).toContain("Denkmaldatenbank");
+    expect(html).toContain("Field guide");
   });
 
   it("builds the hero line from the construction span", () => {

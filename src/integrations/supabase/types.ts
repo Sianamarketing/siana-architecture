@@ -421,6 +421,7 @@ export type Database = {
           alt: string | null
           caption: string | null
           created_at: string
+          card_path: string | null
           download_label: string | null
           download_path: string | null
           downloadable: boolean
@@ -435,6 +436,7 @@ export type Database = {
         Insert: {
           alt?: string | null
           caption?: string | null
+          card_path?: string | null
           created_at?: string
           download_label?: string | null
           download_path?: string | null
@@ -450,6 +452,7 @@ export type Database = {
         Update: {
           alt?: string | null
           caption?: string | null
+          card_path?: string | null
           created_at?: string
           download_label?: string | null
           download_path?: string | null

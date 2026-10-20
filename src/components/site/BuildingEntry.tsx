@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import EditorialButton from "@/components/site/EditorialButton";
+import PlanSet from "@/components/site/PlanSet";
 import Reveal from "@/components/site/Reveal";
 import RichHtml from "@/components/site/RichHtml";
 import {
@@ -552,18 +553,6 @@ function ReadingHub({ groups }: { groups: LinkGroup[] }) {
   );
 }
 
-function menuCards(graphics: BuildingGraphic[], slugs: string[]): BuildingGraphic[] {
-  const cards = graphics.filter((graphic) => graphic.cardPath && graphic.kind !== "poster" && graphic.slug);
-  return cards.slice().sort((a, b) => {
-    const ai = slugs.indexOf(a.slug || "");
-    const bi = slugs.indexOf(b.slug || "");
-    if (ai === -1 && bi === -1) return 0;
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
-  });
-}
-
 export default function BuildingEntry({
   project,
   imageRows,
@@ -596,7 +585,6 @@ export default function BuildingEntry({
   const poster = posterGraphic(graphics);
   const meta = heroMeta(project, project.stats);
   const glance = glanceItems(project.stats, project);
-  const cards = menuCards(graphics, why.sections.map((section) => section.graphicSlug || ""));
   const [active, setActive] = useState<number | null>(null);
   const navRef = useRef<HTMLElement>(null);
 
@@ -764,33 +752,12 @@ export default function BuildingEntry({
         </section>
       )}
 
-      {cards.length > 0 && (
-        <section aria-label="Diagram cards" className="py-10 md:py-14">
-          <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-            <p className="font-mono uppercase text-warm-gray mb-4" style={{ fontSize: 11, letterSpacing: "0.16em" }}>
-              Swipe the cards. Each one opens its explanation.
-            </p>
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
-              {cards.map((card) => {
-                const heading = why.sections.find((section) => section.graphicSlug === card.slug)?.heading;
-                const href = heading ? `#why-${card.slug}` : "#why";
-                const src = resolveMediaUrl(card.cardPath, { supabaseUrl });
-                if (!src) return null;
-                return (
-                  <a
-                    key={card.id}
-                    href={href}
-                    onClick={jump(href.slice(1))}
-                    className="snap-start shrink-0 w-[210px] sm:w-[240px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
-                  >
-                    <img src={src} alt={heading || card.alt || ""} className="block w-full h-auto" />
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
+      <PlanSet
+        projectName={project.name}
+        graphics={graphics}
+        sections={why.sections}
+        supabaseUrl={supabaseUrl}
+      />
 
       {hasText(project.siana_pick) && (
         <section className="bg-background py-12 md:py-16">

@@ -44,6 +44,42 @@ const STAT_LABELS = [
   ["address", "Address"],
 ];
 
+function sheetCode(index) {
+  return `A-${String(index + 1).padStart(2, "0")}`;
+}
+
+/** Crawlable plan set. The viewer animates these same titles and paragraphs. */
+export function planSetHtml(projectName, graphics, sections) {
+  const list = Array.isArray(graphics) ? graphics : [];
+  const posters = list.filter((graphic) => graphic.kind === "poster" || graphic.downloadable);
+  const poster = posters[0] || null;
+  const drawings = list.filter((graphic) => !posters.includes(graphic));
+  const order = (sections || []).map((section) => section.graphic_slug || section.graphicSlug).filter(Boolean);
+  drawings.sort((a, b) => {
+    const ai = a.slug ? order.indexOf(a.slug) : -1;
+    const bi = b.slug ? order.indexOf(b.slug) : -1;
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+  const sequence = poster ? [...drawings, poster] : drawings;
+  if (!sequence.length) return "";
+  const items = sequence.map((graphic, index) => {
+    const code = sheetCode(index);
+    const id = `sheet-a${String(index + 1).padStart(2, "0")}`;
+    const section = graphic.slug ? (sections || []).find((item) => (item.graphic_slug || item.graphicSlug) === graphic.slug) : null;
+    const posterSheet = graphic === poster;
+    const title = posterSheet ? "Field guide" : section?.heading || graphic.caption || graphic.alt || "Drawing";
+    const paragraphs = Array.isArray(section?.paragraphs) && section.paragraphs.length
+      ? section.paragraphs
+      : [graphic.caption || graphic.alt || ""].filter(Boolean);
+    const why = !posterSheet && graphic.slug && section ? `#why-${graphic.slug}` : "";
+    return `<li id="${id}"><h3>${esc(code)} ${esc(title)}</h3>${paragraphs.map((paragraph) => `<p>${esc(paragraph)}</p>`).join("")}${why ? `<a href="${esc(why)}">Read the full explanation</a>` : ""}${posterSheet ? `<p>Download the poster</p>` : ""}<p>${esc(projectName)}. Siana Architecture. NTS. Concept illustration.</p></li>`;
+  });
+  return `<h2>Plan set</h2><ol>${items.join("")}</ol>`;
+}
+
 export function buildingContentHtml(project, related = {}) {
   const images = related.images || [];
   const links = related.links || [];
@@ -75,6 +111,9 @@ export function buildingContentHtml(project, related = {}) {
   if (facts.length) {
     bits.push(`<h2>Worth knowing</h2><ul>${facts.map((fact) => `<li>${esc(fact)}</li>`).join("")}</ul>`);
   }
+
+  const plan = planSetHtml(project.name, graphics, sections);
+  if (plan) bits.push(plan);
 
   if (sections.length) {
     bits.push(`<h2>Why it looks like this</h2>`);
@@ -108,7 +147,7 @@ export function buildingContentHtml(project, related = {}) {
       const credit = [image.author, image.license].filter(Boolean).join(", ");
       const label = esc(image.caption || image.alt || "Photograph");
       const source = image.source_url ? ` <a href="${esc(image.source_url)}">source</a>` : "";
-      return `<li>${label}${credit ? ` — ${esc(credit)}` : ""}${source}</li>`;
+      return `<li>${label}${credit ? `, ${esc(credit)}` : ""}${source}</li>`;
     }).join("")}</ul>`);
   }
 

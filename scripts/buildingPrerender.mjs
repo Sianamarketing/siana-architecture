@@ -48,8 +48,24 @@ function sheetCode(index) {
   return `A-${String(index + 1).padStart(2, "0")}`;
 }
 
+function overviewFrom(project) {
+  const why = project?.why_section && typeof project.why_section === "object" && !Array.isArray(project.why_section)
+    ? project.why_section
+    : {};
+  const overview = why.overview && typeof why.overview === "object" ? why.overview : {};
+  const intro = typeof overview.intro === "string" && overview.intro.trim()
+    ? overview.intro.trim()
+    : typeof project?.tldr === "string" && project.tldr.trim()
+      ? project.tldr.trim()
+      : "";
+  const facts = Array.isArray(overview.facts)
+    ? overview.facts.filter((fact) => fact && typeof fact.label === "string" && typeof fact.value === "string" && fact.label.trim() && fact.value.trim())
+    : [];
+  return { intro, facts };
+}
+
 /** Crawlable plan set. The viewer animates these same titles and paragraphs. */
-export function planSetHtml(projectName, graphics, sections) {
+export function planSetHtml(projectName, graphics, sections, overview = {}) {
   const list = Array.isArray(graphics) ? graphics : [];
   const posters = list.filter((graphic) => graphic.kind === "poster" || graphic.downloadable);
   const poster = posters[0] || null;
@@ -63,19 +79,25 @@ export function planSetHtml(projectName, graphics, sections) {
     if (bi === -1) return -1;
     return ai - bi;
   });
-  const sequence = poster ? [...drawings, poster] : drawings;
+  const sequence = poster ? [poster, ...drawings] : drawings;
   if (!sequence.length) return "";
   const items = sequence.map((graphic, index) => {
     const code = sheetCode(index);
     const id = `sheet-a${String(index + 1).padStart(2, "0")}`;
     const section = graphic.slug ? (sections || []).find((item) => (item.graphic_slug || item.graphicSlug) === graphic.slug) : null;
     const posterSheet = graphic === poster;
-    const title = posterSheet ? "Field guide" : section?.heading || graphic.caption || graphic.alt || "Drawing";
-    const paragraphs = Array.isArray(section?.paragraphs) && section.paragraphs.length
-      ? section.paragraphs
-      : [graphic.caption || graphic.alt || ""].filter(Boolean);
+    const title = posterSheet ? "Overview" : section?.heading || graphic.caption || graphic.alt || "Drawing";
+    const paragraphs = posterSheet
+      ? String(overview.intro || graphic.caption || graphic.alt || "").split(/\n{2,}/).map((line) => line.trim()).filter(Boolean)
+      : Array.isArray(section?.paragraphs) && section.paragraphs.length
+        ? section.paragraphs
+        : [graphic.caption || graphic.alt || ""].filter(Boolean);
+    const facts = posterSheet && Array.isArray(overview.facts) ? overview.facts : [];
+    const factHtml = facts.length
+      ? `<dl>${facts.map((fact) => `<dt>${esc(fact.label)}</dt><dd>${esc(fact.value)}</dd>`).join("")}</dl>`
+      : "";
     const why = !posterSheet && graphic.slug && section ? `#why-${graphic.slug}` : "";
-    return `<li id="${id}"><h3>${esc(code)} ${esc(title)}</h3>${paragraphs.map((paragraph) => `<p>${esc(paragraph)}</p>`).join("")}${why ? `<a href="${esc(why)}">Read the full explanation</a>` : ""}${posterSheet ? `<p>Download the poster</p>` : ""}<p>${esc(projectName)}. Siana Architecture. NTS. Concept illustration.</p></li>`;
+    return `<li id="${id}"><h3>${esc(code)} ${esc(title)}</h3>${paragraphs.map((paragraph) => `<p>${esc(paragraph)}</p>`).join("")}${factHtml}${why ? `<a href="${esc(why)}">Read the full explanation</a>` : ""}${posterSheet ? `<p>Download the poster</p>` : ""}<p>${esc(projectName)}. Siana Architecture. NTS. Concept illustration.</p></li>`;
   });
   return `<h2>Plan set</h2><ol>${items.join("")}</ol>`;
 }
@@ -112,7 +134,7 @@ export function buildingContentHtml(project, related = {}) {
     bits.push(`<h2>Worth knowing</h2><ul>${facts.map((fact) => `<li>${esc(fact)}</li>`).join("")}</ul>`);
   }
 
-  const plan = planSetHtml(project.name, graphics, sections);
+  const plan = planSetHtml(project.name, graphics, sections, overviewFrom(project));
   if (plan) bits.push(plan);
 
   if (sections.length) {

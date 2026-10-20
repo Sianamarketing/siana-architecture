@@ -15,9 +15,11 @@ import {
   hasText,
   heroMeta,
   isHtml,
+  overviewFacts,
   paragraphsOf,
   parseFacts,
   parseWhy,
+  planOverview,
   posterGraphic,
   resolveMediaUrl,
   splitProse,
@@ -580,6 +582,11 @@ export default function BuildingEntry({
   );
   const facts = parseFacts(project.curious_facts);
   const why = parseWhy(project.why_section);
+  const writtenOverview = planOverview(project.why_section, project.tldr);
+  const planSetOverview = {
+    intro: writtenOverview.intro,
+    facts: writtenOverview.facts ?? overviewFacts(project.stats, { ...project, city: project.city?.name ?? null }),
+  };
   const stats = buildStatRows(project.stats, project);
   const events = statEvents(project.stats);
   const poster = posterGraphic(graphics);
@@ -756,6 +763,7 @@ export default function BuildingEntry({
         projectName={project.name}
         graphics={graphics}
         sections={why.sections}
+        overview={planSetOverview}
         supabaseUrl={supabaseUrl}
       />
 

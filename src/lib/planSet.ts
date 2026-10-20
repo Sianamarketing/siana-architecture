@@ -1,4 +1,4 @@
-import type { BuildingGraphic, WhyBlock } from "@/lib/buildingEntry";
+import type { BuildingGraphic, PlanFact, WhyBlock } from "@/lib/buildingEntry";
 
 export interface PlanSheet {
   /** `sheet-a01`. Stable deep-link id. */
@@ -13,6 +13,12 @@ export interface PlanSheet {
   poster: boolean;
   downloadPath: string | null;
   downloadLabel: string | null;
+  facts: PlanFact[];
+}
+
+export interface PlanOverviewInput {
+  intro?: string | null;
+  facts?: PlanFact[] | null;
 }
 
 export function sheetCode(index: number): string {
@@ -40,13 +46,21 @@ function isPoster(graphic: BuildingGraphic): boolean {
   return graphic.kind === "poster" || graphic.downloadable;
 }
 
+function proseLines(value: string | null | undefined): string[] {
+  return String(value || "")
+    .split(/\n{2,}/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 /**
- * One sheet per diagram, poster last. Order follows the "Why it looks like this"
- * sequence when a graphic is linked, then the stored position.
+ * The poster opens the set as A-01 when a building has one. Drawings follow,
+ * in the "Why it looks like this" order, then the stored position.
  */
 export function buildPlanSheets(
   graphics: BuildingGraphic[],
   sections: WhyBlock[],
+  overview?: PlanOverviewInput | null,
 ): PlanSheet[] {
   const posters = graphics.filter(isPoster);
   const poster = posters[0] ?? null;
@@ -60,17 +74,19 @@ export function buildPlanSheets(
     if (bi === -1) return -1;
     return ai - bi;
   });
-  const sequence = poster ? [...sorted, poster] : sorted;
+  const sequence = poster ? [poster, ...sorted] : sorted;
   const sheets: PlanSheet[] = [];
   sequence.forEach((graphic) => {
     const section = graphic.slug ? sections.find((item) => item.graphicSlug === graphic.slug) : undefined;
     const posterSheet = isPoster(graphic);
     const title = posterSheet
-      ? "Field guide"
+      ? "Overview"
       : section?.heading || graphic.caption || graphic.alt || "Drawing";
-    const paragraphs = section?.paragraphs?.length
-      ? section.paragraphs
-      : [graphic.caption || graphic.alt || ""].map((line) => line.trim()).filter(Boolean);
+    const paragraphs = posterSheet
+      ? proseLines(overview?.intro || graphic.caption || graphic.alt || "")
+      : section?.paragraphs?.length
+        ? section.paragraphs
+        : [graphic.caption || graphic.alt || ""].map((line) => line.trim()).filter(Boolean);
     const imagePath = imagePathOf(graphic);
     if (!imagePath && paragraphs.length === 0 && !graphic.downloadPath) return;
     const index = sheets.length;
@@ -84,6 +100,7 @@ export function buildPlanSheets(
       poster: posterSheet,
       downloadPath: posterSheet ? graphic.downloadPath : null,
       downloadLabel: posterSheet ? graphic.downloadLabel : null,
+      facts: posterSheet ? overview?.facts ?? [] : [],
     });
   });
   return sheets;

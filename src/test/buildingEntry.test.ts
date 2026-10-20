@@ -34,6 +34,11 @@ describe("Mäusebunker seed", () => {
     expect(seedSql).toContain("1976 to 1978");
     expect(seedSql).not.toContain("1976-01-01 to 1977-12-31");
     expect(seedSql.toLowerCase()).not.toContain("stopped 1976");
+    expect(seedSql.toLowerCase()).not.toContain("plant floor");
+    expect(seedSql).not.toContain("fresh-air plants");
+    expect(seedSql).toContain("technical floor");
+    expect(seedSql).toContain("air-handling units");
+    expect(seedSql).toContain("Berlin-Lichterfelde");
   });
 });
 

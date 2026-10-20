@@ -419,6 +419,64 @@ export function splitProse(value: string | null | undefined): { lead: string; re
   return { lead: parts[0], rest: parts.slice(1).join("\n\n"), html: false };
 }
 
+export interface PlanFact {
+  label: string;
+  value: string;
+}
+
+/** Short facts for the poster sheet. An editor can override these on why_section.overview.facts. */
+export function overviewFacts(stats: unknown, project?: FallbackFacts & { city?: string | null }): PlanFact[] {
+  const s = asStats(stats);
+  const facts: PlanFact[] = [];
+  const architectList = s.architects?.value;
+  const architects = Array.isArray(architectList)
+    ? architectList.map((item) => String(item).replace(/\s*\([^)]*\)/g, "").trim()).filter(Boolean).join(", ")
+    : lines(architectList) || project?.architect?.trim() || null;
+  if (architects) facts.push({ label: "Architects", value: architects });
+  const start = yearOf(s.construction_start);
+  const end = yearOf(s.completion) ?? project?.year_completed ?? null;
+  if (start && end) facts.push({ label: "Built", value: `${start}–${end}` });
+  else if (end) facts.push({ label: "Built", value: String(end) });
+  const style = lines(s.style?.value) || project?.style || null;
+  if (style) facts.push({ label: "Style", value: style });
+  const district = lines(s.district?.value);
+  const locality = district ? district.split(",")[0].trim() : null;
+  const city = project?.city?.trim() || null;
+  const location = city && locality ? `${city}-${locality}` : city || locality || lines(s.address?.value) || project?.address || null;
+  if (location) facts.push({ label: "Location", value: location });
+  return facts;
+}
+
+function factsFromOverview(value: unknown): PlanFact[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const label = "label" in item && typeof item.label === "string" ? item.label.trim() : "";
+      const factValue = "value" in item && typeof item.value === "string" ? item.value.trim() : "";
+      return label && factValue ? { label, value: factValue } : null;
+    })
+    .filter((item): item is PlanFact => Boolean(item));
+}
+
+/**
+ * Copy for the poster sheet. why_section.overview wins when an editor has written it.
+ * Otherwise the sheet uses the TL;DR and the measured facts, so a building with no extra field still opens.
+ */
+export function planOverview(
+  why: unknown,
+  tldr?: string | null,
+): { intro: string | null; facts: PlanFact[] | null } {
+  const record = why && typeof why === "object" && !Array.isArray(why) ? why as { overview?: unknown } : null;
+  const overview = record?.overview && typeof record.overview === "object"
+    ? record.overview as { intro?: unknown; facts?: unknown }
+    : null;
+  const customIntro = typeof overview?.intro === "string" && overview.intro.trim() ? overview.intro.trim() : null;
+  const intro = customIntro || (typeof tldr === "string" && tldr.trim() ? tldr.trim() : null);
+  const facts = factsFromOverview(overview?.facts);
+  return { intro, facts: facts.length ? facts : null };
+}
+
 export function parseFacts(facts: unknown): string[] {
   if (!Array.isArray(facts)) return [];
   return facts

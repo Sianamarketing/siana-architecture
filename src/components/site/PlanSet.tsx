@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import EditorialButton from "@/components/site/EditorialButton";
 import { resolveMediaUrl, type BuildingGraphic, type WhyBlock } from "@/lib/buildingEntry";
-import { buildPlanSheets, sheetIndexFromHash, type PlanSheet } from "@/lib/planSet";
+import { buildPlanSheets, sheetIndexFromHash, type PlanOverviewInput, type PlanSheet } from "@/lib/planSet";
 
 const serif = "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif";
 
@@ -75,6 +75,20 @@ function NotesFace({ sheet, downloadUrl, headingId, contained }: { sheet: PlanSh
           </p>
         ))}
       </div>
+      {sheet.facts.length > 0 && (
+        <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4">
+          {sheet.facts.map((fact) => (
+            <div key={fact.label}>
+              <dt className="font-mono uppercase text-warm-gray" style={{ fontSize: 10, letterSpacing: "0.16em" }}>
+                {fact.label}
+              </dt>
+              <dd className="mt-1 font-mono text-ink" style={{ fontSize: 13, letterSpacing: "0.02em", lineHeight: 1.35 }}>
+                {fact.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
       <div className="mt-6 flex flex-col items-start gap-4">
         {sheet.whyHash && (
           <a href={`#${sheet.whyHash}`} className="font-mono uppercase text-ink border-b border-ink/40 hover:border-ink pb-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
@@ -95,14 +109,16 @@ export default function PlanSet({
   projectName,
   graphics,
   sections,
+  overview,
   supabaseUrl,
 }: {
   projectName: string;
   graphics: BuildingGraphic[];
   sections: WhyBlock[];
+  overview?: PlanOverviewInput | null;
   supabaseUrl?: string | null;
 }) {
-  const sheets = useMemo(() => buildPlanSheets(graphics, sections), [graphics, sections]);
+  const sheets = useMemo(() => buildPlanSheets(graphics, sections, overview), [graphics, sections, overview]);
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const desktop = useMedia("(min-width: 768px)");
   const [index, setIndex] = useState(0);

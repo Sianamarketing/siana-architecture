@@ -25,6 +25,8 @@ type AnchorProps = CommonProps & {
   href: string;
   /** Set "_blank" for an off-site link so the reader keeps their place here. */
   target?: string;
+  /** When set, the browser downloads the file instead of navigating. A string is the suggested filename. */
+  download?: boolean | string;
   to?: never;
   onClick?: never;
   type?: never;
@@ -102,10 +104,12 @@ export default function EditorialButton(props: EditorialButtonProps) {
   }
   if ("href" in props && props.href) {
     const target = (props as AnchorProps).target;
+    const download = (props as AnchorProps).download;
     return (
       <a
         href={props.href}
         target={target}
+        download={download === true ? "" : download || undefined}
         // Required with _blank: without it the opened page can reach back
         // through window.opener.
         rel={target === "_blank" ? "noopener noreferrer" : undefined}

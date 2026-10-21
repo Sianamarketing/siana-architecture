@@ -54,6 +54,8 @@ export interface BuildingGraphic {
   downloadable: boolean;
   downloadPath: string | null;
   downloadLabel: string | null;
+  /** Terracotta menu card. The plain diagram stays on `storagePath` / `svgPath`. */
+  cardPath?: string | null;
 }
 
 export interface BuildingLink {
@@ -99,6 +101,19 @@ export function paragraphsOf(value: string | null | undefined): string[] {
     .split(/\n{2,}/)
     .map((p) => p.trim())
     .filter(Boolean);
+}
+
+/** The part opens on its first paragraph. Later paragraphs stay in the page behind Read more. */
+export function whyLead(paragraphs: string[]): { lead: string; more: string[] } {
+  const body = paragraphs.map((paragraph) => paragraph.trim()).filter(Boolean);
+  if (body.length === 0) return { lead: "", more: [] };
+  if (body.length > 1) return { lead: body[0], more: body.slice(1) };
+  const text = body[0];
+  const match = text.match(/^([\s\S]+?[.!?])\s+(?=[A-ZÄÖÜ])/);
+  if (!match) return { lead: text, more: [] };
+  const rest = text.slice(match[0].length).trim();
+  if (!rest) return { lead: text, more: [] };
+  return { lead: match[1], more: [rest] };
 }
 
 export function formatThousands(n: number): string {
@@ -340,6 +355,141 @@ export function heroMeta(
   return parts.length ? parts.join(" · ") : null;
 }
 
+export interface GlanceItem {
+  label: string;
+  value: string;
+}
+
+function glanceMeasure(value: unknown): string | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  const rounded = value >= 100 ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${rounded} m`;
+}
+
+function shortArchitect(stats: unknown, project?: FallbackFacts): string | null {
+  if (project?.architect?.trim()) return project.architect.trim();
+  const value = asStats(stats).architects?.value;
+  if (Array.isArray(value)) {
+    const names = value
+      .map((item) => String(item).replace(/\s*\([^)]*\)/g, "").trim())
+      .filter(Boolean);
+    return names.length ? names.join(", ") : null;
+  }
+  return lines(value);
+}
+
+function shortHeritage(stats: unknown, project?: FallbackFacts): string | null {
+  const s = asStats(stats);
+  const raw = lines(s.heritage_status?.value) || project?.heritage_status || null;
+  if (!raw) return null;
+  const name = raw.split("(")[0].split(",")[0].trim();
+  const listed = typeof s.year_listed?.value === "number" ? s.year_listed.value : project?.year_listed;
+  return listed ? `${name}, ${listed}` : name;
+}
+
+/** Four to six short facts for the strip under the hero. Older projects use whatever columns they have. */
+export function glanceItems(stats: unknown, project?: FallbackFacts): GlanceItem[] {
+  const s = asStats(stats);
+  const start = yearOf(s.construction_start);
+  const end = yearOf(s.completion) ?? project?.year_completed ?? null;
+  const years = start && end ? `${start}–${end}` : end ? String(end) : null;
+  const candidates: GlanceItem[] = [];
+  const add = (label: string, value: string | null | undefined) => {
+    const clean = value?.replace(/\s+/g, " ").trim();
+    if (!clean) return;
+    candidates.push({ label, value: clean });
+  };
+  add("Architect", shortArchitect(stats, project));
+  add("Years", years);
+  add("Length", glanceMeasure(s.length_m?.value));
+  add("Height", glanceMeasure(s.height_m?.value));
+  add("Heritage", shortHeritage(stats, project));
+  add("Condition", lines(s.condition?.value) || project?.condition || null);
+  add("Style", lines(s.style?.value) || project?.style || null);
+  add("Floors", lines(s.floors?.value));
+  add("Category", project?.category || null);
+  const seen = new Set<string>();
+  return candidates.filter((item) => {
+    if (seen.has(item.label)) return false;
+    seen.add(item.label);
+    return true;
+  }).slice(0, 6);
+}
+
+/** First paragraph stays visible; the rest can collapse. HTML keeps its tags. */
+export function splitProse(value: string | null | undefined): { lead: string; rest: string; html: boolean } {
+  const html = isHtml(value);
+  if (!value || !value.trim()) return { lead: "", rest: "", html };
+  if (html) {
+    const matches = value.match(/<p\b[^>]*>[\s\S]*?<\/p>/gi);
+    if (matches && matches.length > 1) {
+      return { lead: matches[0], rest: value.slice(value.indexOf(matches[0]) + matches[0].length).trim(), html: true };
+    }
+    return { lead: value.trim(), rest: "", html: true };
+  }
+  const parts = paragraphsOf(value);
+  if (parts.length <= 1) return { lead: parts[0] || "", rest: "", html: false };
+  return { lead: parts[0], rest: parts.slice(1).join("\n\n"), html: false };
+}
+
+export interface PlanFact {
+  label: string;
+  value: string;
+}
+
+/** Short facts for the poster sheet. An editor can override these on why_section.overview.facts. */
+export function overviewFacts(stats: unknown, project?: FallbackFacts & { city?: string | null }): PlanFact[] {
+  const s = asStats(stats);
+  const facts: PlanFact[] = [];
+  const architectList = s.architects?.value;
+  const architects = Array.isArray(architectList)
+    ? architectList.map((item) => String(item).replace(/\s*\([^)]*\)/g, "").trim()).filter(Boolean).join(", ")
+    : lines(architectList) || project?.architect?.trim() || null;
+  if (architects) facts.push({ label: "Architects", value: architects });
+  const start = yearOf(s.construction_start);
+  const end = yearOf(s.completion) ?? project?.year_completed ?? null;
+  if (start && end) facts.push({ label: "Built", value: `${start}–${end}` });
+  else if (end) facts.push({ label: "Built", value: String(end) });
+  const style = lines(s.style?.value) || project?.style || null;
+  if (style) facts.push({ label: "Style", value: style });
+  const district = lines(s.district?.value);
+  const locality = district ? district.split(",")[0].trim() : null;
+  const city = project?.city?.trim() || null;
+  const location = city && locality ? `${city}-${locality}` : city || locality || lines(s.address?.value) || project?.address || null;
+  if (location) facts.push({ label: "Location", value: location });
+  return facts;
+}
+
+function factsFromOverview(value: unknown): PlanFact[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const label = "label" in item && typeof item.label === "string" ? item.label.trim() : "";
+      const factValue = "value" in item && typeof item.value === "string" ? item.value.trim() : "";
+      return label && factValue ? { label, value: factValue } : null;
+    })
+    .filter((item): item is PlanFact => Boolean(item));
+}
+
+/**
+ * Copy for the poster sheet. why_section.overview wins when an editor has written it.
+ * Otherwise the sheet uses the TL;DR and the measured facts, so a building with no extra field still opens.
+ */
+export function planOverview(
+  why: unknown,
+  tldr?: string | null,
+): { intro: string | null; facts: PlanFact[] | null } {
+  const record = why && typeof why === "object" && !Array.isArray(why) ? why as { overview?: unknown } : null;
+  const overview = record?.overview && typeof record.overview === "object"
+    ? record.overview as { intro?: unknown; facts?: unknown }
+    : null;
+  const customIntro = typeof overview?.intro === "string" && overview.intro.trim() ? overview.intro.trim() : null;
+  const intro = customIntro || (typeof tldr === "string" && tldr.trim() ? tldr.trim() : null);
+  const facts = factsFromOverview(overview?.facts);
+  return { intro, facts: facts.length ? facts : null };
+}
+
 export function parseFacts(facts: unknown): string[] {
   if (!Array.isArray(facts)) return [];
   return facts
@@ -502,6 +652,7 @@ interface DbGraphic {
   downloadable: boolean;
   download_path: string | null;
   download_label: string | null;
+  card_path?: string | null;
   position: number;
 }
 
@@ -520,6 +671,7 @@ export function graphicsFromRows(rows: DbGraphic[] | null | undefined): Building
       downloadable: row.downloadable,
       downloadPath: row.download_path,
       downloadLabel: row.download_label,
+      cardPath: row.card_path ?? null,
     }));
 }
 

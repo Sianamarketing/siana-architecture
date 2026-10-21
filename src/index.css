@@ -562,3 +562,108 @@
 .ProseMirror.row-resize-cursor {
   cursor: ns-resize;
 }
+
+/* Plan set: a bound drawing set. The sheet text lives in the articles.
+   The leaf is only the page-turn, and it stays out of the accessibility tree. */
+.plan-book {
+  perspective: 2400px;
+  transform-style: preserve-3d;
+  position: relative;
+  touch-action: pan-y;
+  outline: none;
+}
+.plan-book:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 4px;
+}
+.plan-spread {
+  display: grid;
+  grid-template-columns: 1fr;
+  background: hsl(var(--paper-mid));
+  min-height: 0;
+}
+@media (min-width: 768px) {
+  .plan-spread {
+    grid-template-columns: 1fr 1fr;
+    min-height: 640px;
+  }
+}
+.plan-page {
+  background: hsl(var(--paper));
+  min-width: 0;
+}
+.plan-leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  transform-style: preserve-3d;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: 0 16px 28px hsl(var(--ink) / 0.16);
+}
+.plan-leaf-next {
+  right: 0;
+  transform-origin: left center;
+}
+.plan-leaf-prev {
+  left: 0;
+  transform-origin: right center;
+}
+.plan-leaf-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: hsl(var(--paper));
+}
+.plan-leaf-face > * {
+  height: 100%;
+  overflow: hidden;
+}
+.plan-leaf-back {
+  transform: rotateY(180deg);
+}
+.plan-leaf.is-run.plan-leaf-next {
+  transform: rotateY(-180deg);
+  transition: transform 860ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.plan-leaf.is-run.plan-leaf-prev {
+  transform: rotateY(180deg);
+  transition: transform 860ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@media (max-width: 767px) {
+  .plan-leaf {
+    width: 100%;
+    height: var(--plan-spread-h, 460px);
+    bottom: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-leaf {
+    display: none;
+  }
+  .plan-fade {
+    animation: plan-fade-in 180ms linear;
+  }
+}
+@keyframes plan-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.why-more > summary {
+  list-style: none;
+}
+.why-more > summary::-webkit-details-marker {
+  display: none;
+}
+.why-more > summary .why-less {
+  display: none;
+}
+.why-more[open] > summary .why-more-label {
+  display: none;
+}
+.why-more[open] > summary .why-less {
+  display: inline;
+}

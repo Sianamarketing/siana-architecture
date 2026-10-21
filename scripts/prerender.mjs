@@ -21,6 +21,7 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
+import { buildingContentHtml } from "./buildingPrerender.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -121,11 +122,14 @@ async function main() {
   const template = readFileSync(join(DIST, "index.html"), "utf8");
   const byNewest = (a, b) => (b.published_at ?? "").localeCompare(a.published_at ?? "");
 
-  const [cities, projects, posts, homeRows] = await Promise.all([
+  const [cities, projects, posts, homeRows, projectImages, projectLinks, projectGraphics] = await Promise.all([
     fetchRows("cities?status=eq.published&select=slug,name,country,tagline,hero_image_url&order=name"),
-    fetchRows("projects?status=eq.published&select=slug,name,tagline,architect,practice,year_completed,category,description,hero_image_url,cover_image_url,city:cities(name)&order=name"),
+    fetchRows("projects?status=eq.published&select=id,slug,name,tagline,architect,year_completed,category,style,description,analysis,tldr,siana_pick,curious_facts,why_section,stats,condition,heritage_status,year_listed,meta_title,meta_description,og_image_url,hero_image_url,cover_image_url,address,latitude,longitude,city:cities(name)&order=name"),
     fetchRows("posts?status=eq.published&select=slug,kind,title,excerpt,body,author,category,hero_image_url,published_at&order=published_at.desc"),
     fetchRows("site_pages?key=eq.home&select=content").catch(() => []),
+    fetchRows("project_images?select=project_id,alt,caption,author,license,source_url,position&order=position").catch(() => []),
+    fetchRows("project_links?select=project_id,category,title,url,position&order=position").catch(() => []),
+    fetchRows("project_graphics?select=project_id,slug,kind,alt,caption,downloadable,position&order=position").catch(() => []),
   ]);
   // The home cover: whichever image the editor put first in /admin/home.
   const heroPreload = homeRows?.[0]?.content?.hero?.images?.[0] || null;
@@ -267,22 +271,41 @@ async function main() {
   }
 
   // --- Project detail ---
+  const byProject = (rows) => {
+    const map = new Map();
+    for (const row of rows || []) {
+      const list = map.get(row.project_id) || [];
+      list.push(row);
+      map.set(row.project_id, list);
+    }
+    return map;
+  };
+  const imagesByProject = byProject(projectImages);
+  const linksByProject = byProject(projectLinks);
+  const graphicsByProject = byProject(projectGraphics);
+
   for (const p of projects) {
     const facts = [p.architect, p.year_completed && p.year_completed > 1000 ? p.year_completed : null, p.city?.name].filter(Boolean).join(" · ");
+    const description = p.meta_description || p.tldr || p.tagline || `${p.name}${facts ? " - " + facts : ""}.`;
     write(`/projects/${p.slug}`, renderPage(template, {
       path: `/projects/${p.slug}`,
-      title: `${p.name}${p.architect ? " by " + p.architect : ""} | Siana Architecture`,
-      description: p.tagline || `${p.name}${facts ? " - " + facts : ""}.`,
-      image: p.cover_image_url || p.hero_image_url || OG_DEFAULT,
+      title: p.meta_title || `${p.name}${p.architect ? " by " + p.architect : ""} | Siana Architecture`,
+      description,
+      image: p.og_image_url || p.cover_image_url || p.hero_image_url || OG_DEFAULT,
       type: "article",
+      preloadImage: p.hero_image_url || p.cover_image_url || null,
       jsonld: {
         "@context": "https://schema.org", "@type": "Article",
-        headline: p.name, image: p.cover_image_url || p.hero_image_url || undefined,
+        headline: p.name,
+        description: stripHtml(description),
+        image: p.og_image_url || p.cover_image_url || p.hero_image_url || undefined,
         about: facts || undefined, publisher: ORG, mainEntityOfPage: `${SITE_URL}/projects/${p.slug}`,
       },
-      content:
-        `<h1>${esc(p.name)}</h1>${facts ? `<p>${esc(facts)}</p>` : ""}` +
-        `${p.tagline ? `<p>${esc(p.tagline)}</p>` : ""}${p.description ? `<div>${p.description}</div>` : ""}`,
+      content: buildingContentHtml(p, {
+        images: imagesByProject.get(p.id) || [],
+        links: linksByProject.get(p.id) || [],
+        graphics: graphicsByProject.get(p.id) || [],
+      }),
     })); n++;
   }
 

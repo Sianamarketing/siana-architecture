@@ -43,6 +43,7 @@ describe("plan set", () => {
     expect(sheets[0].poster).toBe(true);
     expect(sheets[0].title).toBe("Overview");
     expect(sheets[0].imagePath).toBe("/poster.png");
+    expect(sheets[0].zoomPath).toBe("/poster.png");
     expect(sheets[0].downloadPath).toBe("/poster.pdf");
     expect(sheets[0].paragraphs).toEqual(["An animal research lab in Lichterfelde."]);
     expect(sheets[0].facts).toEqual([{ label: "Built", value: "1971–1982" }]);
@@ -61,8 +62,52 @@ describe("plan set", () => {
     );
     expect(sheets).toHaveLength(1);
     expect(sheets[0].imagePath).toBe("/diagrams/pipes.png");
+    expect(sheets[0].zoomPath).toBe("/diagrams/pipes.svg");
     expect(sheets[0].title).toBe("The blue pipes");
     expect(sheets[0].whyHash).toBeNull();
+  });
+
+  it("enlarges the svg and leaves the menu card on the closed sheet", () => {
+    const sheets = buildPlanSheets(
+      [graphic({
+        id: "d",
+        slug: "trusses",
+        cardPath: "/menu/twelve-trusses.png",
+        storagePath: "/diagrams/twelve-trusses.png",
+        svgPath: "/diagrams/twelve-trusses.svg",
+        alt: "Twelve trusses over the hall",
+      })],
+      [],
+    );
+    expect(sheets[0].imagePath).toBe("/menu/twelve-trusses.png");
+    expect(sheets[0].zoomPath).toBe("/diagrams/twelve-trusses.svg");
+    expect(sheets[0].alt).toBe("Twelve trusses over the hall");
+  });
+
+  it("uses the full png when a diagram has no svg", () => {
+    const sheets = buildPlanSheets(
+      [graphic({ id: "d", slug: "piers", cardPath: "/menu/pier-pairs.png", storagePath: "/diagrams/pier-pairs.png" })],
+      [],
+    );
+    expect(sheets[0].zoomPath).toBe("/diagrams/pier-pairs.png");
+  });
+
+  it("keeps the poster png ahead of an svg on the overview sheet", () => {
+    const sheets = buildPlanSheets(
+      [graphic({
+        id: "p",
+        slug: "poster",
+        kind: "poster",
+        storagePath: "/poster/icc-berlin-poster.png",
+        svgPath: "/poster/icc-berlin-poster.svg",
+        downloadable: true,
+        downloadPath: "/poster/icc-berlin-poster.pdf",
+      })],
+      [],
+    );
+    expect(sheets[0].poster).toBe(true);
+    expect(sheets[0].zoomPath).toBe("/poster/icc-berlin-poster.png");
+    expect(sheets[0].downloadPath).toBe("/poster/icc-berlin-poster.pdf");
   });
 
   it("ignores section hashes and reads sheet hashes", () => {

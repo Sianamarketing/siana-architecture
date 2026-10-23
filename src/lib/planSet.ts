@@ -9,6 +9,9 @@ export interface PlanSheet {
   paragraphs: string[];
   /** Card art, or the plain diagram when a building has no menu card. */
   imagePath: string | null;
+  /** SVG when one exists, otherwise the full-size PNG. The overview uses the poster PNG. */
+  zoomPath: string | null;
+  alt: string;
   whyHash: string | null;
   poster: boolean;
   downloadPath: string | null;
@@ -40,6 +43,12 @@ export function sheetIndexFromHash(hash: string, count: number): number | null {
 
 function imagePathOf(graphic: BuildingGraphic): string | null {
   return graphic.cardPath || graphic.storagePath || graphic.svgPath || null;
+}
+
+/** The lightbox reads the sharpest file. Menu cards stay on the closed sheet. */
+function zoomPathOf(graphic: BuildingGraphic): string | null {
+  if (isPoster(graphic)) return graphic.storagePath || graphic.cardPath || graphic.svgPath || null;
+  return graphic.svgPath || graphic.storagePath || graphic.cardPath || null;
 }
 
 function isPoster(graphic: BuildingGraphic): boolean {
@@ -88,7 +97,8 @@ export function buildPlanSheets(
         ? section.paragraphs
         : [graphic.caption || graphic.alt || ""].map((line) => line.trim()).filter(Boolean);
     const imagePath = imagePathOf(graphic);
-    if (!imagePath && paragraphs.length === 0 && !graphic.downloadPath) return;
+    const zoomPath = zoomPathOf(graphic) || imagePath;
+    if (!imagePath && !zoomPath && paragraphs.length === 0 && !graphic.downloadPath) return;
     const index = sheets.length;
     sheets.push({
       id: sheetDomId(index),
@@ -96,6 +106,8 @@ export function buildPlanSheets(
       title,
       paragraphs,
       imagePath,
+      zoomPath,
+      alt: graphic.alt || graphic.caption || title,
       whyHash: !posterSheet && section?.graphicSlug ? `why-${section.graphicSlug}` : null,
       poster: posterSheet,
       downloadPath: posterSheet ? graphic.downloadPath : null,

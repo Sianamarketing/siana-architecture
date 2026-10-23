@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import { ZoomIn } from "lucide-react";
 import EditorialButton from "@/components/site/EditorialButton";
+import PlanLightbox from "@/components/site/PlanLightbox";
 import { resolveMediaUrl, type BuildingGraphic, type WhyBlock } from "@/lib/buildingEntry";
 import { buildPlanSheets, sheetIndexFromHash, type PlanOverviewInput, type PlanSheet } from "@/lib/planSet";
 
@@ -17,16 +19,31 @@ function useMedia(query: string) {
   return matches;
 }
 
-function TitleBlock({ sheet, projectName }: { sheet: PlanSheet; projectName: string }) {
+function TitleBlock({ sheet, projectName, onEnlarge }: { sheet: PlanSheet; projectName: string; onEnlarge?: (opener: HTMLElement) => void }) {
   return (
     <footer className="border-t border-ink bg-paper text-ink">
       <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 px-3 py-2">
         <p className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.16em", fontWeight: 600 }}>
           {sheet.code}
         </p>
-        <p className="font-mono uppercase text-warm-gray text-right" style={{ fontSize: 10, letterSpacing: "0.16em" }}>
-          NTS
-        </p>
+        <div className="flex items-center justify-end gap-3">
+          {onEnlarge && (
+            <button
+              type="button"
+              data-plan-enlarge=""
+              onClick={(event) => onEnlarge(event.currentTarget)}
+              className="inline-flex items-center gap-1 font-mono text-ink border-b border-ink/30 hover:border-ink pb-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+              style={{ fontSize: 11, letterSpacing: "0.08em" }}
+            >
+              <ZoomIn aria-hidden="true" className="text-accent-terra" size={14} strokeWidth={1.75} />
+              Enlarge
+              <span className="sr-only"> sheet {sheet.code}, {sheet.title}</span>
+            </button>
+          )}
+          <p className="font-mono uppercase text-warm-gray text-right" style={{ fontSize: 10, letterSpacing: "0.16em" }}>
+            NTS
+          </p>
+        </div>
         <p className="col-span-2 text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "1.15rem", lineHeight: 1.2 }}>
           {sheet.title}
         </p>
@@ -44,17 +61,54 @@ function TitleBlock({ sheet, projectName }: { sheet: PlanSheet; projectName: str
   );
 }
 
-function DrawingFace({ sheet, projectName, src }: { sheet: PlanSheet; projectName: string; src: string | null }) {
+function DrawingFace({
+  sheet,
+  projectName,
+  src,
+  onOpen,
+  zoomGuard,
+}: {
+  sheet: PlanSheet;
+  projectName: string;
+  src: string | null;
+  onOpen?: (opener: HTMLElement) => void;
+  zoomGuard?: { current: boolean };
+}) {
+  const regionRef = useRef<HTMLDivElement>(null);
   return (
     <div className="plan-page h-full flex flex-col border border-ink">
       <div className="flex-1 bg-paper-warm min-h-[220px] md:min-h-0 flex items-center justify-center p-3 md:p-5">
         {src ? (
-          <img src={src} alt="" className="max-h-[420px] md:max-h-[460px] w-full object-contain" draggable={false} />
+          <div
+            ref={regionRef}
+            data-plan-zoom=""
+            role={onOpen ? "button" : undefined}
+            tabIndex={onOpen ? 0 : undefined}
+            aria-label={onOpen ? `Enlarge sheet ${sheet.code}, ${sheet.title}` : undefined}
+            className={`w-full ${onOpen ? "cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]" : ""}`}
+            onClick={() => {
+              if (!onOpen) return;
+              if (zoomGuard?.current) {
+                zoomGuard.current = false;
+                return;
+              }
+              if (regionRef.current) onOpen(regionRef.current);
+            }}
+            onKeyDown={(event) => {
+              if (!onOpen || !regionRef.current) return;
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onOpen(regionRef.current);
+              }
+            }}
+          >
+            <img src={src} alt={sheet.alt || `${sheet.code} ${sheet.title}`} className="max-h-[420px] md:max-h-[460px] w-full object-contain" draggable={false} />
+          </div>
         ) : (
           <p className="font-body text-ink-soft text-[15px]">No drawing filed.</p>
         )}
       </div>
-      <TitleBlock sheet={sheet} projectName={projectName} />
+      <TitleBlock sheet={sheet} projectName={projectName} onEnlarge={onOpen} />
     </div>
   );
 }
@@ -124,8 +178,11 @@ export default function PlanSet({
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState<number | null>(null);
   const [turn, setTurn] = useState<null | { dir: 1 | -1; run: boolean }>(null);
+  const [lightbox, setLightbox] = useState(false);
   const bookRef = useRef<HTMLDivElement>(null);
   const pointer = useRef<{ x: number; y: number; edge: "next" | "prev" | "swipe" } | null>(null);
+  const zoomGuard = useRef(false);
+  const openerRef = useRef<HTMLElement | null>(null);
   const sheetsRef = useRef(sheets);
   const indexRef = useRef(0);
   sheetsRef.current = sheets;
@@ -140,6 +197,35 @@ export default function PlanSet({
     window.history.replaceState(null, "", url);
   };
 
+  const openAt = (next: number, opener: HTMLElement | null) => {
+    const list = sheetsRef.current;
+    const target = list[next];
+    if (!target) return;
+    openerRef.current = opener;
+    if (next !== indexRef.current) {
+      indexRef.current = next;
+      setIndex(next);
+      writeHash(target);
+    }
+    setTurn(null);
+    setDrag(null);
+    setLightbox(true);
+  };
+
+  const closeLightbox = () => setLightbox(false);
+
+  useEffect(() => {
+    if (lightbox) return;
+    const opener = openerRef.current;
+    if (!opener) return;
+    openerRef.current = null;
+    const current = sheetsRef.current[indexRef.current];
+    const fallback = current ? document.querySelector<HTMLElement>(`#${current.id} [data-plan-enlarge]`) : null;
+    const hidden = Boolean(opener.closest("[hidden]"));
+    const target = !hidden && opener.isConnected ? opener : fallback;
+    target?.focus();
+  }, [lightbox]);
+
   const goTo = (nextIndex: number, animate: boolean) => {
     const list = sheetsRef.current;
     const current = indexRef.current;
@@ -152,6 +238,16 @@ export default function PlanSet({
       return;
     }
     setTurn({ dir, run: false });
+  };
+
+  const showSheet = (nextIndex: number) => {
+    const list = sheetsRef.current;
+    if (nextIndex < 0 || nextIndex >= list.length || nextIndex === indexRef.current) return;
+    indexRef.current = nextIndex;
+    setIndex(nextIndex);
+    writeHash(list[nextIndex]);
+    setTurn(null);
+    setDrag(null);
   };
 
   useEffect(() => {
@@ -177,7 +273,7 @@ export default function PlanSet({
 
   useEffect(() => {
     const drawing = bookRef.current?.querySelector<HTMLElement>("[data-plan-drawing]");
-    if (!drawing || !bookRef.current) return;
+    if (!drawing || !bookRef.current || typeof ResizeObserver === "undefined") return;
     const apply = () => {
       bookRef.current?.style.setProperty("--plan-spread-h", `${drawing.offsetHeight}px`);
     };
@@ -236,6 +332,7 @@ export default function PlanSet({
   };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    zoomGuard.current = false;
     if (turn || event.button !== 0) return;
     const target = event.target as HTMLElement;
     if (target.closest("a, button, input, textarea, select")) return;
@@ -284,19 +381,23 @@ export default function PlanSet({
     const dy = event.clientY - start.y;
     const dragged = drag != null && Math.abs(drag) > 8;
     if (start.edge === "next" && ((drag != null && drag < -70) || (!dragged && Math.abs(dx) < 8 && Math.abs(dy) < 8))) {
+      zoomGuard.current = true;
       goTo(safeIndex + 1, true);
       return;
     }
     if (start.edge === "prev" && ((drag != null && drag > 70) || (!dragged && Math.abs(dx) < 8 && Math.abs(dy) < 8))) {
+      zoomGuard.current = true;
       goTo(safeIndex - 1, true);
       return;
     }
     if (start.edge === "swipe" && Math.abs(dx) > Math.abs(dy)) {
       if (dx < -48) {
+        zoomGuard.current = true;
         goTo(safeIndex + 1, true);
         return;
       }
       if (dx > 48) {
+        zoomGuard.current = true;
         goTo(safeIndex - 1, true);
         return;
       }
@@ -311,10 +412,10 @@ export default function PlanSet({
   const turning = Boolean(turn) || drag != null;
 
   const frontFace = !desktop || leafDir < 0
-    ? <DrawingFace sheet={sheet} projectName={projectName} src={urlOf(sheet.imagePath)} />
+    ? <DrawingFace sheet={sheet} projectName={projectName} src={urlOf(sheet.imagePath)} zoomGuard={zoomGuard} onOpen={(opener) => openAt(safeIndex, opener)} />
     : <NotesFace sheet={sheet} downloadUrl={urlOf(sheet.downloadPath)} contained />;
   const backFace = !incoming ? null : !desktop || leafDir > 0
-    ? <DrawingFace sheet={incoming} projectName={projectName} src={urlOf(incoming.imagePath)} />
+    ? <DrawingFace sheet={incoming} projectName={projectName} src={urlOf(incoming.imagePath)} zoomGuard={zoomGuard} onOpen={(opener) => openAt(safeIndex + leafDir, opener)} />
     : <NotesFace sheet={incoming} downloadUrl={urlOf(incoming.downloadPath)} contained />;
 
   return (
@@ -348,7 +449,7 @@ export default function PlanSet({
                   <article id={item.id} aria-labelledby={`${item.id}-title`} className={active ? "plan-fade" : undefined}>
                     <div className="plan-spread">
                       <div className="relative" data-plan-drawing={active ? "true" : undefined}>
-                        <DrawingFace sheet={item} projectName={projectName} src={src} />
+                        <DrawingFace sheet={item} projectName={projectName} src={src} zoomGuard={zoomGuard} onOpen={(opener) => openAt(itemIndex, opener)} />
                         {active && !turning && itemIndex < sheets.length - 1 && (
                           <span aria-hidden="true" className="md:hidden pointer-events-none absolute bottom-0 right-0 z-[4] h-9 w-9" style={{ background: "linear-gradient(135deg, transparent 46%, #fdf0ed 46%, #eca693 72%, transparent 72%)" }} />
                         )}
@@ -426,6 +527,15 @@ export default function PlanSet({
           })}
         </div>
       </div>
+      {lightbox && (
+        <PlanLightbox
+          sheets={sheets}
+          index={safeIndex}
+          urlOf={urlOf}
+          onIndex={showSheet}
+          onClose={closeLightbox}
+        />
+      )}
     </section>
   );
 }

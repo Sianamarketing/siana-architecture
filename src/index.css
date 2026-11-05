@@ -667,3 +667,35 @@
 .why-more[open] > summary .why-less {
   display: inline;
 }
+
+/* Discover: a quiet masonry. Cards keep their own height, like a pin board. */
+.discover-masonry {
+  columns: 2;
+  column-gap: 1rem;
+}
+@media (min-width: 700px) {
+  .discover-masonry { columns: 3; column-gap: 1.25rem; }
+}
+@media (min-width: 1100px) {
+  .discover-masonry { columns: 4; }
+}
+@media (min-width: 1440px) {
+  .discover-masonry { columns: 5; }
+}
+.discover-card {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .discover-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(17, 17, 16, 0.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .discover-card { transition: none; }
+  .discover-card:hover { transform: none; }
+}

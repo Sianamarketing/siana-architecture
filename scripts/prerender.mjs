@@ -22,6 +22,7 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 import { buildingContentHtml } from "./buildingPrerender.mjs";
+import { DISCOVER_DESCRIPTION, DISCOVER_TITLE, discoverContentHtml, firstScreenTiles } from "../src/lib/discoverFeed.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -124,12 +125,12 @@ async function main() {
 
   const [cities, projects, posts, homeRows, projectImages, projectLinks, projectGraphics] = await Promise.all([
     fetchRows("cities?status=eq.published&select=slug,name,country,tagline,hero_image_url&order=name"),
-    fetchRows("projects?status=eq.published&select=id,slug,name,tagline,architect,year_completed,category,style,description,analysis,tldr,siana_pick,curious_facts,why_section,stats,condition,heritage_status,year_listed,meta_title,meta_description,og_image_url,hero_image_url,cover_image_url,address,latitude,longitude,city:cities(name)&order=name"),
+    fetchRows("projects?status=eq.published&select=id,slug,name,tagline,architect,year_completed,featured,updated_at,category,style,description,analysis,tldr,siana_pick,curious_facts,why_section,stats,condition,heritage_status,year_listed,meta_title,meta_description,og_image_url,hero_image_url,cover_image_url,address,latitude,longitude,city:cities(name,slug)&order=name"),
     fetchRows("posts?status=eq.published&select=slug,kind,title,excerpt,body,author,category,hero_image_url,published_at&order=published_at.desc"),
     fetchRows("site_pages?key=eq.home&select=content").catch(() => []),
-    fetchRows("project_images?select=project_id,alt,caption,author,license,source_url,position&order=position").catch(() => []),
+    fetchRows("project_images?select=id,project_id,alt,caption,author,license,license_url,source_url,original_url,storage_path,width,height,is_hero,position&order=position").catch(() => []),
     fetchRows("project_links?select=project_id,category,title,url,position&order=position").catch(() => []),
-    fetchRows("project_graphics?select=project_id,slug,kind,alt,caption,downloadable,position&order=position").catch(() => []),
+    fetchRows("project_graphics?select=id,project_id,slug,kind,alt,caption,card_path,storage_path,svg_path,downloadable,download_path,download_label,position&order=position").catch(() => []),
   ]);
   // The home cover: whichever image the editor put first in /admin/home.
   const heroPreload = homeRows?.[0]?.content?.hero?.images?.[0] || null;
@@ -256,6 +257,14 @@ async function main() {
       `<h1>The Atlas</h1>` +
       `<p>An interactive map of significant architecture across the world's cities - filter by city, architect, style and year, and explore each project on the map.</p>` +
       `<p><a href="/cities">Browse cities</a> · <a href="/journal">Journal</a></p>`,
+  })); n++;
+
+  write("/discover", renderPage(template, {
+    path: "/discover",
+    title: DISCOVER_TITLE,
+    description: DISCOVER_DESCRIPTION,
+    image: OG_DEFAULT,
+    content: discoverContentHtml(firstScreenTiles(projects, projectImages, projectGraphics)),
   })); n++;
 
   // --- City detail ---

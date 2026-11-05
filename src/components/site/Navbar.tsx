@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { to: "/atlas", label: "Map" },
+  { to: "/discover", label: "Discover" },
   { to: "/cities", label: "Cities" },
   { to: "/practice", label: "Practice" },
   { to: "/about", label: "About" },

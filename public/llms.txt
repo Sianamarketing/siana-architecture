@@ -46,6 +46,7 @@ Siana documents notable architecture across global cities and writes about it wi
 
 ## Main sections
 - [Atlas](https://sianaarchitecture.com/atlas): Interactive map — explore every project by city, architect, style and year.
+- [Discover](https://sianaarchitecture.com/discover): A visual feed of buildings, photographs and plan sheets.
 - [Cities index](https://sianaarchitecture.com/cities): Browse all cities in the atlas.
 - [Journal](https://sianaarchitecture.com/journal): All essays and field notes (the blog).
 - [Resources for architects](https://sianaarchitecture.com/resources): Practical guides for architecture, engineering and construction practices.

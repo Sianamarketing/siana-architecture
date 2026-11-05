@@ -72,6 +72,7 @@ function buildSitemap({ cities, projects, journal, resources }) {
   const entries = [
     urlEntry("/", TODAY, "weekly", "1.0"),
     urlEntry("/atlas", TODAY, "weekly", "0.9"),
+    urlEntry("/discover", TODAY, "weekly", "0.8"),
     urlEntry("/cities", TODAY, "weekly", "0.9"),
     urlEntry("/journal", TODAY, "weekly", "0.9"),
     urlEntry("/resources", TODAY, "weekly", "0.7"),
@@ -122,6 +123,7 @@ function buildLlms({ cities, projects, journal }) {
     `## Projects\n${projects.map(projectLine).join("\n")}\n\n` +
     `## Main sections\n` +
     `- [Atlas](${SITE_URL}/atlas): Interactive map - explore every project by city, architect, style and year.\n` +
+    `- [Discover](${SITE_URL}/discover): A visual feed of buildings, photographs and plan sheets.\n` +
     `- [Cities index](${SITE_URL}/cities): Browse all cities in the atlas.\n` +
     `- [Journal](${SITE_URL}/journal): All essays and field notes (the blog).\n` +
     `- [Resources for architects](${SITE_URL}/resources): Practical guides for architecture, engineering and construction practices.\n` +
@@ -154,7 +156,7 @@ async function main() {
   writeFileSync(resolve(PUBLIC, "sitemap.xml"), buildSitemap(data), "utf8");
   writeFileSync(resolve(PUBLIC, "llms.txt"), buildLlms(data), "utf8");
 
-  const total = 5 + cities.length + projects.length + journal.length + resources.length;
+  const total = 7 + cities.length + projects.length + journal.length + resources.length;
   console.log(
     `[seo] Wrote public/sitemap.xml (${total} URLs) + public/llms.txt - ` +
       `${cities.length} cities, ${projects.length} projects, ${journal.length} journal, ${resources.length} resources`,

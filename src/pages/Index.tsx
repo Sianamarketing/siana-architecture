@@ -6,18 +6,28 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/site/Navbar";
 import WelcomeOverlay from "@/components/site/WelcomeOverlay";
 import { getMapboxToken } from "@/lib/mapbox";
-import FeaturedCities from "@/components/site/FeaturedCities";
 import FeaturedBuildings from "@/components/site/FeaturedBuildings";
-import LatestJournal from "@/components/site/LatestJournal";
-import NewsletterCta from "@/components/site/NewsletterCta";
+import HomeDirectory from "@/components/site/HomeDirectory";
+import HomeResearch from "@/components/site/HomeResearch";
 import Footer from "@/components/site/Footer";
-import Reveal from "@/components/site/Reveal";
-import { useHomeContent } from "@/hooks/useHomeContent";
-import { sanitizeInline } from "@/lib/inlineHtml";
 
 type Pin = { latitude: number | null; longitude: number | null };
 
-const HERO_SLIDE_MS = 6000;
+const HERO_PHOTO = {
+  src: "/buildings/unite-d-habitation-berlin/01-slab-on-the-lawn.jpg",
+  alt: "The Unité d'Habitation in Berlin, a 17-storey slab of loggias on its lawn at Flatowallee, seen from the south-west.",
+  building: "Unité d'Habitation Berlin",
+  credit: "Gunnar Klack, CC BY-SA 4.0",
+  href: "/projects/unite-d-habitation-berlin",
+};
+
+const MAP_NOTES = [
+  "Filter by city, material, experience, and style.",
+  "Pins mark published buildings. Select one to open its entry.",
+  "A city or a building can live in the address, so a view can be shared.",
+];
+
+const serif = "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif";
 
 const Index = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
@@ -25,12 +35,7 @@ const Index = () => {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [token] = useState<string>(() => getMapboxToken());
   const [pins, setPins] = useState<Pin[]>([]);
-  const [heroImages, setHeroImages] = useState<string[]>([]);
-  const [activeHero, setActiveHero] = useState(0);
-  const [heroReady, setHeroReady] = useState(false);
-  const content = useHomeContent();
 
-  // Lightweight: just coordinates, to scatter pins across the preview map
   useEffect(() => {
     (async () => {
       const { data } = await supabase
@@ -41,87 +46,6 @@ const Index = () => {
     })();
   }, []);
 
-  // Hero background — curated architecture photography. We deliberately
-  // do NOT pull from the projects/cities tables here: while those rows
-  // are nominally architecture, demo/seed entries can carry stock
-  // imagery that doesn't fit the cover. This list is hand-verified.
-  useEffect(() => {
-    // Editor-chosen hero images (from /admin/home) take priority, in order.
-    const custom = (content.hero.images || []).filter(Boolean);
-    if (custom.length) {
-      setHeroImages(custom);
-      return;
-    }
-    const ARCH_IMAGES = [
-      // Sunlit curved staircase — Valencia City of Sciences
-      "https://images.unsplash.com/photo-1779995734326-3d3790120164?auto=format&fit=crop&w=1800&q=80",
-      // Brutalist concrete structure in the desert
-      "https://images.unsplash.com/photo-1780303063301-33ccfe1c56c2?auto=format&fit=crop&w=1800&q=80",
-      // Concrete ceiling with square skylights, Shanghai
-      "https://images.unsplash.com/photo-1780362507842-f9e75fbdce03?auto=format&fit=crop&w=1800&q=80",
-      // Staircase with circular skylights, MLK Memorial Library
-      "https://images.unsplash.com/photo-1777997271952-4fa8fec2ffa6?auto=format&fit=crop&w=1800&q=80",
-      // Vintage interior with pendant lights and wooden floor
-      "https://images.unsplash.com/photo-1780317307594-15b43d794ce6?auto=format&fit=crop&w=1800&q=80",
-      // Contemporary dining space, Suances, Spain
-      "https://images.unsplash.com/photo-1779960723465-61f8d0f5ac2b?auto=format&fit=crop&w=1800&q=80",
-      // Country home interior with built-in wooden shelving
-      "https://images.unsplash.com/photo-1780427670049-43aa7921e3f0?auto=format&fit=crop&w=1800&q=80",
-    ];
-    // Shuffle so the order isn't predictable between visits — but pin the
-    // first slide. It is the one the page can preload (see the preload tag
-    // the prerender step writes), and preloading only pays off if the image
-    // it fetches is the one actually shown first.
-    const [first, ...rest] = ARCH_IMAGES;
-    for (let i = rest.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [rest[i], rest[j]] = [rest[j], rest[i]];
-    }
-    setHeroImages([first, ...rest]);
-  }, [content.hero.images]);
-
-  // Hold the cover back until its first photo has decoded. Without this the
-  // veil and the white headline paint over an empty background — the grey
-  // wash that showed on every load while the photo was still in flight.
-  //
-  // The deadline is its own mount-once effect on purpose. Living inside the
-  // image effect, it was cleared and restarted every time the URL changed
-  // (the list starts as the built-in photos, then swaps to the editor's), so
-  // it could never fire — and a cover that never appears is worse than one
-  // that appears late. Nothing can cancel this one but unmounting.
-  useEffect(() => {
-    const deadline = setTimeout(() => setHeroReady(true), 2500);
-    return () => clearTimeout(deadline);
-  }, []);
-
-  const firstHero = heroImages[0];
-  useEffect(() => {
-    if (!firstHero) return;
-    let cancelled = false;
-    const reveal = () => !cancelled && setHeroReady(true);
-    const img = new Image();
-    img.onload = reveal;
-    img.onerror = reveal;
-    img.src = firstHero;
-    if (img.complete) reveal();
-    return () => {
-      cancelled = true;
-    };
-  }, [firstHero]);
-
-  // Rotate the active hero image on a calm interval
-  useEffect(() => {
-    if (heroImages.length < 2) return;
-    const t = setInterval(() => {
-      setActiveHero((i) => (i + 1) % heroImages.length);
-    }, HERO_SLIDE_MS);
-    return () => clearInterval(t);
-  }, [heroImages.length]);
-
-  // Non-interactive preview map — a visual teaser of the product, not a tool.
-  // `interactive: false` means it never traps scroll and can't be panned; the
-  // whole surface is a link into the Atlas. The globe spins slowly so the
-  // hero map feels alive even though it's not clickable as a map.
   useEffect(() => {
     if (!token || !mapContainer.current || mapRef.current) return;
     mapboxgl.accessToken = token;
@@ -155,7 +79,7 @@ const Index = () => {
           visible = entry.isIntersecting;
           if (visible) spinGlobe();
         },
-        { threshold: 0 }
+        { threshold: 0 },
       );
       io.observe(mapContainer.current);
     } catch (e) {
@@ -168,21 +92,17 @@ const Index = () => {
     };
   }, [token]);
 
-  // Decorative pins — pinned to the spinning globe at its natural extent;
-  // we deliberately do NOT fitBounds here so the whole globe stays visible.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || pins.length === 0) return;
     const draw = () => {
-      markersRef.current.forEach((m) => m.remove());
+      markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
-      const pts = pins.filter((p) => p.latitude != null && p.longitude != null);
-      pts.forEach((p) => {
+      pins.filter((pin) => pin.latitude != null && pin.longitude != null).forEach((pin) => {
         const el = document.createElement("span");
-        el.style.cssText =
-          "display:block;width:9px;height:9px;border-radius:9999px;background:#bf3a18;border:2px solid #fff;box-shadow:0 0 0 2px #bf3a18;pointer-events:none;";
+        el.style.cssText = "display:block;width:9px;height:9px;border-radius:9999px;background:#bf3a18;border:2px solid #fff;box-shadow:0 0 0 2px #bf3a18;pointer-events:none;";
         markersRef.current.push(
-          new mapboxgl.Marker({ element: el, anchor: "center" }).setLngLat([p.longitude!, p.latitude!]).addTo(map)
+          new mapboxgl.Marker({ element: el, anchor: "center" }).setLngLat([pin.longitude!, pin.latitude!]).addTo(map),
         );
       });
     };
@@ -195,178 +115,113 @@ const Index = () => {
       <WelcomeOverlay />
       <Helmet>
         <title>Siana Architecture</title>
-        <meta name="description" content="An editorial atlas of architecture. Curated projects across the world's great cities - explore them on the interactive map." />
+        <meta name="description" content="Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live." />
         <link rel="canonical" href="/" />
       </Helmet>
-
       <Navbar />
 
-      {/* ============================================================
-          1. HERO — editorial cover that introduces the experience.
-          Project photos quietly crossfade behind a warm paper veil so
-          the ink-coloured headline remains legible.
-          ============================================================ */}
-      <section
-        className="relative grid"
-        style={{ gridTemplateRows: "1fr auto", minHeight: "100vh", background: "hsl(var(--paper-warm))", paddingTop: "76px", overflow: "hidden" }}
-      >
-        {/* Background slideshow. Held at opacity 0 until the first photo has
-            decoded, so the cover never shows its veil over an empty frame. */}
-        <div
-          className="absolute inset-0 z-0 overflow-hidden"
-          aria-hidden="true"
-          style={{ opacity: heroReady ? 1 : 0, transition: "opacity 900ms ease" }}
-        >
-          {heroImages.map((src, i) => (
-            <div
-              key={src}
-              className="absolute inset-0 transition-opacity ease-in-out"
-              style={{
-                opacity: i === activeHero ? 1 : 0,
-                backgroundImage: `url(${src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                transitionDuration: "1800ms",
-              }}
-            />
-          ))}
-          {/* Dark veil — keeps white copy legible over the photo slideshow.
-              Light on top so photos breathe, denser at the bottom where
-              the headline + CTAs live. */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(17,17,16,0.18) 0%, rgba(17,17,16,0.28) 45%, rgba(17,17,16,0.55) 100%)",
-            }}
-          />
+      <section className="bg-paper border-b border-ink/10" style={{ paddingTop: 76 }}>
+        <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-[minmax(0,42%)_minmax(0,56%)] lg:justify-between gap-8 lg:gap-6 lg:min-h-[calc(100vh-76px)]">
+          <div className="flex flex-col">
+            <p className="font-mono uppercase text-ink flex items-center gap-2" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
+              <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-accent-terra" />
+              An independent guide to the built world
+            </p>
+            <h1 className="mt-6 text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.8rem, 6.8vw, 4.5rem)", lineHeight: 0.92, letterSpacing: "-0.02em" }}>
+              <span className="block">Explore the</span>
+              <span className="block">World of</span>
+              <span className="block italic text-accent-terra">Architecture</span>
+              <span className="block italic text-accent-terra">&amp; Design</span>
+            </h1>
+            <div className="mt-auto pt-12 md:pt-16 flex items-end justify-between gap-6">
+              <div className="max-w-sm">
+                <p className="font-body text-ink-soft text-[15px] md:text-[16px] leading-relaxed">
+                  Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live.
+                </p>
+                <p className="mt-8 font-mono uppercase text-ink" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
+                  Places · Projects · People
+                </p>
+              </div>
+              <a
+                href="#featured-buildings"
+                aria-label="Featured buildings"
+                className="shrink-0 inline-flex h-12 w-12 items-center justify-center rounded-full border border-ink/30 text-ink hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 2v11M3.5 9.5 8 14l4.5-4.5" stroke="currentColor" strokeWidth="1" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <figure>
+            <Link to={HERO_PHOTO.href} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]">
+              <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="w-full h-auto object-cover bg-paper-mid max-h-[78vh]" />
+            </Link>
+            <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
+              <span>{HERO_PHOTO.building}</span>
+              <span>{HERO_PHOTO.credit}</span>
+            </figcaption>
+          </figure>
         </div>
+      </section>
 
-        <div
-          className="relative z-10 mx-auto w-full max-w-[1400px] px-6 lg:px-10 text-center md:text-left"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            paddingTop: "10rem",
-            paddingBottom: "4rem",
-            // The copy is white: it only becomes legible once the photo and
-            // its veil are behind it, so it arrives with them, not before.
-            opacity: heroReady ? 1 : 0,
-            transition: "opacity 900ms ease",
-          }}
-        >
-          <p className="fadeup-1 font-mono uppercase text-white font-semibold" style={{ fontSize: "13px", letterSpacing: "0.22em", marginBottom: "1.5rem", textShadow: "0 1px 8px rgba(0,0,0,0.25)" }}>
-            <Link to="/atlas" className="hover:opacity-70 transition-opacity">{content.hero.eyebrow_architecture}</Link>
-            {" · "}
-            <Link to="/cities" className="hover:opacity-70 transition-opacity">{content.hero.eyebrow_cities}</Link>
-            {" · "}
-            <Link to="/practice" className="hover:opacity-70 transition-opacity">{content.hero.eyebrow_practice}</Link>
-          </p>
+      <div id="featured-buildings">
+        <FeaturedBuildings />
+      </div>
 
-          <h1
-            className="fadeup-2 font-display-black text-white"
-            style={{
-              fontSize: "clamp(2.5rem, 8.2vw, 7rem)",
-              lineHeight: 1.02,
-              textShadow: "0 2px 18px rgba(0,0,0,0.25)",
-              whiteSpace: "pre-line",
-            }}
-          >
-            {content.hero.headline}
-          </h1>
+      <section id="home-map" className="bg-paper py-16 md:py-24 border-t border-ink/10">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8 md:mb-10">
+            <div className="max-w-xl">
+              <h2 className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.4rem, 4.4vw, 3.8rem)", lineHeight: 0.98 }}>
+                Explore the map
+              </h2>
+              <p className="mt-4 font-body text-ink-soft text-[16px] leading-relaxed">
+                Published buildings, pinned where they stand. Open the atlas to filter the view and read an entry.
+              </p>
+            </div>
+            <Link
+              to="/atlas"
+              className="inline-flex items-center justify-center h-12 px-6 bg-accent-terra text-white font-mono uppercase shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+              style={{ fontSize: 13, letterSpacing: "0.14em" }}
+            >
+              Open map
+            </Link>
+          </div>
 
-          <div className="fadeup-3 mt-10 md:mt-12">
-            <p
-              className="font-mono text-white/85 mx-auto md:mx-0 max-w-[380px] md:max-w-none [&_em]:italic [&_strong]:font-semibold"
-              style={{ fontSize: "16.5px", lineHeight: 1.7, letterSpacing: "0.01em", textShadow: "0 1px 8px rgba(0,0,0,0.25)" }}
-              dangerouslySetInnerHTML={{ __html: sanitizeInline(content.hero.description) }}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,76%)_minmax(220px,21%)] lg:justify-between gap-8 lg:gap-10">
+            <Link to="/atlas" aria-label="Open the map" className="relative block min-h-[420px] md:min-h-[560px] bg-paper-mid border border-ink/10 overflow-hidden">
+              {token ? (
+                <div ref={mapContainer} className="absolute inset-0" style={{ pointerEvents: "none" }} />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-ink-soft font-mono uppercase px-6 text-center" style={{ fontSize: 13, letterSpacing: "0.14em" }}>
+                  The atlas opens from this map
+                </div>
+              )}
+            </Link>
+            <aside>
+              <p className="font-mono uppercase text-ink mb-4" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
+                A world of architecture
+              </p>
+              <ol>
+                {MAP_NOTES.map((note, index) => (
+                  <li key={note} className="border-t border-ink/15 py-4 grid grid-cols-[2.2rem_1fr] gap-2">
+                    <span className="font-mono text-warm-gray" style={{ fontSize: 12 }}>{String(index + 1).padStart(2, "0")}</span>
+                    <p className="font-body text-ink text-[15px] leading-relaxed">{note}</p>
+                  </li>
+                ))}
+              </ol>
+              <a href="#featured-buildings" className="inline-block mt-6 font-mono uppercase text-ink border-b border-ink pb-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
+                Browse featured buildings
+              </a>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* ============================================================
-          2. MAP PREVIEW — full-bleed map with editorial copy overlaid
-          on top. The whole surface opens the Atlas. The tool itself
-          lives at /atlas.
-          ============================================================ */}
-      <section className="relative bg-paper-warm" style={{ borderBottom: "1px solid hsl(var(--paper-mid))" }}>
-        <Link to="/atlas" aria-label="Open the Map" className="group relative block w-screen" style={{ height: "100vh", minHeight: 640, background: "hsl(var(--paper-mid))" }}>
-          {token ? (
-            <div ref={mapContainer} className="absolute inset-0" style={{ pointerEvents: "none" }} />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-ink-soft font-mono uppercase" style={{ fontSize: 13, letterSpacing: "0.16em" }}>
-              Map preview
-            </div>
-          )}
-
-          {/* Soft editorial veil — soft radial halo at the center so the
-              centered copy block has a calm, legible backdrop. */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 55% 45% at 50% 50%, rgba(247,243,237,0.78) 0%, rgba(247,243,237,0.45) 55%, rgba(247,243,237,0) 100%)",
-            }}
-          />
-
-          {/* Overlaid editorial copy — slides up *after* the map is visible
-              (delayed Reveal so the map renders first, then the text lands
-              on top of it). */}
-          <Reveal
-            delay={650}
-            className="absolute inset-0 flex items-center justify-center pointer-events-none px-6 lg:px-10"
-          >
-            <div className="text-center max-w-[680px]">
-              <p
-                className="font-mono uppercase text-accent-terra mb-3 font-semibold"
-                style={{ fontSize: "13px", letterSpacing: "0.22em" }}
-              >
-                {content.map.eyebrow}
-              </p>
-              <h2
-                className="font-display text-ink [&_em]:italic"
-                style={{ fontSize: "clamp(2.1rem, 4vw, 3.8rem)", fontWeight: 400, lineHeight: 1 }}
-                dangerouslySetInnerHTML={{ __html: sanitizeInline(content.map.headline) }}
-              />
-              <p
-                className="font-mono text-ink-soft mt-5 mx-auto [&_em]:italic [&_strong]:font-semibold"
-                style={{ fontSize: "16.5px", lineHeight: 1.65, maxWidth: 540, letterSpacing: "0.01em" }}
-                dangerouslySetInnerHTML={{ __html: sanitizeInline(content.map.description) }}
-              />
-
-              {/* CTA — minimal hairline underline, gap grows on hover. */}
-              <span
-                className="inline-flex items-center font-mono uppercase text-ink transition-all group-hover:gap-3 mt-10"
-                style={{
-                  fontSize: "12px",
-                  letterSpacing: "0.28em",
-                  fontWeight: 500,
-                  gap: "0.6rem",
-                  borderBottom: "1px solid hsl(var(--ink))",
-                  paddingBottom: 4,
-                }}
-              >
-                {content.map.cta}
-                <span aria-hidden="true">→</span>
-              </span>
-            </div>
-          </Reveal>
-        </Link>
-      </section>
-
-      {/* Cities strip — image, name & project count */}
-      <FeaturedCities />
-
-      {/* Featured buildings — editorial asymmetric grid */}
-      <FeaturedBuildings />
-
-      {/* Latest journal */}
-      <LatestJournal />
-
-      {/* Newsletter + footer */}
-      <NewsletterCta />
+      <HomeDirectory />
+      <HomeResearch />
       <Footer />
     </div>
   );

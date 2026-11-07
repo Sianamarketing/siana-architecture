@@ -23,6 +23,7 @@ import JournalArticle from "./pages/JournalArticle.tsx";
 // the critical path of a visitor who only ever sees the home page.
 const About = lazy(() => import("./pages/About.tsx"));
 const Cities = lazy(() => import("./pages/Cities.tsx"));
+const Directory = lazy(() => import("./pages/Directory.tsx"));
 const Resources = lazy(() => import("./pages/Resources.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -85,6 +86,7 @@ const App = () => (
             <Route path="/atlas" element={<Atlas />} />
             <Route path="/about" element={<About />} />
             <Route path="/cities" element={<Cities />} />
+            <Route path="/directory" element={<Directory />} />
             <Route path="/cities/:slug" element={<CityDetail />} />
             <Route path="/projects/:slug" element={<ProjectDetail />} />
             <Route path="/practice" element={<Resources />} />

@@ -21,12 +21,6 @@ const HERO_PHOTO = {
   href: "/projects/unite-d-habitation-berlin",
 };
 
-const MAP_NOTES = [
-  "Filter by city, material, experience, and style.",
-  "Pins mark published buildings. Select one to open its entry.",
-  "A city or a building can live in the address, so a view can be shared.",
-];
-
 const serif = "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif";
 
 const Index = () => {
@@ -57,9 +51,10 @@ const Index = () => {
         projection: { name: "mercator" },
         center: [10, 25],
         zoom: 1.6,
-        attributionControl: false,
+        attributionControl: true,
         interactive: false,
       });
+      map.addControl(new mapboxgl.NavigationControl({ showCompass: false, visualizePitch: false }), "top-right");
       mapRef.current = map;
 
       const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -111,7 +106,7 @@ const Index = () => {
   }, [pins]);
 
   return (
-    <div className="bg-paper">
+    <div className="home-paper">
       <WelcomeOverlay />
       <Helmet>
         <title>Siana Architecture</title>
@@ -120,7 +115,7 @@ const Index = () => {
       </Helmet>
       <Navbar />
 
-      <section className="bg-paper border-b border-ink/10" style={{ paddingTop: 76 }}>
+      <section className="border-b border-ink/10" style={{ paddingTop: 76 }}>
         <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-[minmax(0,42%)_minmax(0,56%)] lg:justify-between gap-8 lg:gap-6 lg:min-h-[calc(100vh-76px)]">
           <div className="flex flex-col">
             <p className="font-mono uppercase text-ink flex items-center gap-2" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
@@ -143,8 +138,8 @@ const Index = () => {
                 </p>
               </div>
               <a
-                href="#featured-buildings"
-                aria-label="Featured buildings"
+                href="#home-map"
+                aria-label="Map"
                 className="shrink-0 inline-flex h-12 w-12 items-center justify-center rounded-full border border-ink/30 text-ink hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -166,59 +161,40 @@ const Index = () => {
         </div>
       </section>
 
-      <div id="featured-buildings">
-        <FeaturedBuildings />
-      </div>
-
-      <section id="home-map" className="bg-paper py-16 md:py-24 border-t border-ink/10">
-        <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8 md:mb-10">
-            <div className="max-w-xl">
-              <h2 className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.4rem, 4.4vw, 3.8rem)", lineHeight: 0.98 }}>
-                Explore the map
-              </h2>
-              <p className="mt-4 font-body text-ink-soft text-[16px] leading-relaxed">
-                Published buildings, pinned where they stand. Open the atlas to filter the view and read an entry.
-              </p>
-            </div>
+      <section id="home-map" className="home-map relative w-full overflow-hidden bg-[#e7e6e1]">
+        {token ? (
+          <div ref={mapContainer} className="absolute inset-0" />
+        ) : (
+          <p className="absolute bottom-6 left-0 right-0 text-center text-ink-soft font-mono uppercase pointer-events-none" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
+            Map preview unavailable
+          </p>
+        )}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 55% 45% at 50% 50%, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.4) 52%, rgba(255,255,255,0) 100%)" }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-6">
+          <div className="text-center max-w-[640px]">
+            <h2 className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.4rem, 4.4vw, 3.8rem)", lineHeight: 0.98 }}>
+              Explore the map
+            </h2>
+            <p className="mt-4 font-body text-ink-soft text-[16px] leading-relaxed">
+              Published buildings, pinned where they stand. Open the atlas to filter by city, material, experience, and style.
+            </p>
             <Link
               to="/atlas"
-              className="inline-flex items-center justify-center h-12 px-6 bg-accent-terra text-white font-mono uppercase shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+              className="pointer-events-auto inline-flex items-center justify-center h-12 px-6 mt-8 bg-accent-terra text-white font-mono uppercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
               style={{ fontSize: 13, letterSpacing: "0.14em" }}
             >
               Open map
             </Link>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,76%)_minmax(220px,21%)] lg:justify-between gap-8 lg:gap-10">
-            <Link to="/atlas" aria-label="Open the map" className="relative block min-h-[420px] md:min-h-[560px] bg-paper-mid border border-ink/10 overflow-hidden">
-              {token ? (
-                <div ref={mapContainer} className="absolute inset-0" style={{ pointerEvents: "none" }} />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-ink-soft font-mono uppercase px-6 text-center" style={{ fontSize: 13, letterSpacing: "0.14em" }}>
-                  The atlas opens from this map
-                </div>
-              )}
-            </Link>
-            <aside>
-              <p className="font-mono uppercase text-ink mb-4" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
-                A world of architecture
-              </p>
-              <ol>
-                {MAP_NOTES.map((note, index) => (
-                  <li key={note} className="border-t border-ink/15 py-4 grid grid-cols-[2.2rem_1fr] gap-2">
-                    <span className="font-mono text-warm-gray" style={{ fontSize: 12 }}>{String(index + 1).padStart(2, "0")}</span>
-                    <p className="font-body text-ink text-[15px] leading-relaxed">{note}</p>
-                  </li>
-                ))}
-              </ol>
-              <a href="#featured-buildings" className="inline-block mt-6 font-mono uppercase text-ink border-b border-ink pb-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
-                Browse featured buildings
-              </a>
-            </aside>
-          </div>
         </div>
       </section>
+
+      <div id="featured-buildings">
+        <FeaturedBuildings />
+      </div>
 
       <HomeDirectory />
       <HomeResearch />

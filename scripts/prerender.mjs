@@ -166,6 +166,9 @@ async function main() {
       `<p>Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live.</p>` +
       `<p><a href="/projects/unite-d-habitation-berlin">Unité d'Habitation Berlin</a>. Gunnar Klack, CC BY-SA 4.0.</p>` +
 
+      `<h2>Explore the map</h2>` +
+      `<p>Published buildings, pinned where they stand. <a href="/atlas">Open the map</a> to filter by city, material, experience, and style.</p>` +
+
       `<h2>Featured buildings</h2>` +
       `<p>Each entry carries the architect, the year of completion, the materials and the context that makes the building worth the detour.</p>` +
       (projects.filter((project) => project.featured).length
@@ -175,9 +178,6 @@ async function main() {
             [p.architect, p.year_completed, p.city?.name, p.tagline].filter(Boolean).join(", "),
           )).join("") + `</ul>`
         : "") +
-
-      `<h2>Explore the map</h2>` +
-      `<p>Published buildings, pinned where they stand. <a href="/atlas">Open the map</a> to filter by city, material, experience, and style.</p>` +
 
       `<h2>The directory</h2>` +
       `<p>Find architects credited on published buildings. Interior designers, product manufacturers, designers, tools, and marketing agencies will be listed when there are records to show.</p>` +

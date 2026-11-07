@@ -35,7 +35,7 @@ export default function HomeResearch() {
   const rest = stories?.slice(1) || [];
 
   return (
-    <section id="research" className="bg-paper-warm py-16 md:py-24 border-t border-ink/10">
+    <section id="research" className="bg-transparent py-16 md:py-24 border-t border-ink/10">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 md:mb-14">
           <div>

@@ -63,7 +63,7 @@ export default function HomeDirectory() {
   const counts = { all: entries.length, architects: entries.length };
 
   return (
-    <section id="directory" className="bg-paper py-16 md:py-24 border-t border-ink/10">
+    <section id="directory" className="bg-transparent py-16 md:py-24 border-t border-ink/10">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 lg:gap-16 items-end">
           <div>

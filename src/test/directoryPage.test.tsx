@@ -117,8 +117,11 @@ describe("directory page", () => {
   it("opens the Herzog & de Meuron profile without a score or a price", async () => {
     renderAt("/d/architects/herzog-de-meuron");
     expect(await screen.findByRole("heading", { name: "Herzog & de Meuron" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Practice website" })).toHaveAttribute("href", "https://www.herzogdemeuron.com/");
+    expect(screen.getByRole("link", { name: "Practice website, external" })).toHaveAttribute("href", "https://www.herzogdemeuron.com/");
     expect(screen.getByRole("link", { name: "CaixaForum Madrid" })).toHaveAttribute("href", "/projects/caixaforum-madrid");
+    expect(screen.getByText("2006-2016")).toBeInTheDocument();
+    expect(screen.getByText(/Ai Weiwei/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Services" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /pricing/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/out of 10/i)).not.toBeInTheDocument();
     expect(screen.getAllByText("Not verified").length).toBeGreaterThan(0);

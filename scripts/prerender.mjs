@@ -273,8 +273,8 @@ async function main() {
       `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Herzog &amp; de Meuron</nav>` +
       `<h1>Herzog &amp; de Meuron</h1>` +
       `<p>International architectural practice founded in Basel in 1978 by Jacques Herzog and Pierre de Meuron. Headquarters: Rheinschanze 6, 4056 Basel. <a href="https://www.herzogdemeuron.com/practice/">Practice page</a>.</p>` +
-      `<p>The Siana credit line is “Herzog &amp; de Meuron”, including the entry for <a href="/projects/caixaforum-madrid">CaixaForum Madrid</a>. The line is not split.</p>` +
-      `<p>Checked 8 November 2026. Statutory registration was not verified in this pass.</p>`,
+      `<p>Ten selected projects are dated from the practice’s project pages, including <a href="/projects/caixaforum-madrid">CaixaForum Madrid</a>. The Siana credit line “Herzog &amp; de Meuron” is not split.</p>` +
+      `<p>Checked 8 November 2026. Swiss and UK registration: not verified. The practice states it is not licensed in Florida.</p>`,
   }));
   n++;
 

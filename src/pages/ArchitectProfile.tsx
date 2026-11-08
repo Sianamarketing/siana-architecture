@@ -10,6 +10,7 @@ const NAV = [
   ["approach", "Approach"],
   ["projects", "Selected projects"],
   ["practice", "Practice"],
+  ["services", "Services"],
   ["places", "Places"],
   ["recognition", "Recognition"],
   ["sources", "Sources"],
@@ -39,14 +40,14 @@ export default function ArchitectProfile() {
             <span aria-current="page" className="text-ink">{profile.name}</span>
           </nav>
 
-          <header id="overview" className="mt-6 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-end">
+          <header id="overview" className="scroll-mt-36 mt-6 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-end">
             <div>
               <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.4rem, 5vw, 4rem)", lineHeight: 1.02 }}>
                 {profile.name}
               </h1>
               <p className="mt-4 max-w-2xl font-body text-ink-soft text-[17px] leading-relaxed">{profile.summary}</p>
               <p className="mt-4 font-body text-[15px]">
-                <a href={profile.website} className="text-ink underline underline-offset-4" rel="noopener noreferrer">Practice website</a>
+                <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
                 <span className="text-warm-gray"> · Checked {profile.checked}</span>
               </p>
             </div>
@@ -71,19 +72,19 @@ export default function ArchitectProfile() {
             ))}
           </section>
 
-          <section id="portfolio" className="mt-14" aria-labelledby="portfolio-heading">
+          <section id="portfolio" className="scroll-mt-36 mt-14" aria-labelledby="portfolio-heading">
             <h2 id="portfolio-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Portfolio</h2>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Exteriors with a Wikimedia Commons licence. A photograph links to the Siana building page when one exists, and otherwise to the source named on the project.</p>
-            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {photos.map((project, index) => (
-                <li key={project.name} className={index === 0 ? "sm:col-span-2" : ""}>
-                  <ProjectPhoto project={project} tall={index === 0} />
+            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five exteriors with a Wikimedia Commons licence. A photograph opens the Siana building page when one exists, and otherwise the practice’s project page, marked external. Five further projects in the table have no cleared photograph.</p>
+            <ul className="mt-6 columns-1 sm:columns-2 lg:columns-3 gap-3">
+              {photos.map((project) => (
+                <li key={project.name} className="mb-3 break-inside-avoid">
+                  <ProjectPhoto project={project} />
                 </li>
               ))}
             </ul>
           </section>
 
-          <section id="approach" className="mt-14 max-w-3xl" aria-labelledby="approach-heading">
+          <section id="approach" className="scroll-mt-36 mt-14 max-w-3xl" aria-labelledby="approach-heading">
             <h2 id="approach-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Design approach</h2>
             <div className="mt-4 space-y-4">
               {profile.approach.map((paragraph) => (
@@ -92,9 +93,9 @@ export default function ArchitectProfile() {
             </div>
           </section>
 
-          <section id="projects" className="mt-14" aria-labelledby="projects-heading">
+          <section id="projects" className="scroll-mt-36 mt-14" aria-labelledby="projects-heading">
             <h2 id="projects-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Selected projects</h2>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Up to ten projects named by the practice, the Pritzker Prize, or a Siana building entry. This is not a ranking. A client is shown only when a source names one.</p>
+            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Ten projects, in the order of their realization on the practice’s project pages. This is not a ranking. A client or a collaborator is shown only when that page names one.</p>
             <div className="mt-6 overflow-x-auto border border-ink/15">
               <table className="w-full min-w-[720px] text-left">
                 <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
@@ -112,6 +113,9 @@ export default function ArchitectProfile() {
                       <th scope="row" className="px-4 py-3 font-normal">
                         <ProjectLink project={project} />
                         <span className="mt-1 block font-body text-warm-gray text-[13px]">{project.status}</span>
+                        {project.collaborators && (
+                          <span className="mt-1 block font-body text-ink-soft text-[13px]">With: {project.collaborators}</span>
+                        )}
                       </th>
                       <td className="px-4 py-3 font-body text-[15px]">{project.city}, {project.country}</td>
                       <td className="px-4 py-3 font-body text-[15px]">{project.year}</td>
@@ -124,7 +128,7 @@ export default function ArchitectProfile() {
             </div>
           </section>
 
-          <section id="practice" className="mt-14" aria-labelledby="practice-heading">
+          <section id="practice" className="scroll-mt-36 mt-14" aria-labelledby="practice-heading">
             <h2 id="practice-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Practice</h2>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               <article className="border border-ink/15 p-5">
@@ -139,6 +143,10 @@ export default function ArchitectProfile() {
                 <p className="mt-3 font-body text-[15px] leading-relaxed">{profile.peopleNote}</p>
               </article>
             </div>
+            <h3 id="services" className="scroll-mt-36 mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Services</h3>
+            <ul className="mt-3 max-w-3xl space-y-2 font-body text-[15px] text-ink">
+              {profile.services.map((service) => <li key={service}>{service}</li>)}
+            </ul>
             <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Principals</h3>
             <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               {profile.principals.map((person) => (
@@ -149,9 +157,14 @@ export default function ArchitectProfile() {
                 </li>
               ))}
             </ul>
+            <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Senior partners</h3>
+            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Named on the organization page. No portraits are shown. The practice site credits photographs to Gina Folly, and that credit is not a licence for this page.</p>
+            <ul className="mt-4 columns-1 sm:columns-2 gap-x-8 font-body text-[15px] text-ink">
+              {profile.seniorPartners.map((name) => <li key={name} className="border-t border-ink/10 py-2 break-inside-avoid">{name}</li>)}
+            </ul>
           </section>
 
-          <section id="places" className="mt-14" aria-labelledby="places-heading">
+          <section id="places" className="scroll-mt-36 mt-14" aria-labelledby="places-heading">
             <h2 id="places-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Offices and registration</h2>
             <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Offices are where the practice says it works. They are not the same as the cities of the buildings above, and they are not a licence to practise.</p>
             <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -174,7 +187,7 @@ export default function ArchitectProfile() {
             </ul>
           </section>
 
-          <section id="recognition" className="mt-14" aria-labelledby="recognition-heading">
+          <section id="recognition" className="scroll-mt-36 mt-14" aria-labelledby="recognition-heading">
             <h2 id="recognition-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Awards</h2>
             <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Person awards and project awards are marked separately. None of these lines is a professional licence.</p>
             <ul className="mt-6 border-b border-ink/15">
@@ -190,9 +203,9 @@ export default function ArchitectProfile() {
             </ul>
           </section>
 
-          <section id="sources" className="mt-14" aria-labelledby="sources-heading">
+          <section id="sources" className="scroll-mt-36 mt-14" aria-labelledby="sources-heading">
             <h2 id="sources-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
-            <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}. Pages were read for facts. Photographs are used only when the file carries a Commons licence.</p>
+            <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}. Pages were read for facts. Photographs are used only when the file carries a Commons licence. A separate press list was not compiled. No professional certification was confirmed.</p>
             <ul className="mt-4 space-y-2">
               {profile.sources.map((source) => (
                 <li key={source.url}>
@@ -211,26 +224,43 @@ export default function ArchitectProfile() {
 }
 
 function ProjectLink({ project }: { project: SelectedProject }) {
-  const label = project.name;
   if (project.projectPath) {
-    return <Link to={project.projectPath} className="text-ink hover:underline" style={{ fontSize: "1.05rem" }}>{label}</Link>;
+    return (
+      <span className="block">
+        <Link to={project.projectPath} className="text-ink hover:underline" style={{ fontSize: "1.05rem" }}>{project.name}</Link>
+        <a href={project.sourceUrl} className="mt-1 block font-body text-ink-soft text-[13px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Official project page, external</a>
+      </span>
+    );
   }
-  return <a href={project.sourceUrl} className="text-ink hover:underline" style={{ fontSize: "1.05rem" }} rel="noopener noreferrer">{label}</a>;
+  return (
+    <a href={project.sourceUrl} className="text-ink hover:underline" style={{ fontSize: "1.05rem" }} target="_blank" rel="noopener noreferrer">
+      {project.name}
+      <span className="ml-2 font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>External</span>
+    </a>
+  );
 }
 
-function ProjectPhoto({ project, tall }: { project: SelectedProject; tall?: boolean }) {
+function ProjectPhoto({ project }: { project: SelectedProject }) {
   const image = project.image as ProfileImage;
   const frame = (
-    <img src={image.src} alt={image.alt} className={`w-full object-cover bg-paper-mid ${tall ? "h-72 sm:h-96" : "h-52"}`} />
+    <>
+      <img src={image.src} alt={image.alt} className="w-full h-auto bg-paper-mid" />
+      <span className="sr-only">{project.projectPath ? "Siana building page." : "Official project page, external."}</span>
+    </>
   );
+  const focus = "block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]";
   return (
     <figure className="border border-ink/10">
       {project.projectPath
-        ? <Link to={project.projectPath} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]">{frame}</Link>
-        : <a href={project.sourceUrl} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]" rel="noopener noreferrer">{frame}</a>}
-      <figcaption className="px-3 py-2 font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.08em" }}>
-        <span className="text-ink">{project.name}</span>
-        <span className="mt-1 block">{image.attribution}</span>
+        ? <Link to={project.projectPath} className={focus}>{frame}</Link>
+        : <a href={project.sourceUrl} className={focus} target="_blank" rel="noopener noreferrer">{frame}</a>}
+      <figcaption className="px-3 py-3 font-body text-ink-soft text-[13px] leading-relaxed">
+        <span className="block text-ink text-[15px]">{project.name}</span>
+        <span className="mt-1 block">{project.city}, {project.country}</span>
+        <span className="mt-1 block">
+          {image.author}. <a href={image.licenseUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">{image.license}, external</a>.{" "}
+          <a href={image.sourceUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">File page, external</a>.
+        </span>
       </figcaption>
     </figure>
   );

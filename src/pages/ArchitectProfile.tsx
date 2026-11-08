@@ -1,42 +1,49 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import SiteLayout from "@/components/site/SiteLayout";
 import SEO from "@/components/site/SEO";
 import NotFound from "@/pages/NotFound";
-import { profileBySlug, type ProfileImage, type SelectedProject } from "@/data/architectProfiles";
+import ProjectFeature from "@/components/site/ProjectFeature";
+import { profileBySlug, profileStructuredData, type ArchitectProfile, type ProfileImage, type SelectedProject } from "@/data/architectProfiles";
 
-const NAV = [
-  ["overview", "Overview"],
-  ["portfolio", "Portfolio"],
-  ["approach", "Approach"],
-  ["projects", "Selected projects"],
-  ["practice", "Practice"],
-  ["services", "Services"],
-  ["places", "Places"],
-  ["recognition", "Recognition"],
-  ["sources", "Sources"],
-] as const;
+function navFor(profile: ArchitectProfile): [string, string][] {
+  const rows = profile.projectPresentation === "rows";
+  const items: [string, string][] = [["overview", "Overview"]];
+  if (!rows && profile.projects.some((project) => project.image)) items.push(["portfolio", "Portfolio"]);
+  if (profile.approach.length) items.push(["approach", "Approach"]);
+  if (profile.projects.length) items.push(["projects", rows ? "Projects" : "Selected projects"]);
+  if (profile.sectors.length || profile.services.length || profile.principals.length || profile.seniorPartners.length) items.push(["practice", "Practice"]);
+  if (!rows && profile.services.length) items.push(["services", "Services"]);
+  if (profile.offices.length || profile.registration.length) items.push(["places", rows ? "Offices" : "Places"]);
+  if (profile.awards.length) items.push(["recognition", "Recognition"]);
+  items.push(["sources", "Sources"]);
+  return items;
+}
 
 export default function ArchitectProfile() {
   const { profileSlug } = useParams();
   const profile = profileBySlug(profileSlug);
-  const [active, setActive] = useState<string>(NAV[0][0]);
+  const items = profile ? navFor(profile) : [["overview", "Overview"] as [string, string]];
+  const [active, setActive] = useState<string>(items[0][0]);
   useEffect(() => {
-    const ids = NAV.map(([id]) => id);
+    const current = profileBySlug(profileSlug);
+    const ids = (current ? navFor(current) : [["overview", "Overview"]]).map(([id]) => id);
     const onScroll = () => {
       const line = 120;
-      let current: string = ids[0];
+      let next: string = ids[0];
       for (const id of ids) {
         const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= line) current = id;
+        if (el && el.getBoundingClientRect().top <= line) next = id;
       }
-      setActive(current);
+      setActive(next);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [profileSlug]);
   if (!profile) return <NotFound />;
+  const rows = profile.projectPresentation === "rows";
 
   const photos = profile.projects.filter((project) => project.image);
 
@@ -47,12 +54,21 @@ export default function ArchitectProfile() {
         description={profile.summary}
         canonical={`https://sianaarchitecture.com/d/architects/${profile.slug}`}
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(profileStructuredData(profile))}</script>
+      </Helmet>
       <div className="vogue-titles home-paper pb-16" style={{ paddingTop: 76 }}>
         <div className="mx-auto max-w-[1180px] px-6 lg:px-10 py-8">
           <nav aria-label="Breadcrumb" className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
             <Link to="/d/" className="hover:text-ink">Directory</Link>
             <span aria-hidden="true"> / </span>
             <Link to="/d/architects" className="hover:text-ink">Architects</Link>
+            {profile.guide && (
+              <>
+                <span aria-hidden="true"> / </span>
+                <Link to={profile.guide.path} className="hover:text-ink">{profile.guide.label}</Link>
+              </>
+            )}
             <span aria-hidden="true"> / </span>
             <span aria-current="page" className="text-ink">{profile.name}</span>
           </nav>
@@ -60,7 +76,11 @@ export default function ArchitectProfile() {
           <header id="overview" tabIndex={-1} className="scroll-mt-28 mt-6 outline-none">
             <div className="flex items-center gap-4">
               {profile.mark && (
-                <img src={profile.mark.src} alt={profile.mark.alt} className="h-8 sm:h-10 w-auto shrink-0" />
+                <img
+                  src={profile.mark.src}
+                  alt={profile.mark.permissionStatus === "official-identifying-mark" ? "" : profile.mark.alt}
+                  className={`${profile.markOnInk ? "bg-ink px-2 py-1" : ""} h-8 sm:h-10 w-auto max-w-[11rem] object-contain shrink-0`}
+                />
               )}
               <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.2rem, 5vw, 4rem)", lineHeight: 1.02 }}>
                 {profile.name}
@@ -77,9 +97,9 @@ export default function ArchitectProfile() {
                 ))}
               </section>
 
+              {!rows && photos.length > 0 && (
               <section id="portfolio" className="scroll-mt-28 mt-14" aria-labelledby="portfolio-heading">
                 <h2 id="portfolio-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Portfolio</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five licensed exteriors. Each caption links the photographer, the licence, and the file page. CaixaForum Madrid opens its Siana page. The other photographs open the practice's project page.</p>
                 <ul className="mt-6 columns-1 sm:columns-2 xl:columns-3 gap-3">
                   {photos.map((project) => (
                     <li key={project.name} className="mb-3 break-inside-avoid">
@@ -88,7 +108,9 @@ export default function ArchitectProfile() {
                   ))}
                 </ul>
               </section>
+              )}
 
+              {profile.approach.length > 0 && (
               <section id="approach" className="scroll-mt-28 mt-14 max-w-3xl" aria-labelledby="approach-heading">
                 <h2 id="approach-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Design approach</h2>
                 <div className="mt-4 space-y-4">
@@ -97,9 +119,18 @@ export default function ArchitectProfile() {
                   ))}
                 </div>
               </section>
+              )}
 
               <section id="projects" className="scroll-mt-28 mt-14" aria-labelledby="projects-heading">
-                <h2 id="projects-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Selected projects</h2>
+                <h2 id="projects-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>{rows ? "Projects" : "Selected projects"}</h2>
+                {rows ? (
+                  <div className="mt-4">
+                    {profile.projects.map((project) => (
+                      <ProjectFeature key={project.name} project={project} />
+                    ))}
+                  </div>
+                ) : (
+                <>
                 <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Ten projects, in the order of the years on the practice's project pages. A client or a collaborator is included when that page gives one.</p>
                 <div className="mt-6 overflow-x-auto border border-ink/15">
                   <table className="w-full min-w-[720px] text-left">
@@ -131,6 +162,8 @@ export default function ArchitectProfile() {
                     </tbody>
                   </table>
                 </div>
+                </>
+                )}
               </section>
 
               <section id="practice" className="scroll-mt-28 mt-14" aria-labelledby="practice-heading">
@@ -152,32 +185,40 @@ export default function ArchitectProfile() {
                 <ul className="mt-3 max-w-3xl space-y-2 font-body text-[15px] text-ink">
                   {profile.services.map((service) => <li key={service}>{service}</li>)}
                 </ul>
-                <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Principals</h3>
-                <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profile.principals.map((person) => (
-                    <li key={person.name} className="border border-ink/15">
-                      {person.image && (
-                        <img src={person.image.src} alt={person.image.alt} className="w-full h-80 object-cover object-top bg-paper-mid" />
-                      )}
-                      <div className="p-5">
-                        <p className="text-ink" style={{ fontSize: "1.4rem" }}>{person.name}</p>
-                        <p className="mt-1 font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{person.role}</p>
-                        <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">{person.note}</p>
-                        {person.image && <ImageCredit image={person.image} />}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Senior partners</h3>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Listed on the organization page.</p>
-                <ul className="mt-4 columns-1 sm:columns-2 gap-x-8 font-body text-[15px] text-ink">
-                  {profile.seniorPartners.map((name) => <li key={name} className="border-t border-ink/10 py-2 break-inside-avoid">{name}</li>)}
-                </ul>
+                {profile.principals.length > 0 && (
+                  <>
+                    <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Principals</h3>
+                    <ul className={`mt-4 ${profile.principals.some((person) => person.image) ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "max-w-3xl"}`}>
+                      {profile.principals.map((person) => (
+                        <li key={person.name} className={person.image ? "border border-ink/15" : "border-t border-ink/10 py-3"}>
+                          {person.image && (
+                            <img src={person.image.src} alt={person.image.alt} className="w-full h-80 object-cover object-top bg-paper-mid" />
+                          )}
+                          <div className={person.image ? "p-5" : ""}>
+                            <p className="text-ink" style={{ fontSize: "1.4rem" }}>{person.name}</p>
+                            <p className="mt-1 font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{person.role}</p>
+                            {person.note ? <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">{person.note}</p> : null}
+                            {person.image && <ImageCredit image={person.image} />}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {profile.seniorPartners.length > 0 && (
+                  <>
+                    <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Senior partners</h3>
+                    <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Listed on the organization page.</p>
+                    <ul className="mt-4 columns-1 sm:columns-2 gap-x-8 font-body text-[15px] text-ink">
+                      {profile.seniorPartners.map((name) => <li key={name} className="border-t border-ink/10 py-2 break-inside-avoid">{name}</li>)}
+                    </ul>
+                  </>
+                )}
               </section>
 
               <section id="places" className="scroll-mt-28 mt-14" aria-labelledby="places-heading">
                 <h2 id="places-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Offices and registration</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">These are the offices on the practice site. The cities in the project table are the buildings.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">{rows ? "The office is the studio address. A project city can differ from that office." : "These are the offices on the practice site. The cities in the project table are the buildings."}</p>
                 <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {profile.offices.map((office) => (
                     <li key={office.city} className="border border-ink/15 px-4 py-3">
@@ -186,6 +227,17 @@ export default function ArchitectProfile() {
                     </li>
                   ))}
                 </ul>
+                {rows ? (
+                  <ul className="mt-6 max-w-3xl space-y-4">
+                    {profile.registration.map((item) => (
+                      <li key={item.place}>
+                        <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{item.place}</span>
+                        <span className="mt-1 block text-ink">{item.status}</span>
+                        <span className="mt-1 block font-body text-ink-soft text-[15px]">{item.note}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
                 <details className="mt-8 border border-ink/15 px-4 py-3">
                   <summary className="cursor-pointer font-body text-ink text-[16px] min-h-11">Registration notes</summary>
                   <ul className="mt-3 space-y-3">
@@ -198,8 +250,10 @@ export default function ArchitectProfile() {
                     ))}
                   </ul>
                 </details>
+                )}
               </section>
 
+              {profile.awards.length > 0 && (
               <section id="recognition" className="scroll-mt-28 mt-14" aria-labelledby="recognition-heading">
                 <h2 id="recognition-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Awards</h2>
                 <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Person awards and project awards are listed separately. A prize here is not a professional licence.</p>
@@ -215,11 +269,14 @@ export default function ArchitectProfile() {
                   ))}
                 </ul>
               </section>
+              )}
 
-              <section id="sources" className="scroll-mt-28 mt-14" aria-labelledby="sources-heading">
-                <h2 id="sources-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
-                <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}.</p>
-                {profile.mark && (
+              <details id="sources" className="scroll-mt-28 mt-14 border border-ink/15 px-4 py-3">
+                <summary className="cursor-pointer min-h-11">
+                  <h2 id="sources-heading" tabIndex={-1} className="inline text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
+                </summary>
+                <p className="mt-3 font-body text-ink-soft text-[15px]">{profile.sourcesNote ?? `Checked ${profile.checked}. CaixaForum Madrid opens its page on Siana. The other portfolio photographs open the practice project page. Each caption names the photographer and the licence.`}</p>
+                {profile.mark && profile.mark.permissionStatus !== "official-identifying-mark" && (
                   <p className="mt-3 max-w-2xl font-body text-ink-soft text-[14px] leading-relaxed">
                     {profile.mark.attribution}.{" "}
                     <a href={profile.mark.licenseUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Licence, external</a>.{" "}
@@ -237,7 +294,7 @@ export default function ArchitectProfile() {
                 <p className="mt-8">
                   <Link to="/d/architects" className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Back to Architects</Link>
                 </p>
-              </section>
+              </details>
             </div>
 
             <aside className="order-1 lg:order-none lg:col-start-2 lg:sticky lg:top-[88px] lg:self-start lg:max-h-[calc(100vh-104px)] lg:overflow-y-auto" style={{ overscrollBehavior: "contain" }}>
@@ -261,11 +318,11 @@ export default function ArchitectProfile() {
 
               <details className="lg:hidden mt-3 border border-ink/15">
                 <summary className="cursor-pointer px-4 py-3 font-mono uppercase text-ink min-h-11" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Contents</summary>
-                <Contents active={active} />
+                <Contents active={active} items={items} />
               </details>
               <nav aria-label="Contents" className="hidden lg:block mt-4 border border-ink/15 bg-white">
                 <p className="px-4 pt-3 font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Contents</p>
-                <Contents active={active} />
+                <Contents active={active} items={items} />
               </nav>
             </aside>
           </div>
@@ -275,10 +332,10 @@ export default function ArchitectProfile() {
   );
 }
 
-function Contents({ active }: { active: string }) {
+function Contents({ active, items }: { active: string; items: [string, string][] }) {
   return (
     <ol className="px-2 py-2">
-      {NAV.map(([id, label], index) => {
+      {items.map(([id, label], index) => {
         const current = active === id;
         return (
           <li key={id}>
@@ -289,6 +346,7 @@ function Contents({ active }: { active: string }) {
                 const target = document.getElementById(id);
                 if (!target) return;
                 event.preventDefault();
+                if (target instanceof HTMLDetailsElement) target.open = true;
                 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
                 target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
                 if (target instanceof HTMLElement) target.focus({ preventScroll: true });

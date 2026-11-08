@@ -703,3 +703,29 @@
   font-style: normal;
   font-synthesis: none;
 }
+
+.us-state-map {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.us-state-map svg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.us-state-map .state path {
+  fill: #efece6;
+}
+
+.us-state-map .mo {
+  fill: #bf3a18;
+}
+
+.us-state-map .springfield-mark {
+  fill: #111110;
+  stroke: #ffffff;
+  stroke-width: 2;
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { profileForCredit } from "@/data/architectProfiles";
+import { profileBySlug, profileForCredit, profileStructuredData } from "@/data/architectProfiles";
+import { SPRINGFIELD_PROFILES } from "@/data/springfieldProfiles";
 import { architectEntries, filterDirectoryEntries, readMinutes, usableDirectoryImage } from "@/lib/directory";
 
 describe("directory", () => {
@@ -47,6 +48,31 @@ describe("directory", () => {
     expect(profileForCredit("Herzog & de Meuron")?.slug).toBe("herzog-de-meuron");
     expect(profileForCredit("Herzog & de Meuron with someone")).toBeNull();
     expect(profileForCredit("Amanda Levete (AL_A)")).toBeNull();
+  });
+
+  it("keeps nine Springfield profiles clear of the Herzog slug and of cleared photographs", () => {
+    const slugs = ["herzog-de-meuron", ...SPRINGFIELD_PROFILES.map((profile) => profile.slug)];
+    expect(new Set(slugs).size).toBe(slugs.length);
+    expect(slugs).not.toContain("springfield-missouri");
+    expect(SPRINGFIELD_PROFILES).toHaveLength(9);
+    expect(SPRINGFIELD_PROFILES[0].slug).toBe("baron-design-associates");
+    const baron = profileBySlug("baron-design-associates");
+    expect(baron?.mark?.permissionStatus).toBe("official-identifying-mark");
+    expect(baron?.mark?.license).toBe("Official identifying mark");
+    expect(baron?.projects.every((project) => project.image === null)).toBe(true);
+    expect(baron?.registration[0].status).toBe("Missouri registered architect: Janet Rothberg White, no. 003658");
+    expect(baron?.registration[1].status).toContain("2003003845");
+    expect(baron?.registration[1].note).toContain("2003003845-D");
+    expect(baron?.registration[2].status).toBe("Not verified");
+    expect(baron?.registration[2].note.toLowerCase()).not.toContain("unlicensed");
+    expect(profileBySlug("brp-architects")?.registration[0].status).toBe("Missouri registered architect: Christopher Michael Swan, no. 2007005985");
+    expect(profileBySlug("nform-architecture")?.mark).toBeNull();
+    const data = profileStructuredData(baron!);
+    const encoded = JSON.stringify(data);
+    expect(encoded).toContain("BreadcrumbList");
+    expect(encoded).toContain("ProfessionalService");
+    expect(encoded).not.toContain("2003003845");
+    expect(encoded).not.toContain("aggregateRating");
   });
 
   it("counts reading time only from real copy", () => {

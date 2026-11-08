@@ -6,6 +6,7 @@ import NotFound from "@/pages/NotFound";
 import ResearchCoverageMap from "@/components/site/ResearchCoverageMap";
 import { creditTableCsv, directoryCategory, filterDirectoryEntries, readMinutes, type DirectoryEntry } from "@/lib/directory";
 import { profileForCredit } from "@/data/architectProfiles";
+import ArchitectsPlaces from "@/components/site/ArchitectsPlaces";
 import { useDirectoryRecords } from "@/hooks/useDirectoryRecords";
 
 const PREVIEW = 6;
@@ -86,7 +87,7 @@ export default function DirectoryCategory() {
       <SEO
         title={`${category.label} - Directory - Siana Architecture`}
         description={showCredits
-          ? "Architect credits copied from published buildings. A shared credit stays one line. Locations are the buildings, not offices."
+          ? "Architect credits on published buildings, and a guide to Springfield, Missouri."
           : `${category.label} has no listings yet.`}
         canonical={`https://sianaarchitecture.com/d/${category.slug}`}
       />
@@ -102,9 +103,10 @@ export default function DirectoryCategory() {
           </h1>
           <p className="mt-4 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
             {showCredits
-              ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} from published buildings. A credit that names several people stays one line.`
+              ? "Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work."
               : "No published listings in this category yet."}
           </p>
+          {showCredits && <ArchitectsPlaces />}
 
           <form role="search" onSubmit={onSearch} className="mt-8 max-w-xl">
             <label htmlFor="category-search" className="font-body text-ink" style={{ fontSize: 14 }}>
@@ -168,7 +170,11 @@ export default function DirectoryCategory() {
                     Download this list
                   </button>
                 </div>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Places are the cities recorded on the buildings.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">
+                  {showCredits
+                    ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} on published buildings. A shared credit stays one line. The place is the city of the building.`
+                    : "The place is the city of the building."}
+                </p>
                 {visible.filter((entry) => profileForCredit(entry.name)).map((entry) => (
                   <p key={entry.id} className="mt-3">
                     <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>
@@ -306,7 +312,7 @@ export default function DirectoryCategory() {
                   How this list is made
                 </h2>
                 <div className="mt-4 max-w-2xl space-y-3">
-                  <Faq question="How are the credits stored?">Each line is the architect field on a published building, copied as stored. A shared credit stays one line. A place is the city recorded on the building.</Faq>
+                  <Faq question="How are the credits stored?">Each line is the architect field on a published building. A shared credit stays one line. The place is the city of the building.</Faq>
                   <Faq question="What does a credit line cover?">A credit can name a practice, one person, or several people together. It stays one line. One of those lines, Herzog & de Meuron, also has a practice page.</Faq>
                   <Faq question="What do the places refer to?">The city recorded on the published building.</Faq>
                   <Faq question="What about the other categories?">Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet.</Faq>

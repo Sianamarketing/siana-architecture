@@ -25,8 +25,18 @@ describe("published routes", () => {
     expect(seo).not.toContain("urlEntry(`/journal/${p.slug}`");
     expect(seo).not.toContain("urlEntry(`/resources/${p.slug}`");
     const sitemap = readFileSync(resolve(root, "public/sitemap.xml"), "utf8");
+    const prerender = readFileSync(resolve(root, "scripts/prerender.mjs"), "utf8");
     expect(sitemap).toContain("https://sianaarchitecture.com/practice/the-drawing-that-thinks-back");
     expect(sitemap).toContain("https://sianaarchitecture.com/cities/berlin");
+    expect(sitemap).toContain("https://sianaarchitecture.com/d/architects/herzog-de-meuron");
+    expect(sitemap).toContain("https://sianaarchitecture.com/d/architects/springfield-missouri");
+    expect(prerender).toContain("write(`/d/architects/${slug}`");
+    for (const slug of ["baron-design-associates", "arkifex-studios", "bkd-design-collective", "hood-rich", "hdesigngroup", "esterly-schneider", "nform-architecture", "paragon-architecture", "brp-architects"]) {
+      expect(sitemap).toContain(`https://sianaarchitecture.com/d/architects/${slug}`);
+      expect(prerender).toContain(`"${slug}"`);
+    }
+    expect(prerender).toContain("ProfessionalService");
+    expect(prerender).toContain("BreadcrumbList");
     expect(sitemap).not.toContain("https://sianaarchitecture.com/journal/");
     expect(sitemap).not.toContain("https://sianaarchitecture.com/resources/");
   });

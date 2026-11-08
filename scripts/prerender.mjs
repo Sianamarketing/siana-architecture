@@ -252,15 +252,89 @@ async function main() {
       path: `/d/${slug}`,
       title: `${label} - Directory - Siana Architecture`,
       description: architects
-        ? "Architect credits copied from published buildings."
+        ? "Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work."
         : `${label} has no listings yet.`,
       image: OG_DEFAULT,
       content:
         `<nav>Directory / ${label}</nav>` +
         `<h1>${label}</h1>` +
         (architects
-          ? `<p>Architect credits from published buildings. A credit that names several people stays one line.</p><p><a href="/d/">Back to Directory</a></p>`
+          ? `<p>Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work.</p><p><a href="/d/architects/springfield-missouri">Best architecture firms in Springfield, Missouri</a></p><p><a href="/d/">Back to Directory</a></p>`
           : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
+    }));
+    n++;
+  }
+  write("/d/architects/springfield-missouri", renderPage(template, {
+    path: "/d/architects/springfield-missouri",
+    title: "Best architecture firms in Springfield, Missouri - Siana Architecture",
+    description: "Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city.",
+    image: OG_DEFAULT,
+    jsonld: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Best architecture firms in Springfield, Missouri",
+      itemListOrder: "https://schema.org/ItemListUnordered",
+      numberOfItems: 9,
+    },
+    content:
+      `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Springfield, Missouri</nav>` +
+      `<h1>Best architecture firms in Springfield, Missouri</h1>` +
+      `<p>Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city. Baron Design &amp; Associates finished The Preston, a senior residence, along with the Hilton Garden Inn and Towneplace Suites.</p>` +
+      `<ul>` +
+      ["Baron Design & Associates, LLC", "Arkifex Studios", "Buxton Kubik Dodd Design Collective", "Hood-Rich Architecture", "hdesigngroup", "Esterly, Schneider & Associates", "N·FORM Architecture", "Paragon Architecture", "BRP Architects"]
+        .map((name, index) => `<li><a href="/d/architects/${["baron-design-associates","arkifex-studios","bkd-design-collective","hood-rich","hdesigngroup","esterly-schneider","nform-architecture","paragon-architecture","brp-architects"][index]}">${esc(name)}</a></li>`).join("") +
+      `</ul>`,
+  }));
+  n++;
+  const springfieldProfiles = [
+    ["baron-design-associates", "Baron Design & Associates, LLC", "Springfield practice for senior housing, clinics, hotels, and offices, with architecture and interior design named on the project pages.", "3810 E. Sunshine St., Suite 101", "65809", "Missouri registered architect: Janet Rothberg White, no. 003658. Firm certificate of authority: Missouri Architectural Corporation no. 2003003845. Rita Baron, principal: Not verified."],
+    ["arkifex-studios", "Arkifex Studios", "Springfield studio for houses and commercial work, including a completed house in Nixa and a brewery restaurant in a former radio station.", "301 W Walnut St", "65806", "Missouri registered architect: Tyler D. Hellweg, no. 2015000181. Firm certificate of authority: Not verified."],
+    ["bkd-design-collective", "Buxton Kubik Dodd Design Collective", "Springfield practice combining architecture, engineering, and interior design, with a local clinic and hospitality work in the portfolio.", "3100 S National Ave. Suite 300", "65807", "Missouri registered architect: Jonathan Blake Dodd, no. 2004006188. Firm certificate of authority: Not verified."],
+    ["hood-rich", "Hood-Rich Architecture", "Springfield practice with healthcare renovations and hotel public-space work, including Centerstone Building A in Springfield.", "1722 S Luster Ave", "65804", "Missouri registered architect: Larry Keith Parke, no. 007546. Firm certificate of authority: Not verified."],
+    ["hdesigngroup", "hdesigngroup", "Springfield practice with a completed apartment community and a completed hotel in the city.", "5039 S National Ave", "65810", "Missouri registered architect: Robert Christopher Haik, no. 007461. Firm certificate of authority: Not verified."],
+    ["esterly-schneider", "Esterly, Schneider & Associates", "Springfield commercial practice founded in 1947, with nationwide O'Reilly work and a brewery credit in Battlefield.", "1736 East Sunshine, Suite 417", "65804", "Missouri registered architect: Timothy M. Guillot, no. 2016008137. Firm certificate of authority: Not verified."],
+    ["nform-architecture", "N·FORM Architecture", "Springfield studio on C-Street, with a house project beside the Sac River whose municipality is not stated.", "312 W Commercial St", "65803", "Missouri registered architect: Jennifer Lynn Wilson, no. 2001029971. Firm certificate of authority: Not verified."],
+    ["paragon-architecture", "Paragon Architecture", "Multi-office practice with a Springfield studio, and a local remodel of retail space into the Care to Learn offices.", "637 W College St", "65806", "Missouri registered architect: Brad E. Erwin, no. 2006012472. Firm certificate of authority: Not verified."],
+    ["brp-architects", "BRP Architects", "Springfield architecture, design, and planning practice. A 2025 article credits the firm with the design of Caesars Republic Scottsdale.", "138 Park Central Square Suite #101", "65806", "Missouri registered architect: Christopher Michael Swan, no. 2007005985. Firm certificate of authority: Not verified."],
+  ];
+  for (const [slug, name, description, street, postal, registration] of springfieldProfiles) {
+    const url = `${SITE_URL}/d/architects/${slug}`;
+    write(`/d/architects/${slug}`, renderPage(template, {
+      path: `/d/architects/${slug}`,
+      title: `${name} - Directory - Siana Architecture`,
+      description,
+      image: OG_DEFAULT,
+      jsonld: {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Directory", item: `${SITE_URL}/d/` },
+              { "@type": "ListItem", position: 2, name: "Architects", item: `${SITE_URL}/d/architects` },
+              { "@type": "ListItem", position: 3, name: "Springfield, Missouri", item: `${SITE_URL}/d/architects/springfield-missouri` },
+              { "@type": "ListItem", position: 4, name, item: url },
+            ],
+          },
+          {
+            "@type": "ProfessionalService",
+            name,
+            url,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: street,
+              addressLocality: "Springfield",
+              addressRegion: "MO",
+              postalCode: postal,
+              addressCountry: "US",
+            },
+          },
+        ],
+      },
+      content:
+        `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / <a href="/d/architects/springfield-missouri">Springfield, Missouri</a> / ${esc(name)}</nav>` +
+        `<h1>${esc(name)}</h1><p>${esc(description)}</p>` +
+        `<p>${esc(registration)}</p><p>Checked 8 November 2026 in the Active Licensee Only search. <a href="https://mopro.mo.gov/license/s/license-search">Missouri licensee search</a>.</p>`,
     }));
     n++;
   }

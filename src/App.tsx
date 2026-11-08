@@ -25,6 +25,7 @@ const About = lazy(() => import("./pages/About.tsx"));
 const Cities = lazy(() => import("./pages/Cities.tsx"));
 const Directory = lazy(() => import("./pages/Directory.tsx"));
 const DirectoryCategory = lazy(() => import("./pages/DirectoryCategory.tsx"));
+const ArchitectProfile = lazy(() => import("./pages/ArchitectProfile.tsx"));
 const Resources = lazy(() => import("./pages/Resources.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -99,6 +100,7 @@ const App = () => (
             <Route path="/cities" element={<Cities />} />
             <Route path="/d" element={<Directory />} />
             <Route path="/d/" element={<Directory />} />
+            <Route path="/d/architects/:profileSlug" element={<ArchitectProfile />} />
             <Route path="/d/:slug" element={<DirectoryCategory />} />
             <Route path="/directory" element={<DirectoryLegacyRedirect />} />
             <Route path="/directory/" element={<DirectoryLegacyRedirect />} />

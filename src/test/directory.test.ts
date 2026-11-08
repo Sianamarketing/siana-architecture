@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { profileForCredit } from "@/data/architectProfiles";
 import { architectEntries, filterDirectoryEntries, readMinutes, usableDirectoryImage } from "@/lib/directory";
 
 describe("directory", () => {
@@ -40,6 +41,12 @@ describe("directory", () => {
     expect(filterDirectoryEntries(entries, { category: "architects", query: "missing" })).toEqual([]);
     expect(filterDirectoryEntries(entries, { category: "architects", city: "Berlin" })).toHaveLength(2);
     expect(filterDirectoryEntries(entries, { category: "architects", city: "Lisbon" })).toEqual([]);
+  });
+
+  it("links only the exact Herzog & de Meuron credit to a profile", () => {
+    expect(profileForCredit("Herzog & de Meuron")?.slug).toBe("herzog-de-meuron");
+    expect(profileForCredit("Herzog & de Meuron with someone")).toBeNull();
+    expect(profileForCredit("Amanda Levete (AL_A)")).toBeNull();
   });
 
   it("counts reading time only from real copy", () => {

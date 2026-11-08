@@ -5,6 +5,7 @@ import SEO from "@/components/site/SEO";
 import NotFound from "@/pages/NotFound";
 import ResearchCoverageMap from "@/components/site/ResearchCoverageMap";
 import { creditTableCsv, directoryCategory, filterDirectoryEntries, readMinutes, type DirectoryEntry } from "@/lib/directory";
+import { profileForCredit } from "@/data/architectProfiles";
 import { useDirectoryRecords } from "@/hooks/useDirectoryRecords";
 
 const PREVIEW = 6;
@@ -168,6 +169,13 @@ export default function DirectoryCategory() {
                   </button>
                 </div>
                 <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">The places named here are the buildings, not an office address. The list is not a ranking.</p>
+                {visible.filter((entry) => profileForCredit(entry.name)).map((entry) => (
+                  <p key={entry.id} className="mt-3">
+                    <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>
+                      Practice page for {entry.name}
+                    </Link>
+                  </p>
+                ))}
                 {visible.length === 0 ? (
                   <p className="mt-6 font-body text-ink-soft">No architect credits match that search.</p>
                 ) : (
@@ -185,7 +193,12 @@ export default function DirectoryCategory() {
                         <tbody>
                           {shown.map((entry) => (
                             <tr key={entry.id} className="border-t border-ink/10 align-top">
-                              <th scope="row" className="px-4 py-3 font-normal text-ink" style={{ fontSize: "1.05rem" }}>{entry.name}</th>
+                              <th scope="row" className="px-4 py-3 font-normal text-ink" style={{ fontSize: "1.05rem" }}>
+                                {entry.name}
+                                {profileForCredit(entry.name) && (
+                                  <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="mt-1 block font-mono uppercase text-accent-terra" style={{ fontSize: 11, letterSpacing: "0.12em" }}>Practice page</Link>
+                                )}
+                              </th>
                               <td className="px-4 py-3 font-body text-ink-soft text-[15px]">{entry.buildings}</td>
                               <td className="px-4 py-3 font-body text-ink-soft text-[15px]">{locations(entry) || "Not recorded"}</td>
                               <td className="px-4 py-3 font-body text-[15px]">
@@ -221,6 +234,9 @@ export default function DirectoryCategory() {
                         <div className="p-5">
                           <p className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Architect credit</p>
                           <h3 className="mt-2 text-ink" style={{ fontWeight: 400, fontSize: "1.6rem", lineHeight: 1.15 }}>{entry.name}</h3>
+                          {profileForCredit(entry.name) && (
+                            <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="mt-2 inline-block font-mono uppercase text-accent-terra" style={{ fontSize: 11, letterSpacing: "0.12em" }}>Practice page</Link>
+                          )}
                           <ul className="mt-3 space-y-1">
                             {entry.buildingsList.map((building) => (
                               <li key={building.slug}>

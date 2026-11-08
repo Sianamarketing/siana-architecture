@@ -4,6 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { MemoryRouter, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import Directory from "@/pages/Directory";
 import DirectoryCategory from "@/pages/DirectoryCategory";
+import ArchitectProfile from "@/pages/ArchitectProfile";
 
 function DirectoryLegacyRedirect() {
   const [params] = useSearchParams();
@@ -54,6 +55,7 @@ function renderAt(path: string) {
         <Routes>
           <Route path="/d" element={<Directory />} />
           <Route path="/d/" element={<Directory />} />
+          <Route path="/d/architects/:profileSlug" element={<ArchitectProfile />} />
           <Route path="/d/:slug" element={<DirectoryCategory />} />
           <Route path="/directory" element={<DirectoryLegacyRedirect />} />
         </Routes>
@@ -110,6 +112,16 @@ describe("directory page", () => {
     renderAt("/directory?category=architects&q=Corbusier");
     expect(await screen.findByRole("heading", { name: "Architects" })).toBeInTheDocument();
     expect(await screen.findByText("Le Corbusier")).toBeInTheDocument();
+  });
+
+  it("opens the Herzog & de Meuron profile without a score or a price", async () => {
+    renderAt("/d/architects/herzog-de-meuron");
+    expect(await screen.findByRole("heading", { name: "Herzog & de Meuron" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Practice website" })).toHaveAttribute("href", "https://www.herzogdemeuron.com/");
+    expect(screen.getByRole("link", { name: "CaixaForum Madrid" })).toHaveAttribute("href", "/projects/caixaforum-madrid");
+    expect(screen.queryByRole("heading", { name: /pricing/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/out of 10/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText("Not verified").length).toBeGreaterThan(0);
   });
 
   it("treats an unknown category as not found", async () => {

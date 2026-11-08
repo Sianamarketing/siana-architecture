@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { to: "/atlas", label: "Map" },
   { to: "/cities", label: "Cities" },
-  { to: "/practice", label: "Practice" },
+  { to: "/directory", label: "Directory" },
   { to: "/about", label: "About" },
 ];
 
@@ -13,6 +13,10 @@ const navLinks = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const isActive = (to: string) =>
+    to.startsWith("/#") || to === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(to);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -32,14 +36,12 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
-              const active =
-                link.to.startsWith("/#") || link.to === "/"
-                  ? location.pathname === "/"
-                  : location.pathname.startsWith(link.to);
+              const active = isActive(link.to);
               return (
                 <Link
                   key={link.to}
                   to={link.to}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
                     "font-mono uppercase px-3 py-2 transition-colors duration-200 text-ink/70 hover:text-ink link-underline",
                     active && "text-ink is-active"
@@ -57,9 +59,10 @@ export default function Navbar() {
           </nav>
 
           <button
-            className="md:hidden p-2 -mr-2 text-ink press"
+            className="md:hidden inline-flex h-11 w-11 items-center justify-center -mr-2 text-ink press"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
+            aria-expanded={mobileOpen}
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1">
               <line x1="2" y1="6" x2="18" y2="6" />
@@ -76,9 +79,10 @@ export default function Navbar() {
               siana
             </Link>
             <button
-              className="p-2 -mr-2 text-ink press"
+              className="inline-flex h-11 w-11 items-center justify-center -mr-2 text-ink press"
               onClick={() => setMobileOpen(false)}
               aria-label="Close menu"
+              aria-expanded={mobileOpen}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1">
                 <line x1="4" y1="4" x2="16" y2="16" />
@@ -87,15 +91,22 @@ export default function Navbar() {
             </button>
           </div>
           <nav className="flex-1 flex flex-col items-center justify-center gap-6 px-10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="font-display text-[24px] text-ink hover:opacity-60 press"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const active = isActive(link.to);
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "font-display text-[24px] text-ink hover:opacity-60 press",
+                    active && "border-b border-ink"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}

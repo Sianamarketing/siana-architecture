@@ -47,7 +47,7 @@ export default function FeaturedBuildings() {
 
   return (
     <section
-      className="bg-paper py-16 md:py-24"
+      className="bg-transparent py-16 md:py-24"
     >
       <Reveal
         className="mx-auto max-w-[1400px] px-6 lg:px-10"

@@ -76,6 +76,7 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/journal", TODAY, "weekly", "0.9"),
     urlEntry("/resources", TODAY, "weekly", "0.7"),
     urlEntry("/about", TODAY, "monthly", "0.5"),
+    urlEntry("/directory", TODAY, "weekly", "0.6"),
     ...cities.map((c) => urlEntry(`/cities/${c.slug}`, dateOnly(c.updated_at), "monthly", "0.8")),
     ...projects.map((p) => urlEntry(`/projects/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
     ...journal.map((p) => urlEntry(`/journal/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
@@ -125,7 +126,8 @@ function buildLlms({ cities, projects, journal }) {
     `- [Cities index](${SITE_URL}/cities): Browse all cities in the atlas.\n` +
     `- [Journal](${SITE_URL}/journal): All essays and field notes (the blog).\n` +
     `- [Resources for architects](${SITE_URL}/resources): Practical guides for architecture, engineering and construction practices.\n` +
-    `- [About](${SITE_URL}/about): What Siana is and why it exists.\n\n` +
+    `- [About](${SITE_URL}/about): What Siana is and why it exists.\n` +
+    `- [Directory](${SITE_URL}/directory): Architects credited on published buildings.\n\n` +
     `## Optional\n` +
     `- [XML sitemap](${SITE_URL}/sitemap.xml): Full list of indexable URLs.\n`
   );
@@ -154,7 +156,7 @@ async function main() {
   writeFileSync(resolve(PUBLIC, "sitemap.xml"), buildSitemap(data), "utf8");
   writeFileSync(resolve(PUBLIC, "llms.txt"), buildLlms(data), "utf8");
 
-  const total = 5 + cities.length + projects.length + journal.length + resources.length;
+  const total = 7 + cities.length + projects.length + journal.length + resources.length;
   console.log(
     `[seo] Wrote public/sitemap.xml (${total} URLs) + public/llms.txt - ` +
       `${cities.length} cities, ${projects.length} projects, ${journal.length} journal, ${resources.length} resources`,

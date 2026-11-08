@@ -3,43 +3,37 @@
 
   <url>
     <loc>https://sianaarchitecture.com/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/atlas</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/cities</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/journal</loc>
-    <lastmod>2026-06-23</lastmod>
+    <loc>https://sianaarchitecture.com/practice</loc>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://sianaarchitecture.com/resources</loc>
-    <lastmod>2026-06-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/about</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/d/</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -86,196 +80,304 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/cities/barcelona</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://sianaarchitecture.com/cities/berlin</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sianaarchitecture.com/cities/chicago</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sianaarchitecture.com/cities/copenaghue</loc>
-    <lastmod>2026-06-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sianaarchitecture.com/cities/lisbon</loc>
-    <lastmod>2026-06-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sianaarchitecture.com/cities/madrid</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sianaarchitecture.com/cities/mexico-city</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/cities/newyork</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/cities/porto</loc>
-    <lastmod>2026-06-22</lastmod>
+    <loc>https://sianaarchitecture.com/cities/vienna</loc>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/8-house</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/akademie-der-kuenste-hanseatenweg</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/schlange-schlangenbader-strasse</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/bayard-condict-building</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/bierpinsel</loc>
+    <lastmod>2026-10-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/caixaforum-madrid</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/casa-batllo</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/casa-da-musica</loc>
-    <lastmod>2026-06-02</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/casa-luis-barragan</loc>
-    <lastmod>2026-06-02</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/champalimaud-centre</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/tschechische-botschaft-berlin</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/exrotaprint</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/hugh-o-neill-building</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/icc-berlin</loc>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/institut-fuer-hygiene-und-mikrobiologie</loc>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/krematorium-baumschulenweg</loc>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/maat-lisbon</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/manhattan-savings-institution</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/maria-regina-martyrum</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/maeusebunker</loc>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/mercat-santa-caterina</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/museo-soumaya</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/neues-kreuzberger-zentrum</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/pallasseum</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/paul-gerhardt-kirche-schoeneberg</loc>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/robie-house</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/royal-danish-opera</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/sagrada-familia</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/san-gimignano-lichtenberg</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/schering-bayer-wedding</loc>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/serralves-museum</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/spitteleck</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/sez-berlin</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/st-agnes-koenig-galerie</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/st-norbert-schoeneberg</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/steglitzer-kreisel</loc>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/unite-d-habitation-berlin</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sianaarchitecture.com/projects/klinikum-am-urban</loc>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sianaarchitecture.com/projects/willis-tower</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/journal/the-drawing-that-thinks-back</loc>
-    <lastmod>2026-06-03</lastmod>
+    <loc>https://sianaarchitecture.com/practice/the-drawing-that-thinks-back</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/journal/on-the-patience-of-stone</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://sianaarchitecture.com/practice/on-the-patience-of-stone</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/journal/the-museum-that-forgot-its-street</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://sianaarchitecture.com/practice/the-museum-that-forgot-its-street</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/journal/a-conversation-with-the-last-brickmaker</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://sianaarchitecture.com/practice/a-conversation-with-the-last-brickmaker</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/journal/the-slow-return-of-the-courtyard</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://sianaarchitecture.com/practice/the-slow-return-of-the-courtyard</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/resources/barcelona-la-linea-curva-como-manifiesto</loc>
-    <lastmod>2026-06-23</lastmod>
+    <loc>https://sianaarchitecture.com/practice/barcelona-la-linea-curva-como-manifiesto</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/resources/lina-bo-bardi-in-her-own-light</loc>
-    <lastmod>2026-06-23</lastmod>
+    <loc>https://sianaarchitecture.com/practice/lina-bo-bardi-in-her-own-light</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sianaarchitecture.com/resources/lisbon-from-the-tile-up</loc>
-    <lastmod>2026-06-23</lastmod>
+    <loc>https://sianaarchitecture.com/practice/lisbon-from-the-tile-up</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
 
 </urlset>

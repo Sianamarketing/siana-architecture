@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { to: "/atlas", label: "Map" },
   { to: "/cities", label: "Cities" },
-  { to: "/practice", label: "Practice" },
+  { to: "/d/", label: "Directory" },
   { to: "/about", label: "About" },
 ];
 
@@ -13,6 +13,11 @@ const navLinks = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const isActive = (to: string) => {
+    if (to.startsWith("/#") || to === "/") return location.pathname === "/";
+    if (to === "/d/") return location.pathname === "/d" || location.pathname.startsWith("/d/");
+    return location.pathname.startsWith(to);
+  };
 
   useEffect(() => {
     setMobileOpen(false);
@@ -32,14 +37,12 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
-              const active =
-                link.to.startsWith("/#") || link.to === "/"
-                  ? location.pathname === "/"
-                  : location.pathname.startsWith(link.to);
+              const active = isActive(link.to);
               return (
                 <Link
                   key={link.to}
                   to={link.to}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
                     "font-mono uppercase px-3 py-2 transition-colors duration-200 text-ink/70 hover:text-ink link-underline",
                     active && "text-ink is-active"
@@ -87,15 +90,22 @@ export default function Navbar() {
             </button>
           </div>
           <nav className="flex-1 flex flex-col items-center justify-center gap-6 px-10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="font-display text-[24px] text-ink hover:opacity-60 press"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const active = isActive(link.to);
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "font-display text-[24px] text-ink hover:opacity-60 press",
+                    active && "border-b border-ink"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}

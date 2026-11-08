@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -23,6 +23,9 @@ import JournalArticle from "./pages/JournalArticle.tsx";
 // the critical path of a visitor who only ever sees the home page.
 const About = lazy(() => import("./pages/About.tsx"));
 const Cities = lazy(() => import("./pages/Cities.tsx"));
+const Directory = lazy(() => import("./pages/Directory.tsx"));
+const DirectoryCategory = lazy(() => import("./pages/DirectoryCategory.tsx"));
+const ArchitectProfile = lazy(() => import("./pages/ArchitectProfile.tsx"));
 const Resources = lazy(() => import("./pages/Resources.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -59,6 +62,16 @@ function AdminPracticeRedirect() {
   return <Navigate to={`/admin/practice${id ? `/${id}` : ""}`} replace />;
 }
 
+function DirectoryLegacyRedirect() {
+  const [params] = useSearchParams();
+  const category = params.get("category");
+  const known = ["architects", "interior-designers", "product-manufacturers", "designers", "tools", "marketing-agency"];
+  const q = params.get("q");
+  const search = q ? `?q=${encodeURIComponent(q)}` : "";
+  const to = category && known.includes(category) ? `/d/${category}${search}` : `/d/${search}`;
+  return <Navigate to={to} replace />;
+}
+
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
@@ -85,6 +98,12 @@ const App = () => (
             <Route path="/atlas" element={<Atlas />} />
             <Route path="/about" element={<About />} />
             <Route path="/cities" element={<Cities />} />
+            <Route path="/d" element={<Directory />} />
+            <Route path="/d/" element={<Directory />} />
+            <Route path="/d/architects/:profileSlug" element={<ArchitectProfile />} />
+            <Route path="/d/:slug" element={<DirectoryCategory />} />
+            <Route path="/directory" element={<DirectoryLegacyRedirect />} />
+            <Route path="/directory/" element={<DirectoryLegacyRedirect />} />
             <Route path="/cities/:slug" element={<CityDetail />} />
             <Route path="/projects/:slug" element={<ProjectDetail />} />
             <Route path="/practice" element={<Resources />} />

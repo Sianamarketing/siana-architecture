@@ -48,6 +48,21 @@ const esc = (s) =>
 const stripHtml = (s) => String(s ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 const clamp = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
 
+function researchCityList(projects, cities) {
+  const counts = new Map();
+  for (const project of projects) {
+    const name = project.city?.name;
+    if (!name || project.latitude == null || project.longitude == null) continue;
+    counts.set(name, (counts.get(name) || 0) + 1);
+  }
+  const items = cities.filter((city) => counts.has(city.name));
+  if (!items.length) return "<p>No published location is on file.</p>";
+  return `<ul>` + items.map((city) => {
+    const count = counts.get(city.name);
+    return `<li><a href="/cities/${esc(city.slug)}">${esc(city.name)}</a>${city.country ? " - " + esc(city.country) : ""}, ${count} published ${count === 1 ? "building" : "buildings"}</li>`;
+  }).join("") + `</ul>`;
+}
+
 async function fetchRows(query) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
@@ -122,9 +137,9 @@ async function main() {
   const template = readFileSync(join(DIST, "index.html"), "utf8");
   const byNewest = (a, b) => (b.published_at ?? "").localeCompare(a.published_at ?? "");
 
-  const [cities, projects, posts, homeRows, projectImages, projectLinks, projectGraphics] = await Promise.all([
+  const [cities, projects, posts, , projectImages, projectLinks, projectGraphics] = await Promise.all([
     fetchRows("cities?status=eq.published&select=slug,name,country,tagline,hero_image_url&order=name"),
-    fetchRows("projects?status=eq.published&select=id,slug,name,tagline,architect,year_completed,category,style,description,analysis,tldr,siana_pick,curious_facts,why_section,stats,condition,heritage_status,year_listed,meta_title,meta_description,og_image_url,hero_image_url,cover_image_url,address,latitude,longitude,city:cities(name)&order=name"),
+    fetchRows("projects?status=eq.published&select=id,slug,name,tagline,architect,year_completed,featured,category,style,description,analysis,tldr,siana_pick,curious_facts,why_section,stats,condition,heritage_status,year_listed,meta_title,meta_description,og_image_url,hero_image_url,cover_image_url,address,latitude,longitude,city:cities(name)&order=name"),
     fetchRows("posts?status=eq.published&select=slug,kind,title,excerpt,body,author,category,hero_image_url,published_at&order=published_at.desc"),
     fetchRows("site_pages?key=eq.home&select=content").catch(() => []),
     fetchRows("project_images?select=project_id,alt,caption,author,license,source_url,position&order=position").catch(() => []),
@@ -132,7 +147,7 @@ async function main() {
     fetchRows("project_graphics?select=project_id,slug,kind,alt,caption,downloadable,position&order=position").catch(() => []),
   ]);
   // The home cover: whichever image the editor put first in /admin/home.
-  const heroPreload = homeRows?.[0]?.content?.hero?.images?.[0] || null;
+  const heroPreload = "/buildings/unite-d-habitation-berlin/01-slab-on-the-lawn.jpg";
   const journal = posts.filter((p) => p.kind === "journal");
   const resources = posts.filter((p) => p.kind === "resource");
   let n = 0;
@@ -145,26 +160,53 @@ async function main() {
   // is faithful rather than padding. No <img> here on purpose - the block is
   // clipped out of view, so images would download for nobody; the real page
   // carries them once React mounts.
-  const home = homeRows?.[0]?.content || {};
-  const intro = stripHtml(home?.hero?.description) ||
-    "Curated architectural projects, city guides and field notes, mapped city by city.";
   const li = (href, label, tail) =>
     `<li><a href="${esc(href)}">${esc(label)}</a>${tail ? " - " + esc(clamp(stripHtml(tail), 150)) : ""}</li>`;
+  const architects = new Map();
+  for (const project of projects) {
+    const name = String(project.architect || "").trim();
+    if (!name || architects.has(name)) continue;
+    architects.set(name, project.slug);
+  }
 
   write("/", renderPage(template, {
     path: "/",
     preloadImage: heroPreload,
     title: "Siana Architecture",
-    description: "An editorial atlas of architecture: significant buildings mapped city by city, with a journal of essays and field notes and resources for architects.",
+    description: "Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live.",
     image: OG_DEFAULT,
     jsonld: { "@context": "https://schema.org", "@graph": [ORG, { "@type": "WebSite", name: "Siana Architecture", url: SITE_URL }] },
     content:
-      `<h1>Siana Architecture</h1>` +
-      `<p>${esc(intro)}</p>` +
-      `<p>Siana Architecture is an editorial atlas: we document significant buildings across the world's cities, write about them with the care of an editor and the eye of an architect, and place every one of them on a map you can actually use.</p>` +
+      `<h1>Explore the world of architecture and design</h1>` +
+      `<p>Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live.</p>` +
+      `<p><a href="/projects/unite-d-habitation-berlin">Unité d'Habitation Berlin</a>. Gunnar Klack, CC BY-SA 4.0.</p>` +
 
-      `<h2>The interactive map</h2>` +
-      `<p>Every project we publish is pinned on the <a href="/atlas">Atlas</a>, our interactive map. Filter by city, material, era or architectural style, then open any pin to read the full entry.</p>` +
+      `<h2>Explore the map</h2>` +
+      `<p>Published buildings, pinned where they stand. <a href="/atlas">Open the map</a> to filter by city, material, experience, and style.</p>` +
+
+      `<h2>Featured buildings</h2>` +
+      `<p>Each entry carries the architect, the year of completion, the materials and the context that makes the building worth the detour.</p>` +
+      (projects.filter((project) => project.featured).length
+        ? `<ul>` + projects.filter((project) => project.featured).slice(0, 12).map((p) => li(
+            `/projects/${p.slug}`,
+            p.name,
+            [p.architect, p.year_completed, p.city?.name, p.tagline].filter(Boolean).join(", "),
+          )).join("") + `</ul>`
+        : "") +
+
+      `<h2>The directory</h2>` +
+      `<p>Find architects credited on published buildings. Interior designers, product manufacturers, designers, tools, and marketing agencies will be listed when there are records to show.</p>` +
+      (architects.size
+        ? `<ul>` + [...architects.entries()].slice(0, 24).map(([name, slug]) => li(`/projects/${slug}`, name, "Architect")).join("") + `</ul>`
+        : `<p>Nothing listed here yet.</p>`) +
+      `<p><a href="/d/">Browse the directory</a></p>` +
+
+      `<h2>News and research</h2>` +
+      `<p>Essays, criticism, interviews and reportage.</p>` +
+      (posts.length
+        ? `<ul>` + posts.slice(0, 8).map((p) => li(`/practice/${p.slug}`, p.title, p.category || p.excerpt)).join("") + `</ul>`
+        : `<p>Stories will appear here as they are published.</p>`) +
+      `<p><a href="/practice">View all stories</a></p>` +
 
       `<h2>Cities we cover</h2>` +
       `<p>City guides pair an essay on the place with the buildings worth walking to. We currently cover ${cities.length} ${cities.length === 1 ? "city" : "cities"}.</p>` +
@@ -173,30 +215,68 @@ async function main() {
         : "") +
       `<p><a href="/cities">Browse every city guide</a></p>` +
 
-      `<h2>Featured buildings</h2>` +
-      `<p>Each entry carries the architect, the year of completion, the materials and the context that makes the building worth the detour.</p>` +
-      (projects.length
-        ? `<ul>` + projects.slice(0, 12).map((p) => li(
-            `/projects/${p.slug}`,
-            p.name,
-            [p.architect, p.year_completed, p.city?.name, p.tagline].filter(Boolean).join(", "),
-          )).join("") + `</ul>`
-        : "") +
-
-      `<h2>From Practice</h2>` +
-      `<p>Essays, criticism, interviews and field notes on architecture and the cities that hold it.</p>` +
-      (journal.length
-        ? `<ul>` + journal.slice(0, 8).map((p) => li(`/journal/${p.slug}`, p.title, p.excerpt)).join("") + `</ul>`
-        : "") +
-      (resources.length
-        ? `<p>Practical guides for architecture practices:</p><ul>` +
-          resources.slice(0, 8).map((p) => li(`/resources/${p.slug}`, p.title, p.excerpt)).join("") + `</ul>`
-        : "") +
-      `<p><a href="/practice">Read everything in Practice</a></p>` +
-
       `<h2>About Siana Architecture</h2>` +
       `<p>We believe the most interesting building in any city is rarely the most famous one, and that the best way to understand a place is to walk it slowly, with someone pointing. No ads, no clutter, no infinite scroll. <a href="/about">More about what we do</a>.</p>`,
   })); n++;
+
+  const directoryCategories = [
+    ["architects", "Architects"],
+    ["interior-designers", "Interior Designers"],
+    ["product-manufacturers", "Product manufacturers"],
+    ["designers", "Designers"],
+    ["tools", "Tools"],
+    ["marketing-agency", "Marketing Agency"],
+  ];
+  write("/d", renderPage(template, {
+    path: "/d/",
+    title: "Directory - Siana Architecture",
+    description: "Architects credited on published buildings.",
+    image: OG_DEFAULT,
+    content:
+      `<h1>Find the people and tools behind architecture.</h1>` +
+      `<p>Architect credits are taken from published buildings. A credit can name more than one person, and it stays as one line. These are not verified business profiles. Search the directory, or choose a category.</p>` +
+      `<h2>Browse by category</h2><ul>` +
+      directoryCategories.map(([slug, label]) => `<li><a href="/d/${slug}">${label}</a></li>`).join("") +
+      `</ul>` +
+      `<p>Interior designers, product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
+      `<h2>Where the research is</h2>` +
+      `<p>Published buildings with a recorded location.</p>` +
+      researchCityList(projects, cities) +
+      (posts.length
+        ? `<h2>Latest research</h2><ul>` + posts.slice(0, 4).map((p) => li(`/practice/${p.slug}`, p.title, p.category || p.excerpt)).join("") + `</ul>`
+        : ""),
+  })); n++;
+  for (const [slug, label] of directoryCategories) {
+    const architects = slug === "architects";
+    write(`/d/${slug}`, renderPage(template, {
+      path: `/d/${slug}`,
+      title: `${label} - Directory - Siana Architecture`,
+      description: architects
+        ? "Architect credits copied from published buildings."
+        : `${label} has no listings yet.`,
+      image: OG_DEFAULT,
+      content:
+        `<nav>Directory / ${label}</nav>` +
+        `<h1>${label}</h1>` +
+        (architects
+          ? `<p>Architect credits from published buildings. A credit that names several people stays one line.</p><p><a href="/d/">Back to Directory</a></p>`
+          : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
+    }));
+    n++;
+  }
+  write("/d/architects/herzog-de-meuron", renderPage(template, {
+    path: "/d/architects/herzog-de-meuron",
+    title: "Herzog & de Meuron - Directory - Siana Architecture",
+    description: "Herzog & de Meuron is an international practice founded in Basel in 1978. This profile uses the practice's own pages and the 2001 Pritzker Prize record.",
+    image: OG_DEFAULT,
+    content:
+      `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Herzog &amp; de Meuron</nav>` +
+      `<h1>Herzog &amp; de Meuron</h1>` +
+      `<p>International practice founded in Basel in 1978 by Jacques Herzog and Pierre de Meuron, owned by its active partners. <a href="https://www.herzogdemeuron.com/practice/">Practice page</a>.</p>` +
+      `<p>Ten selected projects are dated from the practice’s project pages, including <a href="/projects/caixaforum-madrid">CaixaForum Madrid</a>. The Siana credit line “Herzog &amp; de Meuron” is not split.</p>` +
+      `<p>Checked 8 November 2026. Swiss and UK registration: not verified. The practice states it is not licensed in Florida. The H&amp;dM wordmark is the Commons PD-textlogo file. Portraits of the founders use Commons licences.</p>`,
+  }));
+  n++;
 
   // --- Listing: Cities ---
   write("/cities", renderPage(template, {

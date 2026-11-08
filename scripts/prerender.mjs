@@ -266,7 +266,7 @@ async function main() {
   }
   write("/d/architects/springfield-missouri", renderPage(template, {
     path: "/d/architects/springfield-missouri",
-    title: "Best architecture firms in Springfield, Missouri - Siana Architecture",
+    title: "Best architecture firms in Springfield, Missouri in 2026 - Siana Architecture",
     description: "Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city.",
     image: OG_DEFAULT,
     jsonld: {

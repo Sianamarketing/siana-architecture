@@ -73,8 +73,7 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/", TODAY, "weekly", "1.0"),
     urlEntry("/atlas", TODAY, "weekly", "0.9"),
     urlEntry("/cities", TODAY, "weekly", "0.9"),
-    urlEntry("/journal", TODAY, "weekly", "0.9"),
-    urlEntry("/resources", TODAY, "weekly", "0.7"),
+    urlEntry("/practice", TODAY, "weekly", "0.9"),
     urlEntry("/about", TODAY, "monthly", "0.5"),
     urlEntry("/d/", TODAY, "weekly", "0.6"),
     urlEntry("/d/architects", TODAY, "weekly", "0.5"),
@@ -86,8 +85,7 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/d/architects/herzog-de-meuron", TODAY, "monthly", "0.5"),
     ...cities.map((c) => urlEntry(`/cities/${c.slug}`, dateOnly(c.updated_at), "monthly", "0.8")),
     ...projects.map((p) => urlEntry(`/projects/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
-    ...journal.map((p) => urlEntry(`/journal/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
-    ...resources.map((p) => urlEntry(`/resources/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.6")),
+    ...postsForSitemap(journal, resources).map((p) => urlEntry(`/practice/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
   ];
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
@@ -103,14 +101,23 @@ const LLMS_INTRO =
   `> Siana is an editorial atlas of architecture: a curated guide to significant buildings around the world, mapped city by city, paired with a journal of essays and field notes and a library of resources for architects.\n\n` +
   `Siana documents notable architecture across global cities and writes about it with an editorial eye. The site is organized into four areas: **Cities** (city guides with an interactive map of pinned buildings), **Projects** (individual buildings with architect, year and context), the **Journal** (the blog - essays, criticism, profiles, interviews and field notes on architecture), and **Resources** (practical guides for architecture practices).\n`;
 
-function buildLlms({ cities, projects, journal }) {
+function postsForSitemap(journal, resources) {
+  const seen = new Set();
+  return [...journal, ...resources].filter((post) => {
+    if (!post.slug || seen.has(post.slug)) return false;
+    seen.add(post.slug);
+    return true;
+  });
+}
+
+function buildLlms({ cities, projects, journal, resources }) {
   const cityLine = (c) => {
     let d = `Architecture guide to ${c.name}${c.country ? ", " + c.country : ""}`;
     d += c.tagline ? ` - ${c.tagline}` : ".";
     return `- [${c.name}](${SITE_URL}/cities/${c.slug}): ${d}`;
   };
-  const journalLine = (p) =>
-    `- [${p.title}](${SITE_URL}/journal/${p.slug}): ${p.category ? p.category + " - " : ""}${p.excerpt ?? ""}`.trimEnd();
+  const storyLine = (p) =>
+    `- [${p.title}](${SITE_URL}/practice/${p.slug}): ${p.category ? p.category + " - " : ""}${p.excerpt ?? ""}`.trimEnd();
   const projectLine = (p) => {
     const year = p.year_completed && p.year_completed > 1000 ? p.year_completed : null;
     const meta = [p.architect, year].filter(Boolean).join(", ");
@@ -126,13 +133,12 @@ function buildLlms({ cities, projects, journal }) {
     `- Focus: architecture, cities, urbanism, design history, the built environment\n` +
     `- Cities covered: ${cities.map((c) => c.name).join(", ")}\n\n` +
     `## Cities\n${cities.map(cityLine).join("\n")}\n\n` +
-    `## Journal (blog)\n${journal.map(journalLine).join("\n")}\n\n` +
+    `## Practice\n${postsForSitemap(journal, resources).map(storyLine).join("\n")}\n\n` +
     `## Projects\n${projects.map(projectLine).join("\n")}\n\n` +
     `## Main sections\n` +
     `- [Atlas](${SITE_URL}/atlas): Interactive map - explore every project by city, architect, style and year.\n` +
     `- [Cities index](${SITE_URL}/cities): Browse all cities in the atlas.\n` +
-    `- [Journal](${SITE_URL}/journal): All essays and field notes (the blog).\n` +
-    `- [Resources for architects](${SITE_URL}/resources): Practical guides for architecture, engineering and construction practices.\n` +
+    `- [Practice](${SITE_URL}/practice): Essays, criticism, interviews and practical notes.\n` +
     `- [About](${SITE_URL}/about): What Siana is and why it exists.\n` +
     `- [Directory](${SITE_URL}/d/): Architects credited on published buildings.\n` +
     `- [Architects](${SITE_URL}/d/architects): Credits on published buildings.\n` +
@@ -163,7 +169,7 @@ async function main() {
 
   if (!existsSync(PUBLIC)) mkdirSync(PUBLIC, { recursive: true });
   writeFileSync(resolve(PUBLIC, "sitemap.xml"), buildSitemap(data), "utf8");
-  writeFileSync(resolve(PUBLIC, "llms.txt"), buildLlms(data), "utf8");
+  writeFileSync(resolve(PUBLIC, "llms.txt"), buildLlms({ ...data, resources }), "utf8");
 
   const total = 7 + cities.length + projects.length + journal.length + resources.length;
   console.log(

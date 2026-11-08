@@ -12,9 +12,20 @@
     { "source": "/directory", "destination": "/d/", "permanent": true },
     { "source": "/directory/", "destination": "/d/", "permanent": true },
     { "source": "/d", "destination": "/d/", "permanent": true },
-    { "source": "/d/:slug/", "destination": "/d/:slug", "permanent": true }
+    { "source": "/d/:slug/", "destination": "/d/:slug", "permanent": true },
+    { "source": "/journal", "destination": "/practice", "permanent": true },
+    { "source": "/journal/", "destination": "/practice", "permanent": true },
+    { "source": "/journal/:slug", "destination": "/practice/:slug", "permanent": true },
+    { "source": "/resources", "destination": "/practice", "permanent": true },
+    { "source": "/resources/", "destination": "/practice", "permanent": true },
+    { "source": "/resources/:slug", "destination": "/practice/:slug", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/cities/:slug", "destination": "/api/not-found" },
+    { "source": "/practice/:slug", "destination": "/api/not-found" },
+    { "source": "/projects/:slug", "destination": "/api/not-found" },
+    { "source": "/d/architects/:profile", "destination": "/api/not-found" },
+    { "source": "/d/:slug", "destination": "/api/not-found" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

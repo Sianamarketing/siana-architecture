@@ -290,29 +290,16 @@ async function main() {
       `</ul>`,
   })); n++;
 
-  // --- Listing: Journal ---
-  write("/journal", renderPage(template, {
-    path: "/journal",
-    title: "Journal - Siana Architecture",
-    description: "Essays, criticism, profiles, interviews and field notes on architecture from Siana.",
+  // Practice is the public article route. /journal and /resources redirect there.
+  write("/practice", renderPage(template, {
+    path: "/practice",
+    title: "Practice - Siana Architecture",
+    description: "Essays, criticism, interviews and practical notes on architecture from Siana.",
     image: OG_DEFAULT,
     content:
-      `<h1>Journal</h1><ul>` +
-      journal.map((p) => `<li><a href="/journal/${esc(p.slug)}">${esc(p.title)}</a>${p.excerpt ? " - " + esc(p.excerpt) : ""}</li>`).join("") +
+      `<h1>Practice</h1><ul>` +
+      posts.map((p) => `<li><a href="/practice/${esc(p.slug)}">${esc(p.title)}</a>${p.excerpt ? " - " + esc(p.excerpt) : ""}</li>`).join("") +
       `</ul>`,
-  })); n++;
-
-  // --- Listing: Resources ---
-  write("/resources", renderPage(template, {
-    path: "/resources",
-    title: "Resources for Architects - Siana Architecture",
-    description: "Practical guides, playbooks and tools for architecture, engineering and construction practices.",
-    image: OG_DEFAULT,
-    content:
-      `<h1>Resources for architects</h1>` +
-      (resources.length
-        ? `<ul>` + resources.map((p) => `<li><a href="/resources/${esc(p.slug)}">${esc(p.title)}</a>${p.excerpt ? " - " + esc(p.excerpt) : ""}</li>`).join("") + `</ul>`
-        : `<p>Practical guides for AEC practices - coming soon.</p>`),
   })); n++;
 
   // --- About ---
@@ -389,11 +376,10 @@ async function main() {
     })); n++;
   }
 
-  // --- Journal + Resource articles (full body) ---
-  for (const p of [...journal, ...resources]) {
-    const base = p.kind === "resource" ? "/resources" : "/journal";
-    write(`${base}/${p.slug}`, renderPage(template, {
-      path: `${base}/${p.slug}`,
+  // Every published post, journal or resource, lives at /practice/:slug.
+  for (const p of posts) {
+    write(`/practice/${p.slug}`, renderPage(template, {
+      path: `/practice/${p.slug}`,
       title: `${p.title} | Siana Architecture`,
       description: p.excerpt || stripHtml(p.body).slice(0, 200),
       image: p.hero_image_url || OG_DEFAULT,
@@ -403,7 +389,7 @@ async function main() {
         headline: p.title, description: p.excerpt || undefined, image: p.hero_image_url || undefined,
         datePublished: p.published_at || undefined,
         author: p.author ? { "@type": "Person", name: p.author } : ORG,
-        publisher: ORG, mainEntityOfPage: `${SITE_URL}${base}/${p.slug}`,
+        publisher: ORG, mainEntityOfPage: `${SITE_URL}/practice/${p.slug}`,
         articleSection: p.category || undefined,
       },
       content:

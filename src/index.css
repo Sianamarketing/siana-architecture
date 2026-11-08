@@ -689,3 +689,104 @@
     min-height: 520px;
   }
 }
+
+/* Homepage comparison. Headings on this page only use Bodoni Moda
+   (SIL OFL 1.1, Google Fonts). Body stays Inter. Labels stay Montserrat.
+   The paper grain remains the page background, not a tint on pictures. */
+.home-taste h1,
+.home-taste h2,
+.home-taste h3,
+.home-taste .font-display,
+.home-taste .font-display-black,
+.home-taste .home-display {
+  font-family: "Bodoni Moda", Didot, "Bodoni MT", "Times New Roman", serif;
+  font-weight: 500;
+  font-optical-sizing: auto;
+  font-synthesis: none;
+}
+.home-taste .home-hero-title {
+  font-size: clamp(2.35rem, 4.6vw, 4.35rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.home-taste .home-section-title {
+  font-size: clamp(2.15rem, 3.8vw, 3.45rem);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+}
+.home-taste .home-story-title {
+  font-size: clamp(1.7rem, 2.4vw, 2.35rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+.home-taste .home-story-row {
+  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+  line-height: 1.2;
+}
+.home-taste .taste-action {
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1), transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-taste .taste-photo {
+  overflow: hidden;
+}
+.home-taste .taste-photo img {
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-taste .taste-action:hover {
+    background-color: #9c3014;
+    transform: translateY(-1px);
+  }
+  .home-taste .taste-photo:hover img,
+  .home-taste .lift:hover .photo-thumb {
+    transform: scale(1.03);
+  }
+  .home-taste .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(17, 17, 16, 0.1);
+  }
+}
+.home-taste .taste-action:active {
+  transform: translateY(1px) scale(0.985);
+}
+.home-taste .reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-taste .taste-line {
+    animation: taste-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  .home-taste .taste-line:nth-child(2) { animation-delay: 70ms; }
+  .home-taste .taste-line:nth-child(3) { animation-delay: 140ms; }
+  .home-taste .taste-line:nth-child(4) { animation-delay: 210ms; }
+  .home-taste .taste-follow {
+    animation: taste-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: 320ms;
+  }
+  .home-taste .taste-photo img {
+    animation: taste-settle 1100ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+}
+@keyframes taste-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes taste-settle {
+  from { transform: scale(1.04); }
+  to { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-taste .taste-action,
+  .home-taste .taste-action:hover,
+  .home-taste .taste-action:active,
+  .home-taste .taste-photo img,
+  .home-taste .lift,
+  .home-taste .lift:hover,
+  .home-taste .lift:active {
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+}

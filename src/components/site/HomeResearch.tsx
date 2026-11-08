@@ -42,7 +42,7 @@ export default function HomeResearch() {
             <p className="font-mono uppercase text-warm-gray mb-4" style={{ fontSize: 12, letterSpacing: "0.18em" }}>
               04 / News & research
             </p>
-            <h2 className="text-ink" style={{ fontFamily: "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif", fontWeight: 400, fontSize: "clamp(2.6rem, 5vw, 4.6rem)", lineHeight: 0.95 }}>
+            <h2 className="home-section-title text-ink">
               Ideas worth following.
             </h2>
           </div>
@@ -74,7 +74,7 @@ export default function HomeResearch() {
                     {lead.category}
                   </p>
                 )}
-                <h3 className="text-ink group-hover:opacity-70" style={{ fontFamily: "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif", fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.8rem)", lineHeight: 1.05 }}>
+                <h3 className="home-story-title text-ink group-hover:opacity-70">
                   {lead.title}
                 </h3>
                 {lead.excerpt && (
@@ -100,7 +100,7 @@ export default function HomeResearch() {
                         <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
                           {story.category || "Story"}
                         </span>
-                        <span className="text-ink" style={{ fontFamily: "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif", fontSize: "clamp(1.25rem, 2vw, 1.7rem)", lineHeight: 1.15 }}>
+                        <span className="home-display home-story-row text-ink">
                           {story.title}
                         </span>
                         <span className="flex items-center gap-3 text-ink-soft">

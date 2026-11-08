@@ -21,8 +21,6 @@ const HERO_PHOTO = {
   href: "/projects/unite-d-habitation-berlin",
 };
 
-const serif = "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif";
-
 const Index = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -106,7 +104,7 @@ const Index = () => {
   }, [pins]);
 
   return (
-    <div className="home-paper">
+    <div className="home-paper home-taste">
       <WelcomeOverlay />
       <Helmet>
         <title>Siana Architecture</title>
@@ -116,21 +114,21 @@ const Index = () => {
       <Navbar />
 
       <section className="border-b border-ink/10" style={{ paddingTop: 76 }}>
-        <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-[minmax(0,42%)_minmax(0,56%)] lg:justify-between gap-8 lg:gap-6 lg:min-h-[calc(100vh-76px)]">
-          <div className="flex flex-col">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10 py-8 md:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 lg:min-h-[calc(100svh-76px)] lg:items-stretch">
+          <div className="lg:col-span-6 xl:col-span-5 flex flex-col min-w-0">
             <p className="font-mono uppercase text-ink flex items-center gap-2" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
               <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-accent-terra" />
               An independent guide to the built world
             </p>
-            <h1 className="mt-6 text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.8rem, 6.8vw, 4.5rem)", lineHeight: 0.92, letterSpacing: "-0.02em" }}>
-              <span className="block">Explore the</span>
-              <span className="block">World of</span>
-              <span className="block italic text-accent-terra">Architecture</span>
-              <span className="block italic text-accent-terra">&amp; Design</span>
+            <h1 className="home-hero-title mt-6 text-ink">
+              <span className="taste-line block">Explore the</span>
+              <span className="taste-line block">world of</span>
+              <span className="taste-line block italic text-accent-terra">architecture</span>
+              <span className="taste-line block italic text-accent-terra">&amp; design</span>
             </h1>
-            <div className="mt-auto pt-12 md:pt-16 flex items-end justify-between gap-6">
+            <div className="taste-follow mt-auto pt-10 md:pt-12 flex items-end justify-between gap-6">
               <div className="max-w-sm">
-                <p className="font-body text-ink-soft text-[15px] md:text-[16px] leading-relaxed">
+                <p className="font-body text-ink-soft text-[16px] leading-relaxed">
                   Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live.
                 </p>
                 <p className="mt-8 font-mono uppercase text-ink" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
@@ -149,9 +147,9 @@ const Index = () => {
             </div>
           </div>
 
-          <figure>
-            <Link to={HERO_PHOTO.href} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]">
-              <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="w-full h-auto object-cover bg-paper-mid max-h-[78vh]" />
+          <figure className="lg:col-span-6 xl:col-span-7 min-w-0 flex flex-col">
+            <Link to={HERO_PHOTO.href} className="taste-photo relative block flex-1 min-h-[240px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]">
+              <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="w-full h-full object-cover object-[center_42%] bg-paper-mid aspect-[4/3] lg:aspect-auto lg:absolute lg:inset-0" />
             </Link>
             <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
               <span>{HERO_PHOTO.building}</span>
@@ -175,7 +173,7 @@ const Index = () => {
         />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-6">
           <div className="text-center max-w-[640px]">
-            <h2 className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.4rem, 4.4vw, 3.8rem)", lineHeight: 0.98 }}>
+            <h2 className="home-section-title text-ink">
               Explore the map
             </h2>
             <p className="mt-4 font-body text-ink-soft text-[16px] leading-relaxed">
@@ -183,7 +181,7 @@ const Index = () => {
             </p>
             <Link
               to="/atlas"
-              className="pointer-events-auto inline-flex items-center justify-center h-12 px-6 mt-8 bg-accent-terra text-white font-mono uppercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+              className="taste-action pointer-events-auto inline-flex items-center justify-center h-12 px-6 mt-8 bg-accent-terra text-white font-mono uppercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
               style={{ fontSize: 13, letterSpacing: "0.14em" }}
             >
               Open map

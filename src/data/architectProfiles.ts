@@ -12,7 +12,16 @@ export interface ProfileImage {
   licenseUrl: string;
   sourceUrl: string;
   attribution: string;
-  permissionStatus: "commons-licensed";
+  permissionStatus: "commons-licensed" | "commons-pd-textlogo";
+}
+
+export interface ProfileMark extends ProfileImage {
+  caveat: string;
+}
+
+export interface ProfileFact {
+  label: string;
+  value: string;
 }
 
 export interface SelectedProject {
@@ -59,7 +68,9 @@ export interface ArchitectProfile {
   seniorPartners: string[];
   offices: { city: string; country: string; role: string }[];
   registration: { place: string; status: string; note: string }[];
-  principals: { name: string; role: string; note: string }[];
+  principals: { name: string; role: string; note: string; image: ProfileImage | null }[];
+  mark: ProfileMark | null;
+  facts: ProfileFact[];
   projects: SelectedProject[];
   awards: ProfileAward[];
   sources: { label: string; url: string }[];
@@ -155,16 +166,57 @@ export const ARCHITECT_PROFILES: ArchitectProfile[] = [
         note: "The 1111 Lincoln Road project page says the practice is not licensed to practise architecture in Florida, and that a Florida-licensed architect of record took part. That person is not named. The sentence is about one state, not a finding about any other jurisdiction.",
       },
     ],
+    mark: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Herzog_%26_de_Meuron_logo.png",
+      alt: "H&dM wordmark",
+      author: "Herzog & de Meuron",
+      license: "Public domain (PD-textlogo)",
+      licenseUrl: "https://commons.wikimedia.org/wiki/Template:PD-textlogo",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Herzog_%26_de_Meuron_logo.png",
+      attribution: "H&dM wordmark, via Wikimedia Commons, PD-textlogo",
+      permissionStatus: "commons-pd-textlogo",
+      caveat: "Wikimedia Commons records this as a simple text logo, public domain under the PD-textlogo claim. H&dM is a trademark of the practice. It is shown here only to identify the firm.",
+    },
+    facts: [
+      { label: "Model", value: "Partner-owned" },
+      { label: "Founded", value: "1978" },
+      { label: "Base", value: "Basel, Switzerland" },
+      { label: "Legal name", value: "Herzog & de Meuron Basel Ltd." },
+      { label: "Offices", value: "10 named by the practice" },
+      { label: "People", value: "More than 500, the practice’s own figure" },
+      { label: "Sectors", value: "Cultural, civic, reuse, heritage, commercial, education, industrial" },
+      { label: "Registration", value: "Not verified" },
+    ],
     principals: [
       {
         name: "Jacques Herzog",
         role: "Founding partner",
-        note: "The practice’s people page says he studied architecture at ETH Zurich from 1970 to 1975 and established the office with Pierre de Meuron in 1978. No portrait is shown. The practice site credits photographs to Gina Folly, and that credit is not a licence for this page.",
+        note: "The practice’s people page says he studied architecture at ETH Zurich from 1970 to 1975 and established the office with Pierre de Meuron in 1978.",
+        image: {
+          src: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Jacques_Herzog_2025.jpg/1280px-Jacques_Herzog_2025.jpg",
+          alt: "Jacques Herzog in 2025, wearing a dark knit cap and sweater, against a plain wall.",
+          author: "Quaenuncabibis",
+          license: "CC BY-SA 4.0",
+          licenseUrl: cc("4.0"),
+          sourceUrl: "https://commons.wikimedia.org/wiki/File:Jacques_Herzog_2025.jpg",
+          attribution: "Quaenuncabibis, CC BY-SA 4.0, via Wikimedia Commons",
+          permissionStatus: "commons-licensed",
+        },
       },
       {
         name: "Pierre de Meuron",
         role: "Founding partner",
-        note: "The Pritzker Prize biography says he attended ETH Zurich and established the practice with Jacques Herzog in 1978. The 2001 prize was awarded to both. No portrait is shown.",
+        note: "The Pritzker Prize biography says he attended ETH Zurich and established the practice with Jacques Herzog in 1978. The 2001 prize was awarded to both.",
+        image: {
+          src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/31._ISC-Symposium-Pierre_de_Meuron-HSGN_028-01578.jpg/1280px-31._ISC-Symposium-Pierre_de_Meuron-HSGN_028-01578.jpg",
+          alt: "Pierre de Meuron seated at the 31st ISC Symposium, in a pinstripe jacket.",
+          author: "St. Gallen Symposium, Universitätsarchiv St. Gallen, HSGN 028/01578",
+          license: "CC BY-SA 4.0",
+          licenseUrl: cc("4.0"),
+          sourceUrl: "https://commons.wikimedia.org/wiki/File:31._ISC-Symposium-Pierre_de_Meuron-HSGN_028-01578.jpg",
+          attribution: "St. Gallen Symposium, Universitätsarchiv St. Gallen, HSGN 028/01578, CC BY-SA 4.0, via Wikimedia Commons",
+          permissionStatus: "commons-licensed",
+        },
       },
     ],
     projects: [
@@ -378,6 +430,9 @@ export const ARCHITECT_PROFILES: ArchitectProfile[] = [
       { label: "Herzog & de Meuron, Elbphilharmonie Hamburg", url: "https://www.herzogdemeuron.com/projects/230-elbphilharmonie-hamburg/" },
       { label: "Herzog & de Meuron, Tai Kwun", url: "https://www.herzogdemeuron.com/projects/296-tai-kwun-centre-for-heritage-art/" },
       { label: "Herzog & de Meuron, Blavatnik School of Government", url: "https://www.herzogdemeuron.com/projects/387-blavatnik-school-of-government/" },
+      { label: "Wikimedia Commons, H&dM wordmark", url: "https://commons.wikimedia.org/wiki/File:Herzog_%26_de_Meuron_logo.png" },
+      { label: "Wikimedia Commons, Jacques Herzog, 2025", url: "https://commons.wikimedia.org/wiki/File:Jacques_Herzog_2025.jpg" },
+      { label: "Wikimedia Commons, Pierre de Meuron at the 31st ISC Symposium", url: "https://commons.wikimedia.org/wiki/File:31._ISC-Symposium-Pierre_de_Meuron-HSGN_028-01578.jpg" },
       { label: "Siana Architecture, CaixaForum Madrid", url: "https://sianaarchitecture.com/projects/caixaforum-madrid" },
     ],
     checked: "8 November 2026",

@@ -122,6 +122,11 @@ describe("directory page", () => {
     expect(screen.getByText("2006-2016")).toBeInTheDocument();
     expect(screen.getByText(/Ai Weiwei/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Services" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "H&dM wordmark" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Jacques Herzog in 2025/ })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Pierre de Meuron seated/ })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Portfolio/ }).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Ranked /)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /pricing/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/out of 10/i)).not.toBeInTheDocument();
     expect(screen.getAllByText("Not verified").length).toBeGreaterThan(0);

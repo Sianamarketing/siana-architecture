@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import SiteLayout from "@/components/site/SiteLayout";
 import SEO from "@/components/site/SEO";
@@ -14,11 +15,27 @@ const NAV = [
   ["places", "Places"],
   ["recognition", "Recognition"],
   ["sources", "Sources"],
-];
+] as const;
 
 export default function ArchitectProfile() {
   const { profileSlug } = useParams();
   const profile = profileBySlug(profileSlug);
+  const [active, setActive] = useState<string>(NAV[0][0]);
+  useEffect(() => {
+    const ids = NAV.map(([id]) => id);
+    const onScroll = () => {
+      const line = 120;
+      let current: string = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) current = id;
+      }
+      setActive(current);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [profileSlug]);
   if (!profile) return <NotFound />;
 
   const photos = profile.projects.filter((project) => project.image);
@@ -31,7 +48,7 @@ export default function ArchitectProfile() {
         canonical={`https://sianaarchitecture.com/d/architects/${profile.slug}`}
       />
       <div className="vogue-titles home-paper pb-16" style={{ paddingTop: 76 }}>
-        <div className="mx-auto max-w-[1100px] px-6 lg:px-10 py-8">
+        <div className="mx-auto max-w-[1180px] px-6 lg:px-10 py-8">
           <nav aria-label="Breadcrumb" className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
             <Link to="/d/" className="hover:text-ink">Directory</Link>
             <span aria-hidden="true"> / </span>
@@ -40,186 +57,258 @@ export default function ArchitectProfile() {
             <span aria-current="page" className="text-ink">{profile.name}</span>
           </nav>
 
-          <header id="overview" className="scroll-mt-36 mt-6 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-end">
-            <div>
-              <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.4rem, 5vw, 4rem)", lineHeight: 1.02 }}>
+          <header id="overview" tabIndex={-1} className="scroll-mt-28 mt-6 outline-none">
+            <div className="flex items-center gap-4">
+              {profile.mark && (
+                <img src={profile.mark.src} alt={profile.mark.alt} className="h-8 sm:h-10 w-auto shrink-0" />
+              )}
+              <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.2rem, 5vw, 4rem)", lineHeight: 1.02 }}>
                 {profile.name}
               </h1>
-              <p className="mt-4 max-w-2xl font-body text-ink-soft text-[17px] leading-relaxed">{profile.summary}</p>
-              <p className="mt-4 font-body text-[15px]">
-                <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
-                <span className="text-warm-gray"> · Checked {profile.checked}</span>
-              </p>
             </div>
-            <p className="font-mono uppercase text-warm-gray border border-ink/15 px-4 py-3" style={{ fontSize: 12, letterSpacing: "0.12em" }}>
-              {profile.legalName}<br />Founded {profile.founded}<br />{profile.based}
+            {profile.mark && (
+              <p className="mt-3 max-w-2xl font-body text-ink-soft text-[13px] leading-relaxed">{profile.mark.caveat}</p>
+            )}
+            <p className="mt-4 max-w-2xl font-body text-ink-soft text-[17px] leading-relaxed">{profile.summary}</p>
+            <p className="mt-4 font-body text-[15px]">
+              <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+              <span className="text-warm-gray"> · Checked {profile.checked}</span>
             </p>
           </header>
 
-          <nav aria-label="On this page" className="sticky top-[76px] z-20 mt-8 -mx-6 px-6 py-3 overflow-x-auto bg-white/95 border-y border-ink/10">
-            <ul className="flex gap-4 min-w-max">
-              {NAV.map(([id, label]) => (
-                <li key={id}>
-                  <a href={`#${id}`} className="inline-flex h-11 items-center font-mono uppercase text-ink-soft hover:text-ink" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{label}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="mt-8 flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-x-10 lg:items-start">
+            <div className="min-w-0 order-2 lg:order-none lg:col-start-1 lg:row-start-1 lg:row-span-2">
+              <section className="max-w-3xl space-y-4">
+                {profile.overview.map((paragraph) => (
+                  <p key={paragraph.slice(0, 24)} className="font-body text-ink text-[16px] leading-relaxed">{paragraph}</p>
+                ))}
+              </section>
 
-          <section className="mt-10 max-w-3xl space-y-4">
-            {profile.overview.map((paragraph) => (
-              <p key={paragraph.slice(0, 24)} className="font-body text-ink text-[16px] leading-relaxed">{paragraph}</p>
-            ))}
-          </section>
-
-          <section id="portfolio" className="scroll-mt-36 mt-14" aria-labelledby="portfolio-heading">
-            <h2 id="portfolio-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Portfolio</h2>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five exteriors with a Wikimedia Commons licence. A photograph opens the Siana building page when one exists, and otherwise the practice’s project page, marked external. Five further projects in the table have no cleared photograph.</p>
-            <ul className="mt-6 columns-1 sm:columns-2 lg:columns-3 gap-3">
-              {photos.map((project) => (
-                <li key={project.name} className="mb-3 break-inside-avoid">
-                  <ProjectPhoto project={project} />
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section id="approach" className="scroll-mt-36 mt-14 max-w-3xl" aria-labelledby="approach-heading">
-            <h2 id="approach-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Design approach</h2>
-            <div className="mt-4 space-y-4">
-              {profile.approach.map((paragraph) => (
-                <p key={paragraph.slice(0, 24)} className="font-body text-ink text-[16px] leading-relaxed">{paragraph}</p>
-              ))}
-            </div>
-          </section>
-
-          <section id="projects" className="scroll-mt-36 mt-14" aria-labelledby="projects-heading">
-            <h2 id="projects-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Selected projects</h2>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Ten projects, in the order of their realization on the practice’s project pages. This is not a ranking. A client or a collaborator is shown only when that page names one.</p>
-            <div className="mt-6 overflow-x-auto border border-ink/15">
-              <table className="w-full min-w-[720px] text-left">
-                <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
-                  <tr>
-                    <th className="px-4 py-3 font-medium">Project</th>
-                    <th className="px-4 py-3 font-medium">Place</th>
-                    <th className="px-4 py-3 font-medium">Year</th>
-                    <th className="px-4 py-3 font-medium">Use</th>
-                    <th className="px-4 py-3 font-medium">Client</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {profile.projects.map((project) => (
-                    <tr key={project.name} className="border-t border-ink/10 align-top">
-                      <th scope="row" className="px-4 py-3 font-normal">
-                        <ProjectLink project={project} />
-                        <span className="mt-1 block font-body text-warm-gray text-[13px]">{project.status}</span>
-                        {project.collaborators && (
-                          <span className="mt-1 block font-body text-ink-soft text-[13px]">With: {project.collaborators}</span>
-                        )}
-                      </th>
-                      <td className="px-4 py-3 font-body text-[15px]">{project.city}, {project.country}</td>
-                      <td className="px-4 py-3 font-body text-[15px]">{project.year}</td>
-                      <td className="px-4 py-3 font-body text-[15px]">{project.use}</td>
-                      <td className="px-4 py-3 font-body text-[15px]">{project.client || "Not verified"}</td>
-                    </tr>
+              <section id="portfolio" className="scroll-mt-28 mt-14" aria-labelledby="portfolio-heading">
+                <h2 id="portfolio-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Portfolio</h2>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five exteriors with a Wikimedia Commons licence. A photograph opens the Siana building page when one exists, and otherwise the practice’s project page, marked external. Five further projects in the table have no cleared photograph.</p>
+                <ul className="mt-6 columns-1 sm:columns-2 xl:columns-3 gap-3">
+                  {photos.map((project) => (
+                    <li key={project.name} className="mb-3 break-inside-avoid">
+                      <ProjectPhoto project={project} />
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section id="practice" className="scroll-mt-36 mt-14" aria-labelledby="practice-heading">
-            <h2 id="practice-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Practice</h2>
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <article className="border border-ink/15 p-5">
-                <h3 className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Project sectors</h3>
-                <ul className="mt-3 space-y-2 font-body text-[15px] text-ink">
-                  {profile.sectors.map((sector) => <li key={sector}>{sector}</li>)}
                 </ul>
-              </article>
-              <article className="border border-ink/15 p-5">
-                <h3 className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Size and model</h3>
-                <p className="mt-3 font-body text-[15px] leading-relaxed">{profile.practiceModel}</p>
-                <p className="mt-3 font-body text-[15px] leading-relaxed">{profile.peopleNote}</p>
-              </article>
+              </section>
+
+              <section id="approach" className="scroll-mt-28 mt-14 max-w-3xl" aria-labelledby="approach-heading">
+                <h2 id="approach-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Design approach</h2>
+                <div className="mt-4 space-y-4">
+                  {profile.approach.map((paragraph) => (
+                    <p key={paragraph.slice(0, 24)} className="font-body text-ink text-[16px] leading-relaxed">{paragraph}</p>
+                  ))}
+                </div>
+              </section>
+
+              <section id="projects" className="scroll-mt-28 mt-14" aria-labelledby="projects-heading">
+                <h2 id="projects-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Selected projects</h2>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Ten projects, in the order of their realization on the practice’s project pages. This is not a ranking. A client or a collaborator is shown only when that page names one.</p>
+                <div className="mt-6 overflow-x-auto border border-ink/15">
+                  <table className="w-full min-w-[720px] text-left">
+                    <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
+                      <tr>
+                        <th className="px-4 py-3 font-medium">Project</th>
+                        <th className="px-4 py-3 font-medium">Place</th>
+                        <th className="px-4 py-3 font-medium">Year</th>
+                        <th className="px-4 py-3 font-medium">Use</th>
+                        <th className="px-4 py-3 font-medium">Client</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {profile.projects.map((project) => (
+                        <tr key={project.name} className="border-t border-ink/10 align-top">
+                          <th scope="row" className="px-4 py-3 font-normal">
+                            <ProjectLink project={project} />
+                            <span className="mt-1 block font-body text-warm-gray text-[13px]">{project.status}</span>
+                            {project.collaborators && (
+                              <span className="mt-1 block font-body text-ink-soft text-[13px]">With: {project.collaborators}</span>
+                            )}
+                          </th>
+                          <td className="px-4 py-3 font-body text-[15px]">{project.city}, {project.country}</td>
+                          <td className="px-4 py-3 font-body text-[15px]">{project.year}</td>
+                          <td className="px-4 py-3 font-body text-[15px]">{project.use}</td>
+                          <td className="px-4 py-3 font-body text-[15px]">{project.client || "Not verified"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section id="practice" className="scroll-mt-28 mt-14" aria-labelledby="practice-heading">
+                <h2 id="practice-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Practice</h2>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <article className="border border-ink/15 p-5">
+                    <h3 className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Project sectors</h3>
+                    <ul className="mt-3 space-y-2 font-body text-[15px] text-ink">
+                      {profile.sectors.map((sector) => <li key={sector}>{sector}</li>)}
+                    </ul>
+                  </article>
+                  <article className="border border-ink/15 p-5">
+                    <h3 className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Size and model</h3>
+                    <p className="mt-3 font-body text-[15px] leading-relaxed">{profile.practiceModel}</p>
+                    <p className="mt-3 font-body text-[15px] leading-relaxed">{profile.peopleNote}</p>
+                  </article>
+                </div>
+                <h3 id="services" tabIndex={-1} className="scroll-mt-28 mt-8 text-ink outline-none" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Services</h3>
+                <ul className="mt-3 max-w-3xl space-y-2 font-body text-[15px] text-ink">
+                  {profile.services.map((service) => <li key={service}>{service}</li>)}
+                </ul>
+                <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Principals</h3>
+                <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {profile.principals.map((person) => (
+                    <li key={person.name} className="border border-ink/15">
+                      {person.image && (
+                        <img src={person.image.src} alt={person.image.alt} className="w-full h-80 object-cover object-top bg-paper-mid" />
+                      )}
+                      <div className="p-5">
+                        <p className="text-ink" style={{ fontSize: "1.4rem" }}>{person.name}</p>
+                        <p className="mt-1 font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{person.role}</p>
+                        <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">{person.note}</p>
+                        {person.image && <ImageCredit image={person.image} />}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Senior partners</h3>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Named on the organization page. No licensed portrait was cleared for these partners. The practice site credits photographs to Gina Folly, and that credit is not a licence for this page.</p>
+                <ul className="mt-4 columns-1 sm:columns-2 gap-x-8 font-body text-[15px] text-ink">
+                  {profile.seniorPartners.map((name) => <li key={name} className="border-t border-ink/10 py-2 break-inside-avoid">{name}</li>)}
+                </ul>
+              </section>
+
+              <section id="places" className="scroll-mt-28 mt-14" aria-labelledby="places-heading">
+                <h2 id="places-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Offices and registration</h2>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Offices are where the practice says it works. They are not the same as the cities of the buildings above, and they are not a licence to practise.</p>
+                <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {profile.offices.map((office) => (
+                    <li key={office.city} className="border border-ink/15 px-4 py-3">
+                      <span className="block text-ink" style={{ fontSize: "1.2rem" }}>{office.city}</span>
+                      <span className="mt-1 block font-body text-ink-soft text-[14px]">{office.country}. {office.role}</span>
+                    </li>
+                  ))}
+                </ul>
+                <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Registration</h3>
+                <ul className="mt-4 space-y-3">
+                  {profile.registration.map((item) => (
+                    <li key={item.place} className="border border-ink/15 px-4 py-3">
+                      <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{item.place}</span>
+                      <span className="mt-1 block text-ink">{item.status}</span>
+                      <span className="mt-1 block font-body text-ink-soft text-[15px]">{item.note}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="recognition" className="scroll-mt-28 mt-14" aria-labelledby="recognition-heading">
+                <h2 id="recognition-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Awards</h2>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Person awards and project awards are marked separately. None of these lines is a professional licence.</p>
+                <ul className="mt-6 border-b border-ink/15">
+                  {profile.awards.map((award) => (
+                    <li key={`${award.year}-${award.name}`} className="border-t border-ink/15 py-4 grid grid-cols-1 sm:grid-cols-[5rem_1fr] gap-2">
+                      <span className="font-mono text-warm-gray" style={{ fontSize: 13 }}>{award.year}</span>
+                      <span>
+                        <a href={award.sourceUrl} className="text-ink hover:underline" rel="noopener noreferrer">{award.name}</a>
+                        <span className="mt-1 block font-body text-ink-soft text-[14px]">{award.issuer}. {award.scope === "person" ? "Awarded to people" : "Awarded to a project"}: {award.subject}.</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="sources" className="scroll-mt-28 mt-14" aria-labelledby="sources-heading">
+                <h2 id="sources-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
+                <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}. Pages were read for facts. Photographs are used only when the file carries a Commons licence. A separate press list was not compiled. No professional certification was confirmed.</p>
+                <ul className="mt-4 space-y-2">
+                  {profile.sources.map((source) => (
+                    <li key={source.url}>
+                      <a href={source.url} className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">{source.label}</a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-8">
+                  <Link to="/d/architects" className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Back to Architects</Link>
+                </p>
+              </section>
             </div>
-            <h3 id="services" className="scroll-mt-36 mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Services</h3>
-            <ul className="mt-3 max-w-3xl space-y-2 font-body text-[15px] text-ink">
-              {profile.services.map((service) => <li key={service}>{service}</li>)}
-            </ul>
-            <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Principals</h3>
-            <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profile.principals.map((person) => (
-                <li key={person.name} className="border border-ink/15 p-5">
-                  <p className="text-ink" style={{ fontSize: "1.4rem" }}>{person.name}</p>
-                  <p className="mt-1 font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{person.role}</p>
-                  <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">{person.note}</p>
-                </li>
-              ))}
-            </ul>
-            <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Senior partners</h3>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Named on the organization page. No portraits are shown. The practice site credits photographs to Gina Folly, and that credit is not a licence for this page.</p>
-            <ul className="mt-4 columns-1 sm:columns-2 gap-x-8 font-body text-[15px] text-ink">
-              {profile.seniorPartners.map((name) => <li key={name} className="border-t border-ink/10 py-2 break-inside-avoid">{name}</li>)}
-            </ul>
-          </section>
 
-          <section id="places" className="scroll-mt-36 mt-14" aria-labelledby="places-heading">
-            <h2 id="places-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Offices and registration</h2>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Offices are where the practice says it works. They are not the same as the cities of the buildings above, and they are not a licence to practise.</p>
-            <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {profile.offices.map((office) => (
-                <li key={office.city} className="border border-ink/15 px-4 py-3">
-                  <span className="block text-ink" style={{ fontSize: "1.2rem" }}>{office.city}</span>
-                  <span className="mt-1 block font-body text-ink-soft text-[14px]">{office.country}. {office.role}</span>
-                </li>
-              ))}
-            </ul>
-            <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Registration</h3>
-            <ul className="mt-4 space-y-3">
-              {profile.registration.map((item) => (
-                <li key={item.place} className="border border-ink/15 px-4 py-3">
-                  <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{item.place}</span>
-                  <span className="mt-1 block text-ink">{item.status}</span>
-                  <span className="mt-1 block font-body text-ink-soft text-[15px]">{item.note}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+            <div className="order-1 lg:order-none lg:col-start-2 lg:row-start-1">
+              <section aria-labelledby="facts-heading" className="border border-ink/15 p-4">
+                <h2 id="facts-heading" className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Facts</h2>
+                <dl className="mt-3">
+                  {profile.facts.map((fact) => (
+                    <div key={fact.label} className="grid grid-cols-[6.5rem_1fr] gap-2 border-t border-ink/10 py-2">
+                      <dt className="font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.08em" }}>{fact.label}</dt>
+                      <dd className="font-body text-ink text-[14px] leading-snug">{fact.value}</dd>
+                    </div>
+                  ))}
+                  <div className="grid grid-cols-[6.5rem_1fr] gap-2 border-t border-ink/10 py-2">
+                    <dt className="font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.08em" }}>Site</dt>
+                    <dd className="font-body text-[14px]">
+                      <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Official site, external</a>
+                    </dd>
+                  </div>
+                </dl>
+              </section>
 
-          <section id="recognition" className="scroll-mt-36 mt-14" aria-labelledby="recognition-heading">
-            <h2 id="recognition-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Awards</h2>
-            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Person awards and project awards are marked separately. None of these lines is a professional licence.</p>
-            <ul className="mt-6 border-b border-ink/15">
-              {profile.awards.map((award) => (
-                <li key={`${award.year}-${award.name}`} className="border-t border-ink/15 py-4 grid grid-cols-1 sm:grid-cols-[5rem_1fr] gap-2">
-                  <span className="font-mono text-warm-gray" style={{ fontSize: 13 }}>{award.year}</span>
-                  <span>
-                    <a href={award.sourceUrl} className="text-ink hover:underline" rel="noopener noreferrer">{award.name}</a>
-                    <span className="mt-1 block font-body text-ink-soft text-[14px]">{award.issuer}. {award.scope === "person" ? "Awarded to people" : "Awarded to a project"}: {award.subject}.</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section id="sources" className="scroll-mt-36 mt-14" aria-labelledby="sources-heading">
-            <h2 id="sources-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
-            <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}. Pages were read for facts. Photographs are used only when the file carries a Commons licence. A separate press list was not compiled. No professional certification was confirmed.</p>
-            <ul className="mt-4 space-y-2">
-              {profile.sources.map((source) => (
-                <li key={source.url}>
-                  <a href={source.url} className="font-body text-ink text-[15px] underline underline-offset-4" rel="noopener noreferrer">{source.label}</a>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-8">
-              <Link to="/d/architects" className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Back to Architects</Link>
-            </p>
-          </section>
+              <details className="lg:hidden mt-3 border border-ink/15">
+                <summary className="cursor-pointer px-4 py-3 font-mono uppercase text-ink min-h-11" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Contents</summary>
+                <Contents active={active} />
+              </details>
+            </div>
+              <nav aria-label="Contents" className="hidden lg:block lg:col-start-2 lg:row-start-2 lg:sticky lg:top-[88px] lg:self-start mt-4 border border-ink/15">
+                <p className="px-4 pt-3 font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Contents</p>
+                <Contents active={active} />
+              </nav>
+          </div>
         </div>
       </div>
     </SiteLayout>
+  );
+}
+
+function Contents({ active }: { active: string }) {
+  return (
+    <ol className="px-2 py-2">
+      {NAV.map(([id, label], index) => {
+        const current = active === id;
+        return (
+          <li key={id}>
+            <a
+              href={`#${id}`}
+              aria-current={current ? "true" : undefined}
+              onClick={(event) => {
+                const target = document.getElementById(id);
+                if (!target) return;
+                event.preventDefault();
+                const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+                if (target instanceof HTMLElement) target.focus({ preventScroll: true });
+                window.history.pushState(null, "", `#${id}`);
+              }}
+              className={`flex items-center gap-3 min-h-11 px-2 font-body text-[15px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))] ${current ? "text-ink border-l-2 border-[hsl(var(--accent))] bg-paper-warm" : "text-ink-soft border-l-2 border-transparent hover:text-ink"}`}
+            >
+              <span className="font-mono text-warm-gray" style={{ fontSize: 11 }}>{String(index + 1).padStart(2, "0")}</span>
+              {label}
+            </a>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function ImageCredit({ image }: { image: ProfileImage }) {
+  return (
+    <p className="mt-3 font-body text-ink-soft text-[13px] leading-relaxed">
+      {image.author}. <a href={image.licenseUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">{image.license}, external</a>.{" "}
+      <a href={image.sourceUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">File page, external</a>.
+    </p>
   );
 }
 

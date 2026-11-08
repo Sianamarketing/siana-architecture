@@ -210,11 +210,15 @@ async function main() {
     description: "Architects credited on published buildings.",
     image: OG_DEFAULT,
     content:
-      `<h1>Directory</h1>` +
-      `<p>Architects credited on published buildings. Other categories have no listings yet.</p>` +
+      `<h1>Find the people and tools behind architecture.</h1>` +
+      `<p>Architect credits are taken from published buildings. A credit can name more than one person, and it stays as one line. These are not verified business profiles.</p>` +
+      `<p>Interior designers, product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
       (architects.size
-        ? `<ul>` + [...architects.entries()].map(([name, slug]) => li(`/projects/${slug}`, name, "Architect")).join("") + `</ul>`
-        : `<p>Nothing listed here yet.</p>`),
+        ? `<h2>Architects behind the buildings</h2><ul>` + [...architects.entries()].map(([name, slug]) => li(`/projects/${slug}`, name, "Architect credit")).join("") + `</ul>`
+        : `<p>No architect credits yet.</p>`) +
+      (posts.length
+        ? `<h2>Latest research</h2><ul>` + posts.slice(0, 4).map((p) => li(`/practice/${p.slug}`, p.title, p.category || p.excerpt)).join("") + `</ul>`
+        : ""),
   })); n++;
 
   // --- Listing: Cities ---

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { architectEntries, readMinutes, usableDirectoryImage } from "@/lib/directory";
+import { architectEntries, filterDirectoryEntries, readMinutes, usableDirectoryImage } from "@/lib/directory";
 
 describe("directory", () => {
   it("groups architect credits without splitting a shared line", () => {
@@ -23,6 +23,21 @@ describe("directory", () => {
     expect(usableDirectoryImage("/buildings/icc-berlin/08-saal-1.jpg")).toBeNull();
     expect(usableDirectoryImage("/buildings/icc-berlin/07-car-tunnel.jpg")).toBeNull();
     expect(usableDirectoryImage("/buildings/icc-berlin/01-from-funkturm.jpg")).toBe("/buildings/icc-berlin/01-from-funkturm.jpg");
+  });
+
+  it("searches credits, buildings and cities, and leaves other categories empty", () => {
+    const entries = architectEntries([
+      { id: "1", slug: "unite-d-habitation-berlin", name: "Unité d'Habitation Berlin", architect: "Le Corbusier", city: "Berlin" },
+      { id: "2", slug: "maeusebunker", name: "Mäusebunker", architect: "Gerd Hänska, Magdalena Hänska, with Kurt Schmersow", city: "Berlin" },
+    ]);
+    expect(filterDirectoryEntries(entries, { query: "hänska" }).map((entry) => entry.name)).toEqual([
+      "Gerd Hänska, Magdalena Hänska, with Kurt Schmersow",
+    ]);
+    expect(filterDirectoryEntries(entries, { query: "unité" })).toHaveLength(1);
+    expect(filterDirectoryEntries(entries, { query: "berlin" })).toHaveLength(2);
+    expect(filterDirectoryEntries(entries, { query: "" })).toHaveLength(2);
+    expect(filterDirectoryEntries(entries, { category: "tools", query: "berlin" })).toEqual([]);
+    expect(filterDirectoryEntries(entries, { category: "architects", query: "missing" })).toEqual([]);
   });
 
   it("counts reading time only from real copy", () => {

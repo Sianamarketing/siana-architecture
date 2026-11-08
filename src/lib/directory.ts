@@ -15,9 +15,16 @@ export interface DirectorySourceProject {
   slug: string;
   name: string;
   architect: string | null;
+  city?: string | null;
   updated_at?: string | null;
   image?: string | null;
   imageAlt?: string | null;
+}
+
+export interface DirectoryBuildingRef {
+  slug: string;
+  name: string;
+  city: string | null;
 }
 
 export interface DirectoryEntry {
@@ -30,6 +37,7 @@ export interface DirectoryEntry {
   /** Building name, or a real count when one credit covers several buildings. */
   meta: string;
   buildings: number;
+  buildingsList: DirectoryBuildingRef[];
 }
 
 const BANNED_IMAGE = [
@@ -68,6 +76,9 @@ export function architectEntries(projects: DirectorySourceProject[]): DirectoryE
     const withImage = ordered.find((project) => usableDirectoryImage(project.image));
     const lead = withImage || ordered[0];
     const image = usableDirectoryImage(lead.image);
+    const buildingsList = ordered
+      .map((project) => ({ slug: project.slug, name: project.name, city: project.city?.trim() || null }))
+      .sort((a, b) => a.name.localeCompare(b.name));
     entries.push({
       id: name,
       name,
@@ -77,9 +88,28 @@ export function architectEntries(projects: DirectorySourceProject[]): DirectoryE
       alt: lead.imageAlt?.trim() || `${name}, ${lead.name}`,
       meta: list.length > 1 ? `${list.length} buildings` : lead.name,
       buildings: list.length,
+      buildingsList,
     });
   }
   return entries.sort((a, b) => b.buildings - a.buildings || a.name.localeCompare(b.name));
+}
+
+/**
+ * Architect credits are the only listings. Other categories stay empty.
+ * Search matches the credit line, a building name, or a city. Results are not ranked.
+ */
+export function filterDirectoryEntries(
+  entries: DirectoryEntry[],
+  options: { query?: string | null; category?: string | null },
+): DirectoryEntry[] {
+  const category = options.category || "all";
+  if (category !== "all" && category !== "architects") return [];
+  const query = String(options.query || "").trim().toLowerCase();
+  if (!query) return entries;
+  return entries.filter((entry) => {
+    const fields = [entry.name, ...entry.buildingsList.flatMap((building) => [building.name, building.city || ""])];
+    return fields.some((field) => field.toLowerCase().includes(query));
+  });
 }
 
 export function directoryCategory(slug: string | null | undefined) {

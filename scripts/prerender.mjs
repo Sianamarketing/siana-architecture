@@ -211,11 +211,16 @@ async function main() {
     image: OG_DEFAULT,
     content:
       `<h1>Find the people and tools behind architecture.</h1>` +
-      `<p>Architect credits are taken from published buildings. A credit can name more than one person, and it stays as one line. These are not verified business profiles.</p>` +
+      `<p>Architect credits are taken from published buildings. A credit can name more than one person, and it stays as one line. These are not verified business profiles. Search the directory, or choose a category.</p>` +
+      `<h2>Browse by category</h2><ul>` +
+      `<li><a href="/directory?category=architects">Architects</a></li>` +
+      `<li><a href="/directory?category=interior-designers">Interior Designers</a></li>` +
+      `<li><a href="/directory?category=product-manufacturers">Product manufacturers</a></li>` +
+      `<li><a href="/directory?category=designers">Designers</a></li>` +
+      `<li><a href="/directory?category=tools">Tools</a></li>` +
+      `<li><a href="/directory?category=marketing-agency">Marketing Agency</a></li>` +
+      `</ul>` +
       `<p>Interior designers, product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
-      (architects.size
-        ? `<h2>Architects behind the buildings</h2><ul>` + [...architects.entries()].map(([name, slug]) => li(`/projects/${slug}`, name, "Architect credit")).join("") + `</ul>`
-        : `<p>No architect credits yet.</p>`) +
       (posts.length
         ? `<h2>Latest research</h2><ul>` + posts.slice(0, 4).map((p) => li(`/practice/${p.slug}`, p.title, p.category || p.excerpt)).join("") + `</ul>`
         : ""),

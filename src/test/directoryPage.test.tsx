@@ -49,11 +49,18 @@ function renderAt(path: string) {
   );
 }
 
+const CATEGORIES = ["Architects", "Interior Designers", "Product manufacturers", "Designers", "Tools", "Marketing Agency"];
+
 describe("directory page", () => {
   it("filters from the search form and keeps the query in the page", async () => {
     renderAt("/directory");
     expect(await screen.findByRole("heading", { name: "Find the people and tools behind architecture." })).toBeInTheDocument();
-    expect(await screen.findByText("Le Corbusier")).toBeInTheDocument();
+    expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();
+    expect(screen.queryByText("Architect credits")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "All" })).not.toBeInTheDocument();
+    for (const name of CATEGORIES) {
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
     fireEvent.change(screen.getByLabelText("Search architect credits, buildings, or cities"), { target: { value: "Mäusebunker" } });
     fireEvent.click(screen.getByRole("button", { name: "Search" }));
     expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();

@@ -35,6 +35,8 @@ describe("published routes", () => {
       expect(sitemap).toContain(`https://sianaarchitecture.com/d/architects/${slug}`);
       expect(prerender).toContain(`"${slug}"`);
     }
+    expect(prerender).toContain('title: "Best architecture firms in Springfield, Missouri in 2026 - Siana Architecture"');
+    expect(prerender).toContain("<h1>Best architecture firms in Springfield, Missouri</h1>");
     expect(prerender).toContain("ProfessionalService");
     expect(prerender).toContain("BreadcrumbList");
     expect(sitemap).not.toContain("https://sianaarchitecture.com/journal/");

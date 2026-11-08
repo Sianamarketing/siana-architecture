@@ -52,7 +52,7 @@ export default function ArchitectPlace() {
   return (
     <SiteLayout>
       <SEO
-        title={`${SPRINGFIELD_PLACE.title} - Siana Architecture`}
+        title={`${SPRINGFIELD_PLACE.title} in ${SPRINGFIELD_PLACE.edition} - Siana Architecture`}
         description={SPRINGFIELD_PLACE.summary}
         canonical={`https://sianaarchitecture.com${SPRINGFIELD_PLACE.path}`}
       />

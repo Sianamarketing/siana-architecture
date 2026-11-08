@@ -11,6 +11,8 @@ export const SPRINGFIELD_PLACE = {
   city: "Springfield",
   region: "Missouri",
   title: "Best architecture firms in Springfield, Missouri",
+  /** Fixed document-title edition. Not the calendar year, so it does not roll forward on its own. */
+  edition: "2026",
   summary:
     "Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city. Baron Design & Associates finished The Preston, a senior residence, along with the Hilton Garden Inn and Towneplace Suites. Arkifex Studios turned a former radio station into Lost Signal Brewing.",
   checked: "8 November 2026",

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SPRINGFIELD_PLACE } from "@/data/architectPlaces";
 import { profileBySlug, profileForCredit, profileStructuredData } from "@/data/architectProfiles";
 import { SPRINGFIELD_PROFILES } from "@/data/springfieldProfiles";
 import { architectEntries, filterDirectoryEntries, readMinutes, usableDirectoryImage } from "@/lib/directory";
@@ -73,6 +74,14 @@ describe("directory", () => {
     expect(encoded).toContain("ProfessionalService");
     expect(encoded).not.toContain("2003003845");
     expect(encoded).not.toContain("aggregateRating");
+  });
+
+  it("keeps the Springfield heading and puts 2026 only in the document title", () => {
+    expect(SPRINGFIELD_PLACE.title).toBe("Best architecture firms in Springfield, Missouri");
+    expect(SPRINGFIELD_PLACE.edition).toBe("2026");
+    expect(`${SPRINGFIELD_PLACE.title} in ${SPRINGFIELD_PLACE.edition} - Siana Architecture`).toBe(
+      "Best architecture firms in Springfield, Missouri in 2026 - Siana Architecture",
+    );
   });
 
   it("counts reading time only from real copy", () => {

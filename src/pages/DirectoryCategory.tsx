@@ -102,8 +102,8 @@ export default function DirectoryCategory() {
           </h1>
           <p className="mt-4 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
             {showCredits
-              ? `${allCredits.length} credit ${allCredits.length === 1 ? "line" : "lines"} copied from published buildings. A line can name more than one person, and it stays one line. These are not reviewed firms.`
-              : `${category.label} is not in the records yet.`}
+              ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} from published buildings. A credit that names several people stays one line.`
+              : "No published listings in this category yet."}
           </p>
 
           <form role="search" onSubmit={onSearch} className="mt-8 max-w-xl">
@@ -168,7 +168,7 @@ export default function DirectoryCategory() {
                     Download this list
                   </button>
                 </div>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">The places named here are the buildings, not an office address. The list is not a ranking.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Places are the cities recorded on the buildings.</p>
                 {visible.filter((entry) => profileForCredit(entry.name)).map((entry) => (
                   <p key={entry.id} className="mt-3">
                     <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>
@@ -232,8 +232,7 @@ export default function DirectoryCategory() {
                       <li key={entry.id} className="border border-ink/15 bg-paper grid grid-cols-1 md:grid-cols-[220px_1fr]">
                         <img src={entry.image || ""} alt={entry.alt} className="w-full h-48 md:h-full object-cover bg-paper-mid" />
                         <div className="p-5">
-                          <p className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Architect credit</p>
-                          <h3 className="mt-2 text-ink" style={{ fontWeight: 400, fontSize: "1.6rem", lineHeight: 1.15 }}>{entry.name}</h3>
+                          <h3 className="text-ink" style={{ fontWeight: 400, fontSize: "1.6rem", lineHeight: 1.15 }}>{entry.name}</h3>
                           {profileForCredit(entry.name) && (
                             <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="mt-2 inline-block font-mono uppercase text-accent-terra" style={{ fontSize: 11, letterSpacing: "0.12em" }}>Practice page</Link>
                           )}
@@ -258,7 +257,7 @@ export default function DirectoryCategory() {
                   <h2 id="locations-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.3rem)", lineHeight: 1.1 }}>
                     Where the buildings stand
                   </h2>
-                  <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">These marks are the published buildings. They are not office addresses.</p>
+                  <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Pins show the published buildings.</p>
                   <div className="mt-6">
                     <ResearchCoverageMap pins={mapPins} />
                   </div>
@@ -306,13 +305,11 @@ export default function DirectoryCategory() {
                 <h2 id="about-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.3rem)", lineHeight: 1.1 }}>
                   How this list is made
                 </h2>
-                <p className="mt-4 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
-                  Each line is the architect field on a published building in Siana Architecture. The line is copied as stored. A shared credit is not split into separate people, and nothing here is scored, priced, or ranked. A place is the city recorded on the building.
-                </p>
-                <div className="mt-6 max-w-2xl space-y-3">
-                  <Faq question="Are these firms?">No. A credit can name a practice, one person, or several people together. It stays one line.</Faq>
-                  <Faq question="Are the places offices?">No. They are the published buildings linked to that credit.</Faq>
-                  <Faq question="Why are the other directory categories empty?">Interior designers, product manufacturers, designers, tools, and marketing agencies have no records yet.</Faq>
+                <div className="mt-4 max-w-2xl space-y-3">
+                  <Faq question="How are the credits stored?">Each line is the architect field on a published building, copied as stored. A shared credit stays one line. A place is the city recorded on the building.</Faq>
+                  <Faq question="What does a credit line cover?">A credit can name a practice, one person, or several people together. It stays one line. One of those lines, Herzog & de Meuron, also has a practice page.</Faq>
+                  <Faq question="What do the places refer to?">The city recorded on the published building.</Faq>
+                  <Faq question="What about the other categories?">Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet.</Faq>
                 </div>
               </section>
             </>

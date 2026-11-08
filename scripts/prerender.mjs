@@ -259,7 +259,7 @@ async function main() {
         `<nav>Directory / ${label}</nav>` +
         `<h1>${label}</h1>` +
         (architects
-          ? `<p>These lines are copied from the architect field on published buildings. They are not checked business profiles, and a shared credit stays one line. A place is the building, not an office.</p><p><a href="/d/">Back to Directory</a></p>`
+          ? `<p>Architect credits from published buildings. A credit that names several people stays one line.</p><p><a href="/d/">Back to Directory</a></p>`
           : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
     }));
     n++;
@@ -272,7 +272,7 @@ async function main() {
     content:
       `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Herzog &amp; de Meuron</nav>` +
       `<h1>Herzog &amp; de Meuron</h1>` +
-      `<p>International architectural practice founded in Basel in 1978 by Jacques Herzog and Pierre de Meuron. Headquarters: Rheinschanze 6, 4056 Basel. <a href="https://www.herzogdemeuron.com/practice/">Practice page</a>.</p>` +
+      `<p>International practice founded in Basel in 1978 by Jacques Herzog and Pierre de Meuron, owned by its active partners. <a href="https://www.herzogdemeuron.com/practice/">Practice page</a>.</p>` +
       `<p>Ten selected projects are dated from the practice’s project pages, including <a href="/projects/caixaforum-madrid">CaixaForum Madrid</a>. The Siana credit line “Herzog &amp; de Meuron” is not split.</p>` +
       `<p>Checked 8 November 2026. Swiss and UK registration: not verified. The practice states it is not licensed in Florida. The H&amp;dM wordmark is the Commons PD-textlogo file. Portraits of the founders use Commons licences.</p>`,
   }));

@@ -109,7 +109,7 @@ const Index = () => {
       <Helmet>
         <title>Siana Architecture</title>
         <meta name="description" content="Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live." />
-        <link rel="canonical" href="/" />
+        <link rel="canonical" href="https://sianaarchitecture.com/" />
       </Helmet>
       <Navbar />
 
@@ -117,11 +117,7 @@ const Index = () => {
       <section className="border-b border-ink/10" style={{ paddingTop: 76 }}>
         <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-[minmax(0,42%)_minmax(0,56%)] lg:justify-between gap-8 lg:gap-6 lg:min-h-[calc(100vh-76px)]">
           <div className="flex flex-col">
-            <p className="font-mono uppercase text-ink flex items-center gap-2" style={{ fontSize: 12, letterSpacing: "0.16em" }}>
-              <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-accent-terra" />
-              An independent guide to the built world
-            </p>
-            <h1 className="mt-6 text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.8rem, 6.2vw, 4.4rem)", lineHeight: 1.02, letterSpacing: "-0.02em" }}>
+            <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.8rem, 6.2vw, 4.4rem)", lineHeight: 1.02, letterSpacing: "-0.02em" }}>
               <span className="block">Explore the</span>
               <span className="block">world of</span>
               <span className="block text-accent-terra">architecture</span>

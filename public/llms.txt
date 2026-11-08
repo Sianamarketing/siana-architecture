@@ -52,6 +52,7 @@ Siana documents notable architecture across global cities and writes about it wi
 - [About](https://sianaarchitecture.com/about): What Siana is and why it exists.
 - [Directory](https://sianaarchitecture.com/d/): Architects credited on published buildings.
 - [Architects](https://sianaarchitecture.com/d/architects): Credits on published buildings.
+- [Herzog & de Meuron](https://sianaarchitecture.com/d/architects/herzog-de-meuron): Practice profile.
 
 ## Optional
 - [XML sitemap](https://sianaarchitecture.com/sitemap.xml): Full list of indexable URLs.

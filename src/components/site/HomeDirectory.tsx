@@ -67,10 +67,7 @@ export default function HomeDirectory() {
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 lg:gap-16 items-end">
           <div>
-            <p id="directory-heading" className="font-mono uppercase text-warm-gray mb-4" style={{ fontSize: 12, letterSpacing: "0.18em" }}>
-              03 / The directory
-            </p>
-            <h2 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.4rem, 4.6vw, 4.2rem)", lineHeight: 1.05 }}>
+            <h2 id="directory-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.4rem, 4.6vw, 4.2rem)", lineHeight: 1.05 }}>
               Find your people
               <span className="block">and tools.</span>
             </h2>
@@ -134,9 +131,6 @@ function DirectoryCard({ entry, large }: { entry: DirectoryEntry; large?: boolea
           background: entry.image ? "linear-gradient(transparent, rgba(17,17,16,0.88))" : "transparent",
         }}
       >
-        <p className="font-mono uppercase mb-1" style={{ fontSize: 12, letterSpacing: "0.16em", color: entry.image ? "#ffe4dc" : "hsl(var(--accent))" }}>
-          Architect
-        </p>
         <h3 className={`font-display ${entry.image ? "text-white" : "text-ink"}`} style={{ fontSize: large ? "1.4rem" : "1rem", letterSpacing: "-0.01em" }}>
           {entry.name}
         </h3>

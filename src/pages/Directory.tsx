@@ -55,13 +55,12 @@ export default function Directory() {
       <section>
         <div className="mx-auto max-w-[1400px] px-6 lg:px-10 py-6 lg:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 lg:items-center">
           <div className="min-w-0">
-            <p className="font-mono uppercase text-warm-gray mb-3" style={{ fontSize: 12, letterSpacing: "0.16em" }}>Directory</p>
             <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2rem, 3.4vw, 3.15rem)", lineHeight: 1.08 }}>
               <span className="block">Find the people</span>
               <span className="block">and tools behind architecture.</span>
             </h1>
             <p className="mt-4 max-w-md font-body text-ink-soft text-[16px] leading-relaxed">
-              Architect credits from published buildings. A shared credit stays one line.
+              Architect credits from published buildings. A credit shared by several people stays one line.
             </p>
             <form role="search" onSubmit={onSearch} className="mt-6 max-w-md">
               <label htmlFor="directory-search" className="font-body text-ink" style={{ fontSize: 14 }}>
@@ -118,11 +117,12 @@ export default function Directory() {
               <h2 id="directory-results-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: 1.1 }}>
                 Architects behind the buildings
               </h2>
-              {(
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
-                  These lines are copied from the architect field on published buildings. They are not checked business profiles, and a shared credit is not split into separate people.
+              <details className="mt-3 max-w-2xl border border-ink/15 px-4 py-3">
+                <summary className="cursor-pointer font-body text-ink text-[15px]">About these results</summary>
+                <p className="mt-2 font-body text-ink-soft text-[15px] leading-relaxed">
+                  Each line is the architect field on a published building, copied as stored. A shared credit stays one line.
                 </p>
-              )}
+              </details>
 
               {!ready ? (
                 <p className="mt-8 font-body text-ink-soft">Loading the directory.</p>
@@ -157,7 +157,7 @@ export default function Directory() {
               Where the research is
             </h2>
             <p className="mt-3 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
-              Published buildings with a recorded location. The filters use the countries and cities already on those entries.
+              Published buildings, pinned where they stand.
             </p>
             <div className="mt-6">
               <ResearchCoverageMap pins={pins} />
@@ -276,8 +276,7 @@ function CreditCard({ entry, compact }: { entry: DirectoryEntry; compact?: boole
       {!compact && entry.image && (
         <img src={entry.image} alt={entry.alt} className="mb-4 w-full h-40 object-cover" />
       )}
-      <p className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Architect credit</p>
-      <h3 className="mt-1 text-ink" style={{ fontWeight: 400, fontSize: compact ? "1.35rem" : "1.6rem", lineHeight: 1.15 }}>
+      <h3 className="text-ink" style={{ fontWeight: 400, fontSize: compact ? "1.35rem" : "1.6rem", lineHeight: 1.15 }}>
         {entry.name}
       </h3>
       <ul className="mt-2 space-y-1">

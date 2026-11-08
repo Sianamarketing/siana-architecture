@@ -66,18 +66,11 @@ export default function ArchitectProfile() {
                 {profile.name}
               </h1>
             </div>
-            {profile.mark && (
-              <p className="mt-3 max-w-2xl font-body text-ink-soft text-[13px] leading-relaxed">{profile.mark.caveat}</p>
-            )}
-            <p className="mt-4 max-w-2xl font-body text-ink-soft text-[17px] leading-relaxed">{profile.summary}</p>
-            <p className="mt-4 font-body text-[15px]">
-              <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
-              <span className="text-warm-gray"> · Checked {profile.checked}</span>
-            </p>
+            <p className="mt-4 max-w-2xl font-body text-ink text-[18px] leading-snug">{profile.summary}</p>
           </header>
 
           <div className="mt-8 flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-x-10 lg:items-start">
-            <div className="min-w-0 order-2 lg:order-none lg:col-start-1 lg:row-start-1 lg:row-span-2">
+            <div className="min-w-0 order-2 lg:order-none lg:col-start-1">
               <section className="max-w-3xl space-y-4">
                 {profile.overview.map((paragraph) => (
                   <p key={paragraph.slice(0, 24)} className="font-body text-ink text-[16px] leading-relaxed">{paragraph}</p>
@@ -86,7 +79,7 @@ export default function ArchitectProfile() {
 
               <section id="portfolio" className="scroll-mt-28 mt-14" aria-labelledby="portfolio-heading">
                 <h2 id="portfolio-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Portfolio</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five exteriors with a Wikimedia Commons licence. A photograph opens the Siana building page when one exists, and otherwise the practice’s project page, marked external. Five further projects in the table have no cleared photograph.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five licensed exteriors. Each caption links the photographer, the licence, and the file page. CaixaForum Madrid opens its Siana page. The other photographs open the practice's project page.</p>
                 <ul className="mt-6 columns-1 sm:columns-2 xl:columns-3 gap-3">
                   {photos.map((project) => (
                     <li key={project.name} className="mb-3 break-inside-avoid">
@@ -107,7 +100,7 @@ export default function ArchitectProfile() {
 
               <section id="projects" className="scroll-mt-28 mt-14" aria-labelledby="projects-heading">
                 <h2 id="projects-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Selected projects</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Ten projects, in the order of their realization on the practice’s project pages. This is not a ranking. A client or a collaborator is shown only when that page names one.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Ten projects, in the order of the years on the practice's project pages. A client or a collaborator is included when that page gives one.</p>
                 <div className="mt-6 overflow-x-auto border border-ink/15">
                   <table className="w-full min-w-[720px] text-left">
                     <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
@@ -176,7 +169,7 @@ export default function ArchitectProfile() {
                   ))}
                 </ul>
                 <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Senior partners</h3>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Named on the organization page. No licensed portrait was cleared for these partners. The practice site credits photographs to Gina Folly, and that credit is not a licence for this page.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Listed on the organization page.</p>
                 <ul className="mt-4 columns-1 sm:columns-2 gap-x-8 font-body text-[15px] text-ink">
                   {profile.seniorPartners.map((name) => <li key={name} className="border-t border-ink/10 py-2 break-inside-avoid">{name}</li>)}
                 </ul>
@@ -184,7 +177,7 @@ export default function ArchitectProfile() {
 
               <section id="places" className="scroll-mt-28 mt-14" aria-labelledby="places-heading">
                 <h2 id="places-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Offices and registration</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Offices are where the practice says it works. They are not the same as the cities of the buildings above, and they are not a licence to practise.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">These are the offices on the practice site. The cities in the project table are the buildings.</p>
                 <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {profile.offices.map((office) => (
                     <li key={office.city} className="border border-ink/15 px-4 py-3">
@@ -193,21 +186,23 @@ export default function ArchitectProfile() {
                     </li>
                   ))}
                 </ul>
-                <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.5rem" }}>Registration</h3>
-                <ul className="mt-4 space-y-3">
-                  {profile.registration.map((item) => (
-                    <li key={item.place} className="border border-ink/15 px-4 py-3">
-                      <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{item.place}</span>
-                      <span className="mt-1 block text-ink">{item.status}</span>
-                      <span className="mt-1 block font-body text-ink-soft text-[15px]">{item.note}</span>
-                    </li>
-                  ))}
-                </ul>
+                <details className="mt-8 border border-ink/15 px-4 py-3">
+                  <summary className="cursor-pointer font-body text-ink text-[16px] min-h-11">Registration notes</summary>
+                  <ul className="mt-3 space-y-3">
+                    {profile.registration.map((item) => (
+                      <li key={item.place}>
+                        <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{item.place}</span>
+                        <span className="mt-1 block text-ink">{item.status}</span>
+                        <span className="mt-1 block font-body text-ink-soft text-[15px]">{item.note}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               </section>
 
               <section id="recognition" className="scroll-mt-28 mt-14" aria-labelledby="recognition-heading">
                 <h2 id="recognition-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Awards</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Person awards and project awards are marked separately. None of these lines is a professional licence.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Person awards and project awards are listed separately. A prize here is not a professional licence.</p>
                 <ul className="mt-6 border-b border-ink/15">
                   {profile.awards.map((award) => (
                     <li key={`${award.year}-${award.name}`} className="border-t border-ink/15 py-4 grid grid-cols-1 sm:grid-cols-[5rem_1fr] gap-2">
@@ -223,7 +218,15 @@ export default function ArchitectProfile() {
 
               <section id="sources" className="scroll-mt-28 mt-14" aria-labelledby="sources-heading">
                 <h2 id="sources-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
-                <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}. Pages were read for facts. Photographs are used only when the file carries a Commons licence. A separate press list was not compiled. No professional certification was confirmed.</p>
+                <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}.</p>
+                {profile.mark && (
+                  <p className="mt-3 max-w-2xl font-body text-ink-soft text-[14px] leading-relaxed">
+                    {profile.mark.attribution}.{" "}
+                    <a href={profile.mark.licenseUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Licence, external</a>.{" "}
+                    <a href={profile.mark.sourceUrl} className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">File page, external</a>.{" "}
+                    {profile.mark.caveat} Portraits on the practice website are credited to Gina Folly and are not reproduced here.
+                  </p>
+                )}
                 <ul className="mt-4 space-y-2">
                   {profile.sources.map((source) => (
                     <li key={source.url}>
@@ -237,7 +240,7 @@ export default function ArchitectProfile() {
               </section>
             </div>
 
-            <div className="order-1 lg:order-none lg:col-start-2 lg:row-start-1">
+            <aside className="order-1 lg:order-none lg:col-start-2 lg:sticky lg:top-[88px] lg:self-start lg:max-h-[calc(100vh-104px)] lg:overflow-y-auto" style={{ overscrollBehavior: "contain" }}>
               <section aria-labelledby="facts-heading" className="border border-ink/15 p-4">
                 <h2 id="facts-heading" className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Facts</h2>
                 <dl className="mt-3">
@@ -250,7 +253,7 @@ export default function ArchitectProfile() {
                   <div className="grid grid-cols-[6.5rem_1fr] gap-2 border-t border-ink/10 py-2">
                     <dt className="font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.08em" }}>Site</dt>
                     <dd className="font-body text-[14px]">
-                      <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Official site, external</a>
+                      <a href={profile.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
                     </dd>
                   </div>
                 </dl>
@@ -260,11 +263,11 @@ export default function ArchitectProfile() {
                 <summary className="cursor-pointer px-4 py-3 font-mono uppercase text-ink min-h-11" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Contents</summary>
                 <Contents active={active} />
               </details>
-            </div>
-              <nav aria-label="Contents" className="hidden lg:block lg:col-start-2 lg:row-start-2 lg:sticky lg:top-[88px] lg:self-start mt-4 border border-ink/15">
+              <nav aria-label="Contents" className="hidden lg:block mt-4 border border-ink/15 bg-white">
                 <p className="px-4 pt-3 font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Contents</p>
                 <Contents active={active} />
               </nav>
+            </aside>
           </div>
         </div>
       </div>

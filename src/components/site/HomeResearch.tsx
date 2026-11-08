@@ -39,9 +39,6 @@ export default function HomeResearch() {
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 md:mb-14">
           <div>
-            <p className="font-mono uppercase text-warm-gray mb-4" style={{ fontSize: 12, letterSpacing: "0.18em" }}>
-              04 / News & research
-            </p>
             <h2 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.6rem, 5vw, 4.6rem)", lineHeight: 1.05 }}>
               Ideas worth following.
             </h2>

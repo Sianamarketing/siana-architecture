@@ -135,3 +135,7 @@ Several public surfaces read their copy from `site_pages` JSONB rows, with hard-
 - Tests use Vitest + Testing Library in a jsdom environment; setup is `src/test/setup.ts` (jest-dom + a `matchMedia` stub). Test files match `src/**/*.{test,spec}.{ts,tsx}`.
 - Per-record SEO columns (`meta_title`, `meta_description`, `og_image_url`) exist on `projects`, `cities`, and `posts`. When adding new content tables, follow the same pattern.
 - For editor-controlled copy on a public surface, follow the `site_pages` pattern: define a typed shape and `*_DEFAULTS` in a lib file, a `merge*` helper that backfills missing fields, a singleton hook that fetches once per session, and an admin page that writes the row back.
+
+## Public copy
+
+New public sentences should read as plain explanatory prose: concrete, first-visit readable, with Oxford commas and ordinary punctuation. Do not use em dashes in new public copy. Do not add kickers above headings, body bold for emphasis, scores, prices, rankings, invented quotes, or unsourced statistics. Keep licence lines and trademarks next to the images they cover. A directory credit line is the stored architect field. A practice page exists only when that exact line has a sourced profile. Registration that has not been checked stays "Not verified", or moves into a collapsed note. Do not infer a licence to practise from built work.

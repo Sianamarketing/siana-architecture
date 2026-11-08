@@ -259,11 +259,33 @@ async function main() {
         `<nav>Directory / ${label}</nav>` +
         `<h1>${label}</h1>` +
         (architects
-          ? `<p>Architect credits from published buildings. A credit that names several people stays one line.</p><p><a href="/d/">Back to Directory</a></p>`
+          ? `<p>Guides for practices with a local office, then architect lines copied from published buildings.</p><p><a href="/d/architects/springfield-missouri">Best architecture firms in Springfield, Missouri</a></p><p><a href="/d/">Back to Directory</a></p>`
           : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
     }));
     n++;
   }
+  write("/d/architects/springfield-missouri", renderPage(template, {
+    path: "/d/architects/springfield-missouri",
+    title: "Best architecture firms in Springfield, Missouri - Siana Architecture",
+    description: "Nine practices with a Springfield office. Baron Design & Associates, LLC is placed first in an editorial selection.",
+    image: OG_DEFAULT,
+    jsonld: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Best architecture firms in Springfield, Missouri",
+      itemListOrder: "https://schema.org/ItemListUnordered",
+      numberOfItems: 9,
+    },
+    content:
+      `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Springfield, Missouri</nav>` +
+      `<h1>Best architecture firms in Springfield, Missouri</h1>` +
+      `<p>Nine practices with a Springfield office. The sequence is an editorial selection, and Baron Design &amp; Associates, LLC is placed first.</p>` +
+      `<ul>` +
+      ["Baron Design & Associates, LLC", "Arkifex Studios", "Buxton Kubik Dodd Design Collective", "Hood-Rich Architecture", "hdesigngroup", "Esterly, Schneider & Associates", "N·FORM Architecture", "Paragon Architecture", "BRP Architects"]
+        .map((name) => `<li>${name}</li>`).join("") +
+      `</ul>`,
+  }));
+  n++;
   write("/d/architects/herzog-de-meuron", renderPage(template, {
     path: "/d/architects/herzog-de-meuron",
     title: "Herzog & de Meuron - Directory - Siana Architecture",

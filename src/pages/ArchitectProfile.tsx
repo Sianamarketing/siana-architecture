@@ -79,7 +79,6 @@ export default function ArchitectProfile() {
 
               <section id="portfolio" className="scroll-mt-28 mt-14" aria-labelledby="portfolio-heading">
                 <h2 id="portfolio-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Portfolio</h2>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Five licensed exteriors. Each caption links the photographer, the licence, and the file page. CaixaForum Madrid opens its Siana page. The other photographs open the practice's project page.</p>
                 <ul className="mt-6 columns-1 sm:columns-2 xl:columns-3 gap-3">
                   {photos.map((project) => (
                     <li key={project.name} className="mb-3 break-inside-avoid">
@@ -216,9 +215,11 @@ export default function ArchitectProfile() {
                 </ul>
               </section>
 
-              <section id="sources" className="scroll-mt-28 mt-14" aria-labelledby="sources-heading">
-                <h2 id="sources-heading" tabIndex={-1} className="text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
-                <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}.</p>
+              <details id="sources" className="scroll-mt-28 mt-14 border border-ink/15 px-4 py-3">
+                <summary className="cursor-pointer min-h-11">
+                  <h2 id="sources-heading" tabIndex={-1} className="inline text-ink outline-none" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)", lineHeight: 1.05 }}>Sources</h2>
+                </summary>
+                <p className="mt-3 font-body text-ink-soft text-[15px]">Checked {profile.checked}. CaixaForum Madrid opens its page on Siana. The other portfolio photographs open the practice project page. Each caption names the photographer and the licence.</p>
                 {profile.mark && (
                   <p className="mt-3 max-w-2xl font-body text-ink-soft text-[14px] leading-relaxed">
                     {profile.mark.attribution}.{" "}
@@ -237,7 +238,7 @@ export default function ArchitectProfile() {
                 <p className="mt-8">
                   <Link to="/d/architects" className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Back to Architects</Link>
                 </p>
-              </section>
+              </details>
             </div>
 
             <aside className="order-1 lg:order-none lg:col-start-2 lg:sticky lg:top-[88px] lg:self-start lg:max-h-[calc(100vh-104px)] lg:overflow-y-auto" style={{ overscrollBehavior: "contain" }}>
@@ -289,6 +290,7 @@ function Contents({ active }: { active: string }) {
                 const target = document.getElementById(id);
                 if (!target) return;
                 event.preventDefault();
+                if (target instanceof HTMLDetailsElement) target.open = true;
                 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
                 target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
                 if (target instanceof HTMLElement) target.focus({ preventScroll: true });

@@ -83,6 +83,7 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/d/tools", TODAY, "monthly", "0.4"),
     urlEntry("/d/marketing-agency", TODAY, "monthly", "0.4"),
     urlEntry("/d/architects/herzog-de-meuron", TODAY, "monthly", "0.5"),
+    urlEntry("/d/architects/springfield-missouri", TODAY, "monthly", "0.5"),
     ...cities.map((c) => urlEntry(`/cities/${c.slug}`, dateOnly(c.updated_at), "monthly", "0.8")),
     ...projects.map((p) => urlEntry(`/projects/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
     ...postsForSitemap(journal, resources).map((p) => urlEntry(`/practice/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
@@ -142,7 +143,8 @@ function buildLlms({ cities, projects, journal, resources }) {
     `- [About](${SITE_URL}/about): What Siana is and why it exists.\n` +
     `- [Directory](${SITE_URL}/d/): Architects credited on published buildings.\n` +
     `- [Architects](${SITE_URL}/d/architects): Credits on published buildings.\n` +
-    `- [Herzog & de Meuron](${SITE_URL}/d/architects/herzog-de-meuron): Practice profile.\n\n` +
+    `- [Herzog & de Meuron](${SITE_URL}/d/architects/herzog-de-meuron): Practice profile.\n` +
+    `- [Springfield, Missouri](${SITE_URL}/d/architects/springfield-missouri): Practices with a Springfield office.\n\n` +
     `## Optional\n` +
     `- [XML sitemap](${SITE_URL}/sitemap.xml): Full list of indexable URLs.\n`
   );

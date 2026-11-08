@@ -6,6 +6,7 @@ import NotFound from "@/pages/NotFound";
 import ResearchCoverageMap from "@/components/site/ResearchCoverageMap";
 import { creditTableCsv, directoryCategory, filterDirectoryEntries, readMinutes, type DirectoryEntry } from "@/lib/directory";
 import { profileForCredit } from "@/data/architectProfiles";
+import ArchitectsPlaces from "@/components/site/ArchitectsPlaces";
 import { useDirectoryRecords } from "@/hooks/useDirectoryRecords";
 
 const PREVIEW = 6;
@@ -102,9 +103,10 @@ export default function DirectoryCategory() {
           </h1>
           <p className="mt-4 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
             {showCredits
-              ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} from published buildings. A credit that names several people stays one line.`
+              ? "Guides for practices with a local office, then architect lines copied from published buildings."
               : "No published listings in this category yet."}
           </p>
+          {showCredits && <ArchitectsPlaces />}
 
           <form role="search" onSubmit={onSearch} className="mt-8 max-w-xl">
             <label htmlFor="category-search" className="font-body text-ink" style={{ fontSize: 14 }}>
@@ -168,7 +170,11 @@ export default function DirectoryCategory() {
                     Download this list
                   </button>
                 </div>
-                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">Places are the cities recorded on the buildings.</p>
+                <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">
+                  {showCredits
+                    ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} from published buildings. A credit that names several people stays one line. Places are the cities recorded on the buildings.`
+                    : "Places are the cities recorded on the buildings."}
+                </p>
                 {visible.filter((entry) => profileForCredit(entry.name)).map((entry) => (
                   <p key={entry.id} className="mt-3">
                     <Link to={`/d/architects/${profileForCredit(entry.name)!.slug}`} className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>

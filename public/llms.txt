@@ -73,6 +73,7 @@ Siana documents notable architecture across global cities and writes about it wi
 - [Directory](https://sianaarchitecture.com/d/): Architects credited on published buildings.
 - [Architects](https://sianaarchitecture.com/d/architects): Credits on published buildings.
 - [Herzog & de Meuron](https://sianaarchitecture.com/d/architects/herzog-de-meuron): Practice profile.
+- [Springfield, Missouri](https://sianaarchitecture.com/d/architects/springfield-missouri): Practices with a Springfield office.
 
 ## Optional
 - [XML sitemap](https://sianaarchitecture.com/sitemap.xml): Full list of indexable URLs.

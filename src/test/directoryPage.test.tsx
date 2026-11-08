@@ -5,6 +5,7 @@ import { MemoryRouter, Navigate, Route, Routes, useSearchParams } from "react-ro
 import Directory from "@/pages/Directory";
 import DirectoryCategory from "@/pages/DirectoryCategory";
 import ArchitectProfile from "@/pages/ArchitectProfile";
+import ArchitectPlace from "@/pages/ArchitectPlace";
 
 function DirectoryLegacyRedirect() {
   const [params] = useSearchParams();
@@ -55,6 +56,7 @@ function renderAt(path: string) {
         <Routes>
           <Route path="/d" element={<Directory />} />
           <Route path="/d/" element={<Directory />} />
+          <Route path="/d/architects/springfield-missouri" element={<ArchitectPlace />} />
           <Route path="/d/architects/:profileSlug" element={<ArchitectProfile />} />
           <Route path="/d/:slug" element={<DirectoryCategory />} />
           <Route path="/directory" element={<DirectoryLegacyRedirect />} />
@@ -130,6 +132,25 @@ describe("directory page", () => {
     expect(screen.queryByRole("heading", { name: /pricing/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/out of 10/i)).not.toBeInTheDocument();
     expect(screen.getAllByText("Not verified").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Five licensed exteriors/)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Sources" }).closest("details")).toBeInTheDocument();
+  });
+
+  it("lists Baron Design first among Springfield offices", async () => {
+    const landing = renderAt("/d/architects");
+    const placeLinks = await screen.findAllByRole("link", { name: /Springfield, Missouri/ });
+    expect(placeLinks.some((link) => link.getAttribute("href") === "/d/architects/springfield-missouri")).toBe(true);
+    expect(screen.queryByRole("link", { name: /Miami/ })).not.toBeInTheDocument();
+    landing.unmount();
+    renderAt("/d/architects/springfield-missouri");
+    expect(await screen.findByRole("heading", { name: "Best architecture firms in Springfield, Missouri" })).toBeInTheDocument();
+    const names = screen.getAllByRole("rowheader").map((cell) => cell.textContent);
+    expect(names[0]).toBe("Baron Design & Associates, LLC");
+    expect(names).toContain("Arkifex Studios");
+    expect(names).toHaveLength(9);
+    expect(screen.queryByRole("columnheader", { name: "Score" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Largest firms" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("3810 E. Sunshine St., Suite 101, Springfield, MO 65809").length).toBeGreaterThan(0);
   });
 
   it("treats an unknown category as not found", async () => {

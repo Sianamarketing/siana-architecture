@@ -67,15 +67,7 @@ export default function RecentBuildingsCarousel({ slides }: { slides: BuildingSl
           </figure>
         ))}
       </div>
-      <div className="mt-3 flex items-center justify-between gap-3">
-        <div className="flex gap-2">
-          <button type="button" onClick={() => go(index - 1)} className="h-11 px-3 border border-ink/20 font-mono uppercase text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
-            Previous
-          </button>
-          <button type="button" onClick={() => go(index + 1)} className="h-11 px-3 border border-ink/20 font-mono uppercase text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
-            Next
-          </button>
-        </div>
+      <div className="mt-3 flex justify-end">
         <div className="flex gap-1.5" role="group" aria-label="Slides">
           {slides.map((slide, slideIndex) => (
             <button

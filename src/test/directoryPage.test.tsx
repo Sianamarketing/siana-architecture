@@ -1,9 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { HelmetProvider } from "react-helmet-async";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import Directory from "@/pages/Directory";
+import DirectoryCategory from "@/pages/DirectoryCategory";
 
+function DirectoryLegacyRedirect() {
+  const [params] = useSearchParams();
+  const category = params.get("category");
+  const known = ["architects", "interior-designers", "product-manufacturers", "designers", "tools", "marketing-agency"];
+  const q = params.get("q");
+  const search = q ? `?q=${encodeURIComponent(q)}` : "";
+  const to = category && known.includes(category) ? `/d/${category}${search}` : `/d/${search}`;
+  return <Navigate to={to} replace />;
+}
 vi.mock("@/hooks/useHomeContent", async () => {
   const { HOME_DEFAULTS } = await import("@/lib/homeContent");
   return { useHomeContent: () => HOME_DEFAULTS };
@@ -42,7 +52,10 @@ function renderAt(path: string) {
     <HelmetProvider>
       <MemoryRouter initialEntries={[path]}>
         <Routes>
-          <Route path="/directory" element={<Directory />} />
+          <Route path="/d" element={<Directory />} />
+          <Route path="/d/" element={<Directory />} />
+          <Route path="/d/:slug" element={<DirectoryCategory />} />
+          <Route path="/directory" element={<DirectoryLegacyRedirect />} />
         </Routes>
       </MemoryRouter>
     </HelmetProvider>,
@@ -53,26 +66,30 @@ const CATEGORIES = ["Architects", "Interior Designers", "Product manufacturers",
 
 describe("directory page", () => {
   it("filters from the search form and keeps the query in the page", async () => {
-    renderAt("/directory");
+    renderAt("/d/");
     expect(await screen.findByRole("heading", { name: "Find the people and tools behind architecture." })).toBeInTheDocument();
     expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();
     expect(screen.queryByText("Architect credits")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "All" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Previous" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Browse by category" })).toHaveClass("sr-only");
     expect(screen.getByRole("heading", { name: "Where the research is" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Buildings by city" })).not.toBeInTheDocument();
     for (const name of CATEGORIES) {
-      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+      const links = screen.getAllByRole("link", { name });
+      expect(links.some((link) => link.getAttribute("href")?.startsWith("/d/"))).toBe(true);
     }
+    expect(screen.getAllByRole("link", { name: "Architects" }).some((link) => link.getAttribute("href") === "/d/architects")).toBe(true);
     fireEvent.change(screen.getByLabelText("Search architect credits, buildings, or cities"), { target: { value: "Mäusebunker" } });
-    fireEvent.click(screen.getByRole("button", { name: "Search" }));
+    fireEvent.submit(screen.getByRole("search"));
     expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();
     expect(screen.getByText("Gerd Hänska, Magdalena Hänska, with Kurt Schmersow")).toBeInTheDocument();
     expect(screen.getByLabelText("Search architect credits, buildings, or cities")).toHaveValue("Mäusebunker");
   });
 
   it("reads a category and query from the address and can clear the search", async () => {
-    renderAt("/directory?category=architects&q=Corbusier");
+    renderAt("/d/architects?q=Corbusier");
+    expect(await screen.findByRole("heading", { name: "Architects" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to Directory" })).toHaveAttribute("href", "/d/");
     expect(await screen.findByText("Le Corbusier")).toBeInTheDocument();
     expect(screen.queryByText("Gerd Hänska, Magdalena Hänska, with Kurt Schmersow")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
@@ -80,9 +97,20 @@ describe("directory page", () => {
   });
 
   it("shows an empty category without inventing listings", async () => {
-    renderAt("/directory?category=tools");
+    renderAt("/d/tools");
     expect(await screen.findByRole("heading", { name: "Tools" })).toBeInTheDocument();
     expect(screen.getByText("No listings yet.")).toBeInTheDocument();
     expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();
+  });
+
+  it("sends an old category address to the new page and keeps the query", async () => {
+    renderAt("/directory?category=architects&q=Corbusier");
+    expect(await screen.findByRole("heading", { name: "Architects" })).toBeInTheDocument();
+    expect(await screen.findByText("Le Corbusier")).toBeInTheDocument();
+  });
+
+  it("treats an unknown category as not found", async () => {
+    renderAt("/d/not-a-category");
+    expect(await screen.findByRole("heading", { name: "404" })).toBeInTheDocument();
   });
 });

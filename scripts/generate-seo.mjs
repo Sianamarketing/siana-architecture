@@ -76,7 +76,13 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/journal", TODAY, "weekly", "0.9"),
     urlEntry("/resources", TODAY, "weekly", "0.7"),
     urlEntry("/about", TODAY, "monthly", "0.5"),
-    urlEntry("/directory", TODAY, "weekly", "0.6"),
+    urlEntry("/d/", TODAY, "weekly", "0.6"),
+    urlEntry("/d/architects", TODAY, "weekly", "0.5"),
+    urlEntry("/d/interior-designers", TODAY, "monthly", "0.4"),
+    urlEntry("/d/product-manufacturers", TODAY, "monthly", "0.4"),
+    urlEntry("/d/designers", TODAY, "monthly", "0.4"),
+    urlEntry("/d/tools", TODAY, "monthly", "0.4"),
+    urlEntry("/d/marketing-agency", TODAY, "monthly", "0.4"),
     ...cities.map((c) => urlEntry(`/cities/${c.slug}`, dateOnly(c.updated_at), "monthly", "0.8")),
     ...projects.map((p) => urlEntry(`/projects/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
     ...journal.map((p) => urlEntry(`/journal/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
@@ -127,7 +133,8 @@ function buildLlms({ cities, projects, journal }) {
     `- [Journal](${SITE_URL}/journal): All essays and field notes (the blog).\n` +
     `- [Resources for architects](${SITE_URL}/resources): Practical guides for architecture, engineering and construction practices.\n` +
     `- [About](${SITE_URL}/about): What Siana is and why it exists.\n` +
-    `- [Directory](${SITE_URL}/directory): Architects credited on published buildings.\n\n` +
+    `- [Directory](${SITE_URL}/d/): Architects credited on published buildings.\n` +
+    `- [Architects](${SITE_URL}/d/architects): Credits on published buildings.\n\n` +
     `## Optional\n` +
     `- [XML sitemap](${SITE_URL}/sitemap.xml): Full list of indexable URLs.\n`
   );

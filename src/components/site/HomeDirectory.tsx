@@ -105,7 +105,7 @@ export default function HomeDirectory() {
         </div>
 
         <div className="flex justify-center pt-12">
-          <EditorialButton to={tab === "all" ? "/directory" : `/directory?category=${tab}`} arrow variant="muted">
+          <EditorialButton to={tab === "all" ? "/d/" : `/d/${tab}`} arrow variant="muted">
             Browse the directory
           </EditorialButton>
         </div>

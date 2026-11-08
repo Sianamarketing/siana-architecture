@@ -199,7 +199,7 @@ async function main() {
       (architects.size
         ? `<ul>` + [...architects.entries()].slice(0, 24).map(([name, slug]) => li(`/projects/${slug}`, name, "Architect")).join("") + `</ul>`
         : `<p>Nothing listed here yet.</p>`) +
-      `<p><a href="/directory">Browse the directory</a></p>` +
+      `<p><a href="/d/">Browse the directory</a></p>` +
 
       `<h2>News and research</h2>` +
       `<p>Essays, criticism, interviews and reportage.</p>` +
@@ -219,8 +219,16 @@ async function main() {
       `<p>We believe the most interesting building in any city is rarely the most famous one, and that the best way to understand a place is to walk it slowly, with someone pointing. No ads, no clutter, no infinite scroll. <a href="/about">More about what we do</a>.</p>`,
   })); n++;
 
-  write("/directory", renderPage(template, {
-    path: "/directory",
+  const directoryCategories = [
+    ["architects", "Architects"],
+    ["interior-designers", "Interior Designers"],
+    ["product-manufacturers", "Product manufacturers"],
+    ["designers", "Designers"],
+    ["tools", "Tools"],
+    ["marketing-agency", "Marketing Agency"],
+  ];
+  write("/d", renderPage(template, {
+    path: "/d/",
     title: "Directory - Siana Architecture",
     description: "Architects credited on published buildings.",
     image: OG_DEFAULT,
@@ -228,12 +236,7 @@ async function main() {
       `<h1>Find the people and tools behind architecture.</h1>` +
       `<p>Architect credits are taken from published buildings. A credit can name more than one person, and it stays as one line. These are not verified business profiles. Search the directory, or choose a category.</p>` +
       `<h2>Browse by category</h2><ul>` +
-      `<li><a href="/directory?category=architects">Architects</a></li>` +
-      `<li><a href="/directory?category=interior-designers">Interior Designers</a></li>` +
-      `<li><a href="/directory?category=product-manufacturers">Product manufacturers</a></li>` +
-      `<li><a href="/directory?category=designers">Designers</a></li>` +
-      `<li><a href="/directory?category=tools">Tools</a></li>` +
-      `<li><a href="/directory?category=marketing-agency">Marketing Agency</a></li>` +
+      directoryCategories.map(([slug, label]) => `<li><a href="/d/${slug}">${label}</a></li>`).join("") +
       `</ul>` +
       `<p>Interior designers, product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
       `<h2>Where the research is</h2>` +
@@ -243,6 +246,24 @@ async function main() {
         ? `<h2>Latest research</h2><ul>` + posts.slice(0, 4).map((p) => li(`/practice/${p.slug}`, p.title, p.category || p.excerpt)).join("") + `</ul>`
         : ""),
   })); n++;
+  for (const [slug, label] of directoryCategories) {
+    const architects = slug === "architects";
+    write(`/d/${slug}`, renderPage(template, {
+      path: `/d/${slug}`,
+      title: `${label} - Directory - Siana Architecture`,
+      description: architects
+        ? "Architect credits copied from published buildings."
+        : `${label} has no listings yet.`,
+      image: OG_DEFAULT,
+      content:
+        `<nav>Directory / ${label}</nav>` +
+        `<h1>${label}</h1>` +
+        (architects
+          ? `<p>These lines are copied from the architect field on published buildings. They are not checked business profiles.</p><p><a href="/d/">Back to Directory</a></p>`
+          : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
+    }));
+    n++;
+  }
 
   // --- Listing: Cities ---
   write("/cities", renderPage(template, {

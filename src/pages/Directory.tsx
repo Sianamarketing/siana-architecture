@@ -1,162 +1,58 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import SiteLayout from "@/components/site/SiteLayout";
 import SEO from "@/components/site/SEO";
 import RecentBuildingsCarousel from "@/components/site/RecentBuildingsCarousel";
-import ResearchCoverageMap, { type CoveragePin } from "@/components/site/ResearchCoverageMap";
-import {
-  DIRECTORY_CATEGORIES,
-  architectEntries,
-  directoryCategory,
-  filterDirectoryEntries,
-  readMinutes,
-  usableDirectoryImage,
-  type DirectoryEntry,
-  type DirectorySlug,
-} from "@/lib/directory";
-import { selectRecentSlides, type BuildingSlide, type RecentImageInput } from "@/lib/recentBuildings";
+import ResearchCoverageMap from "@/components/site/ResearchCoverageMap";
+import { DIRECTORY_CATEGORIES, filterDirectoryEntries, readMinutes, type DirectoryEntry, type DirectorySlug } from "@/lib/directory";
+import { useDirectoryRecords, type DirectoryStory } from "@/hooks/useDirectoryRecords";
 
 const PAGE_SIZE = 8;
 
-interface Story {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string | null;
-  category: string | null;
-  hero_image_url: string | null;
-  body: string | null;
-}
-
 export default function Directory() {
   const [params, setParams] = useSearchParams();
-  const requested = directoryCategory(params.get("category"));
-  const tab = requested?.slug || "all";
   const query = params.get("q") || "";
   const [draft, setDraft] = useState(query);
-  const [entries, setEntries] = useState<DirectoryEntry[]>([]);
-  const [stories, setStories] = useState<Story[]>([]);
-  const [slides, setSlides] = useState<BuildingSlide[]>([]);
-  const [pins, setPins] = useState<CoveragePin[]>([]);
-  const [ready, setReady] = useState(false);
   const [shown, setShown] = useState(PAGE_SIZE);
+  const { entries, stories, slides, pins, ready } = useDirectoryRecords();
 
   useEffect(() => {
     setDraft(query);
   }, [query]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { data: projects } = await supabase
-        .from("projects")
-        .select("id, slug, name, architect, created_at, updated_at, latitude, longitude, city:cities(name, slug, country)")
-        .eq("status", "published");
-      const { data: images } = await supabase
-        .from("project_images")
-        .select("project_id, alt, storage_path, is_hero, position, author, license, license_url, kind")
-        .order("position");
-      const { data: posts } = await supabase
-        .from("posts")
-        .select("id, slug, title, excerpt, category, hero_image_url, body")
-        .eq("status", "published")
-        .order("published_at", { ascending: false })
-        .limit(4);
-      if (cancelled) return;
-      const imagesByProject = new Map<string, RecentImageInput[]>();
-      const imageByProject = new Map<string, { src: string; alt: string | null }>();
-      (images || []).forEach((image) => {
-        if (!image.project_id) return;
-        const list = imagesByProject.get(image.project_id) || [];
-        list.push(image);
-        imagesByProject.set(image.project_id, list);
-        const src = usableDirectoryImage(image.storage_path);
-        if (!src) return;
-        const current = imageByProject.get(image.project_id);
-        if (!current || image.is_hero) imageByProject.set(image.project_id, { src, alt: image.alt });
-      });
-      const coverage: CoveragePin[] = [];
-      const sources = (projects || []).map((project) => {
-        const city = Array.isArray(project.city) ? project.city[0] : project.city;
-        if (project.latitude != null && project.longitude != null) {
-          coverage.push({
-            slug: project.slug,
-            name: project.name,
-            latitude: project.latitude,
-            longitude: project.longitude,
-            city: city?.name || null,
-            citySlug: city?.slug || null,
-            country: city?.country || null,
-          });
-        }
-        const image = imageByProject.get(project.id);
-        return {
-          id: project.id,
-          slug: project.slug,
-          name: project.name,
-          architect: project.architect,
-          city: city?.name || null,
-          updated_at: project.updated_at,
-          image: image?.src || null,
-          imageAlt: image?.alt || null,
-        };
-      });
-      setSlides(selectRecentSlides((projects || []).map((project) => ({
-        slug: project.slug,
-        name: project.name,
-        created_at: project.created_at,
-        images: imagesByProject.get(project.id) || [],
-      }))));
-      setPins(coverage);
-      setEntries(architectEntries(sources));
-      setStories((posts || []) as Story[]);
-      setReady(true);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const asked = Boolean(query.trim()) || Boolean(requested);
+  const asked = Boolean(query.trim());
   const visible = useMemo(
-    () => (asked ? filterDirectoryEntries(entries, { query, category: tab }) : []),
-    [asked, entries, query, tab],
+    () => (asked ? filterDirectoryEntries(entries, { query, category: "all" }) : []),
+    [asked, entries, query],
   );
-  const showCredits = asked && (tab === "all" || tab === "architects");
 
   useEffect(() => {
     setShown(PAGE_SIZE);
-  }, [query, tab]);
+  }, [query]);
 
-  const writeParams = (next: { category?: DirectorySlug | "all"; q?: string }) => {
-    const category = next.category ?? tab;
-    const q = next.q ?? query;
-    const nextParams = new URLSearchParams(params);
-    if (category === "all") nextParams.delete("category");
-    else nextParams.set("category", category);
+  const writeQuery = (q: string) => {
+    const nextParams = new URLSearchParams();
     if (q.trim()) nextParams.set("q", q.trim());
-    else nextParams.delete("q");
     setParams(nextParams, { replace: true });
   };
 
   const onSearch = (event: FormEvent) => {
     event.preventDefault();
-    writeParams({ q: draft });
+    writeQuery(draft);
   };
 
-  const label = requested?.label || "Directory";
   const lead = stories[0];
   const restStories = stories.slice(1, 4);
 
   return (
     <SiteLayout>
       <SEO
-        title={`${label} - Siana Architecture`}
+        title="Directory - Siana Architecture"
         description="Search architect credits on published buildings. Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet."
-        canonical="https://sianaarchitecture.com/directory"
+        canonical="https://sianaarchitecture.com/d/"
       />
-      <section className="vogue-titles home-paper border-b border-ink/10" style={{ paddingTop: 76 }}>
+      <div className="vogue-titles home-paper pb-8" style={{ paddingTop: 76 }}>
+      <section>
         <div className="mx-auto max-w-[1400px] px-6 lg:px-10 py-6 lg:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 lg:items-center">
           <div className="min-w-0">
             <p className="font-mono uppercase text-warm-gray mb-3" style={{ fontSize: 12, letterSpacing: "0.16em" }}>Directory</p>
@@ -181,20 +77,13 @@ export default function Directory() {
                   placeholder="Credits, buildings, or cities"
                   className="min-w-0 flex-1 h-12 bg-transparent font-body text-[16px] text-ink placeholder:text-ink-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
                 />
-                <button
-                  type="submit"
-                  className="inline-flex h-12 shrink-0 items-center gap-2 font-body text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
-                  style={{ fontSize: 16 }}
-                >
-                  Search
-                  <span aria-hidden="true">↗</span>
-                </button>
+                <button type="submit" className="sr-only">Search</button>
               </div>
             </form>
             {query && (
               <button
                 type="button"
-                onClick={() => writeParams({ q: "" })}
+                onClick={() => writeQuery("")}
                 className="mt-3 font-body text-ink underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
                 style={{ fontSize: 15 }}
               >
@@ -206,36 +95,30 @@ export default function Directory() {
         </div>
       </section>
 
-      <div className="vogue-titles home-paper pb-8">
-        <div className="mx-auto max-w-[1100px] px-6 lg:px-10">
-          <section aria-labelledby="directory-categories" className="mt-8 lg:mt-6">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
+          <section aria-labelledby="directory-categories" className="mt-2">
           <h2 id="directory-categories" className="sr-only">Browse by category</h2>
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {DIRECTORY_CATEGORIES.map((category) => {
-              const selected = tab === category.slug;
-              return (
-                <li key={category.slug}>
-                  <button
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => writeParams({ category: category.slug })}
-                    className={`w-full text-left border bg-paper px-5 py-5 flex items-center gap-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))] ${selected ? "border-ink" : "border-ink/15 hover:border-ink"}`}
-                  >
-                    <CategoryIcon slug={category.slug} />
-                    <span className="block font-display text-ink" style={{ fontSize: "1.35rem" }}>{category.label}</span>
-                  </button>
-                </li>
-              );
-            })}
+            {DIRECTORY_CATEGORIES.map((category) => (
+              <li key={category.slug}>
+                <Link
+                  to={`/d/${category.slug}`}
+                  className="w-full text-left border border-ink/15 bg-paper px-5 py-5 flex items-center gap-4 hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]"
+                >
+                  <CategoryIcon slug={category.slug} />
+                  <span className="block font-display text-ink" style={{ fontSize: "1.35rem" }}>{category.label}</span>
+                </Link>
+              </li>
+            ))}
           </ul>
           </section>
 
           {asked && (
             <div id="directory-panel" className="pt-14">
               <h2 id="directory-results-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: 1.1 }}>
-                {showCredits ? "Architects behind the buildings" : label}
+                Architects behind the buildings
               </h2>
-              {showCredits && (
+              {(
                 <p className="mt-3 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
                   These lines are copied from the architect field on published buildings. They are not checked business profiles, and a shared credit is not split into separate people.
                 </p>
@@ -243,8 +126,6 @@ export default function Directory() {
 
               {!ready ? (
                 <p className="mt-8 font-body text-ink-soft">Loading the directory.</p>
-              ) : !showCredits ? (
-                <p className="mt-8 font-body text-ink-soft text-[16px]">No listings yet.</p>
               ) : visible.length === 0 ? (
                 <p className="mt-8 font-body text-ink-soft text-[16px]">No architect credits match that search.</p>
               ) : (
@@ -383,7 +264,7 @@ function CategoryIcon({ slug }: { slug: DirectorySlug }) {
   );
 }
 
-function storyImage(story: Story): string | null {
+function storyImage(story: DirectoryStory): string | null {
   const src = story.hero_image_url;
   if (!src || src.includes("picsum.photos")) return null;
   return src;

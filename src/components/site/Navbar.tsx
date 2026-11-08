@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { to: "/atlas", label: "Map" },
   { to: "/cities", label: "Cities" },
-  { to: "/directory", label: "Directory" },
+  { to: "/d/", label: "Directory" },
   { to: "/about", label: "About" },
 ];
 
@@ -13,10 +13,11 @@ const navLinks = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const isActive = (to: string) =>
-    to.startsWith("/#") || to === "/"
-      ? location.pathname === "/"
-      : location.pathname.startsWith(to);
+  const isActive = (to: string) => {
+    if (to.startsWith("/#") || to === "/") return location.pathname === "/";
+    if (to === "/d/") return location.pathname === "/d" || location.pathname.startsWith("/d/");
+    return location.pathname.startsWith(to);
+  };
 
   useEffect(() => {
     setMobileOpen(false);

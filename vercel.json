@@ -2,6 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/directory", "has": [{ "type": "query", "key": "category", "value": "architects" }], "destination": "/d/architects", "permanent": true },
+    { "source": "/directory", "has": [{ "type": "query", "key": "category", "value": "interior-designers" }], "destination": "/d/interior-designers", "permanent": true },
+    { "source": "/directory", "has": [{ "type": "query", "key": "category", "value": "product-manufacturers" }], "destination": "/d/product-manufacturers", "permanent": true },
+    { "source": "/directory", "has": [{ "type": "query", "key": "category", "value": "designers" }], "destination": "/d/designers", "permanent": true },
+    { "source": "/directory", "has": [{ "type": "query", "key": "category", "value": "tools" }], "destination": "/d/tools", "permanent": true },
+    { "source": "/directory", "has": [{ "type": "query", "key": "category", "value": "marketing-agency" }], "destination": "/d/marketing-agency", "permanent": true },
+    { "source": "/directory", "destination": "/d/", "permanent": true },
+    { "source": "/directory/", "destination": "/d/", "permanent": true },
+    { "source": "/d", "destination": "/d/", "permanent": true },
+    { "source": "/d/:slug/", "destination": "/d/:slug", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

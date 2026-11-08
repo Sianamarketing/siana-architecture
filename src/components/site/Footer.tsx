@@ -21,13 +21,13 @@ export default function Footer() {
             </Link>
           ))}
           <div>
-            <Link to="/directory" className="font-mono uppercase text-ink hover:text-accent-terra focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 13, letterSpacing: "0.14em" }}>
+            <Link to="/d/" className="font-mono uppercase text-ink hover:text-accent-terra focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]" style={{ fontSize: 13, letterSpacing: "0.14em" }}>
               Directory
             </Link>
             <ul className="mt-3 space-y-2">
               {DIRECTORY_CATEGORIES.map((category) => (
                 <li key={category.slug}>
-                  <Link to={`/directory?category=${category.slug}`} className="font-body text-ink-soft text-[14px] hover:text-ink">
+                  <Link to={`/d/${category.slug}`} className="font-body text-ink-soft text-[14px] hover:text-ink">
                     {category.label}
                   </Link>
                 </li>

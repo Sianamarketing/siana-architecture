@@ -74,6 +74,15 @@ Siana documents notable architecture across global cities and writes about it wi
 - [Architects](https://sianaarchitecture.com/d/architects): Credits on published buildings.
 - [Herzog & de Meuron](https://sianaarchitecture.com/d/architects/herzog-de-meuron): Practice profile.
 - [Springfield, Missouri](https://sianaarchitecture.com/d/architects/springfield-missouri): Practices with a Springfield office.
+- [Baron Design & Associates, LLC](https://sianaarchitecture.com/d/architects/baron-design-associates): Springfield office profile.
+- [Arkifex Studios](https://sianaarchitecture.com/d/architects/arkifex-studios): Springfield office profile.
+- [Buxton Kubik Dodd Design Collective](https://sianaarchitecture.com/d/architects/bkd-design-collective): Springfield office profile.
+- [Hood-Rich Architecture](https://sianaarchitecture.com/d/architects/hood-rich): Springfield office profile.
+- [hdesigngroup](https://sianaarchitecture.com/d/architects/hdesigngroup): Springfield office profile.
+- [Esterly, Schneider & Associates](https://sianaarchitecture.com/d/architects/esterly-schneider): Springfield office profile.
+- [N·FORM Architecture](https://sianaarchitecture.com/d/architects/nform-architecture): Springfield office profile.
+- [Paragon Architecture](https://sianaarchitecture.com/d/architects/paragon-architecture): Springfield office profile.
+- [BRP Architects](https://sianaarchitecture.com/d/architects/brp-architects): Springfield office profile.
 
 ## Optional
 - [XML sitemap](https://sianaarchitecture.com/sitemap.xml): Full list of indexable URLs.

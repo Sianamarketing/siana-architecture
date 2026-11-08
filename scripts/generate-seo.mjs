@@ -84,6 +84,17 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/d/marketing-agency", TODAY, "monthly", "0.4"),
     urlEntry("/d/architects/herzog-de-meuron", TODAY, "monthly", "0.5"),
     urlEntry("/d/architects/springfield-missouri", TODAY, "monthly", "0.5"),
+    ...[
+      "baron-design-associates",
+      "arkifex-studios",
+      "bkd-design-collective",
+      "hood-rich",
+      "hdesigngroup",
+      "esterly-schneider",
+      "nform-architecture",
+      "paragon-architecture",
+      "brp-architects",
+    ].map((slug) => urlEntry(`/d/architects/${slug}`, TODAY, "monthly", "0.5")),
     ...cities.map((c) => urlEntry(`/cities/${c.slug}`, dateOnly(c.updated_at), "monthly", "0.8")),
     ...projects.map((p) => urlEntry(`/projects/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
     ...postsForSitemap(journal, resources).map((p) => urlEntry(`/practice/${p.slug}`, dateOnly(p.updated_at), "monthly", "0.7")),
@@ -144,7 +155,16 @@ function buildLlms({ cities, projects, journal, resources }) {
     `- [Directory](${SITE_URL}/d/): Architects credited on published buildings.\n` +
     `- [Architects](${SITE_URL}/d/architects): Credits on published buildings.\n` +
     `- [Herzog & de Meuron](${SITE_URL}/d/architects/herzog-de-meuron): Practice profile.\n` +
-    `- [Springfield, Missouri](${SITE_URL}/d/architects/springfield-missouri): Practices with a Springfield office.\n\n` +
+    `- [Springfield, Missouri](${SITE_URL}/d/architects/springfield-missouri): Practices with a Springfield office.\n` +
+    `- [Baron Design & Associates, LLC](${SITE_URL}/d/architects/baron-design-associates): Springfield office profile.\n` +
+    `- [Arkifex Studios](${SITE_URL}/d/architects/arkifex-studios): Springfield office profile.\n` +
+    `- [Buxton Kubik Dodd Design Collective](${SITE_URL}/d/architects/bkd-design-collective): Springfield office profile.\n` +
+    `- [Hood-Rich Architecture](${SITE_URL}/d/architects/hood-rich): Springfield office profile.\n` +
+    `- [hdesigngroup](${SITE_URL}/d/architects/hdesigngroup): Springfield office profile.\n` +
+    `- [Esterly, Schneider & Associates](${SITE_URL}/d/architects/esterly-schneider): Springfield office profile.\n` +
+    `- [N·FORM Architecture](${SITE_URL}/d/architects/nform-architecture): Springfield office profile.\n` +
+    `- [Paragon Architecture](${SITE_URL}/d/architects/paragon-architecture): Springfield office profile.\n` +
+    `- [BRP Architects](${SITE_URL}/d/architects/brp-architects): Springfield office profile.\n\n` +
     `## Optional\n` +
     `- [XML sitemap](${SITE_URL}/sitemap.xml): Full list of indexable URLs.\n`
   );

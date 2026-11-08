@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { HelmetProvider } from "react-helmet-async";
 import { MemoryRouter, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import Directory from "@/pages/Directory";
@@ -144,13 +144,57 @@ describe("directory page", () => {
     landing.unmount();
     renderAt("/d/architects/springfield-missouri");
     expect(await screen.findByRole("heading", { name: "Best architecture firms in Springfield, Missouri" })).toBeInTheDocument();
-    const names = screen.getAllByRole("rowheader").map((cell) => cell.textContent);
+    const offices = screen.getAllByRole("table")[0];
+    const names = within(offices).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
     expect(names[0]).toBe("Baron Design & Associates, LLC");
     expect(names).toContain("Arkifex Studios");
     expect(names).toHaveLength(9);
+    expect(within(offices).getByRole("columnheader", { name: "Project experience" })).toBeInTheDocument();
+    expect(within(offices).getByRole("columnheader", { name: "Architect registration" })).toBeInTheDocument();
+    expect(within(offices).getByText("Missouri registered architect: Janet Rothberg White, no. 003658")).toBeInTheDocument();
+    expect(within(offices).getByText("Missouri Architectural Corporation no. 2003003845")).toBeInTheDocument();
+    expect(within(offices).getByText("Rita Baron, principal: Not verified")).toBeInTheDocument();
+    expect(within(offices).getAllByText("Firm certificate of authority: Not verified")).toHaveLength(8);
+    expect(within(offices).getByText("Missouri registered architect: Tyler D. Hellweg, no. 2015000181")).toBeInTheDocument();
+    expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();
+    expect(within(offices).getByRole("link", { name: "Baron Design & Associates, LLC" })).toHaveAttribute("href", "/d/architects/baron-design-associates");
+    expect(screen.getByRole("heading", { name: "Homes and residential buildings" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Commercial and public-facing projects" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Practice types and specialist briefs" })).toBeInTheDocument();
+    for (const id of ["healthcare", "hotels", "restaurants", "renovations", "houses", "boutique", "engineering", "luxury"]) {
+      expect(document.getElementById(id)).toBeTruthy();
+    }
     expect(screen.queryByRole("columnheader", { name: "Score" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Largest firms" })).not.toBeInTheDocument();
     expect(screen.getAllByText("3810 E. Sunshine St., Suite 101, Springfield, MO 65809").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/placed first/i)).not.toBeInTheDocument();
+  });
+
+  it("opens a Springfield profile with registration still not verified", async () => {
+    renderAt("/d/architects/baron-design-associates");
+    expect(await screen.findByRole("heading", { name: "Baron Design & Associates, LLC" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Springfield, Missouri" })).toHaveAttribute("href", "/d/architects/springfield-missouri");
+    expect(screen.getAllByText("Rita Baron").length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("link", { name: "The Preston" })[0]).toHaveAttribute("href", "https://baron-design.com/portfolio/the-preston-springfield-mo");
+    expect(screen.getByText("Missouri registered architect: Janet Rothberg White, no. 003658")).toBeInTheDocument();
+    expect(screen.getByText("Architect in charge")).toBeInTheDocument();
+    expect(screen.getByText("Rita Baron, principal")).toBeInTheDocument();
+    expect(screen.getAllByText("Not verified").length).toBeGreaterThan(0);
+    expect(document.body.textContent).toMatch(/2003003845-D/);
+    expect(document.querySelector('a[href="https://mopro.mo.gov/license/s/license-search"]')).toBeTruthy();
+    expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Ten projects/)).not.toBeInTheDocument();
+    expect(document.body.textContent).toMatch(/not a Creative Commons image/i);
+    expect(screen.getByRole("heading", { name: "Sources" }).closest("details")).toBeInTheDocument();
+    expect(document.querySelector('img[src="/directory-marks/baron-design-associates.png"]')).toBeTruthy();
+  });
+
+  it("names N·FORM in type when the mark file is absent", async () => {
+    renderAt("/d/architects/nform-architecture");
+    expect(await screen.findByRole("heading", { name: "N·FORM Architecture" })).toBeInTheDocument();
+    expect(screen.getAllByText("Sac River Residence").length).toBeGreaterThan(0);
+    expect(document.querySelector("img")).toBeNull();
+    expect(document.body.textContent).toMatch(/An official mark is not shown/);
   });
 
   it("treats an unknown category as not found", async () => {

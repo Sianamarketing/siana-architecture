@@ -3,6 +3,7 @@
  * is entered here. Other credits stay project lines.
  * Checked 8 November 2026.
  */
+import { SPRINGFIELD_PROFILES } from "@/data/springfieldProfiles";
 
 export interface ProfileImage {
   src: string;
@@ -12,7 +13,7 @@ export interface ProfileImage {
   licenseUrl: string;
   sourceUrl: string;
   attribution: string;
-  permissionStatus: "commons-licensed" | "commons-pd-textlogo";
+  permissionStatus: "commons-licensed" | "commons-pd-textlogo" | "official-identifying-mark";
 }
 
 export interface ProfileMark extends ProfileImage {
@@ -38,6 +39,8 @@ export interface SelectedProject {
   sourceUrl: string;
   sourceLabel: string;
   image: ProfileImage | null;
+  /** Editorial paragraph for a text row. Gallery profiles can omit it. */
+  summary?: string;
 }
 
 export interface ProfileAward {
@@ -75,6 +78,15 @@ export interface ArchitectProfile {
   awards: ProfileAward[];
   sources: { label: string; url: string }[];
   checked: string;
+  /** Local guides use text rows. The default keeps the gallery and project table. */
+  projectPresentation?: "gallery" | "rows";
+  sourcesNote?: string;
+  guide?: { label: string; path: string };
+  address?: { street: string; locality: string; region: string; postalCode: string; country: string };
+  /** Short project-experience line for a place table. */
+  experience?: string;
+  /** Reversed official marks sit on ink so the white drawing stays visible. */
+  markOnInk?: boolean;
 }
 
 const cc = (version: "4.0" | "3.0" | "2.0", sa = true) =>
@@ -438,12 +450,52 @@ export const ARCHITECT_PROFILES: ArchitectProfile[] = [
   },
 ];
 
+const PRACTICE_PROFILES = [...ARCHITECT_PROFILES, ...SPRINGFIELD_PROFILES];
+
 export function profileForCredit(name: string): ArchitectProfile | null {
   const trimmed = name.trim();
-  return ARCHITECT_PROFILES.find((profile) => profile.creditName === trimmed) || null;
+  return PRACTICE_PROFILES.find((profile) => profile.creditName === trimmed) || null;
 }
 
 export function profileBySlug(slug: string | undefined): ArchitectProfile | null {
   if (!slug) return null;
-  return ARCHITECT_PROFILES.find((profile) => profile.slug === slug) || null;
+  return PRACTICE_PROFILES.find((profile) => profile.slug === slug) || null;
+}
+
+export function profileStructuredData(profile: ArchitectProfile) {
+  const url = `https://sianaarchitecture.com/d/architects/${profile.slug}`;
+  const crumbs = [
+    { name: "Directory", item: "https://sianaarchitecture.com/d/" },
+    { name: "Architects", item: "https://sianaarchitecture.com/d/architects" },
+  ];
+  if (profile.guide) crumbs.push({ name: profile.guide.label, item: `https://sianaarchitecture.com${profile.guide.path}` });
+  crumbs.push({ name: profile.name, item: url });
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: crumbs.map((crumb, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: crumb.name,
+        item: crumb.item,
+      })),
+    },
+  ];
+  if (profile.address) {
+    graph.push({
+      "@type": "ProfessionalService",
+      name: profile.name,
+      url,
+      sameAs: profile.website,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: profile.address.street,
+        addressLocality: profile.address.locality,
+        addressRegion: profile.address.region,
+        postalCode: profile.address.postalCode,
+        addressCountry: profile.address.country,
+      },
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
 }

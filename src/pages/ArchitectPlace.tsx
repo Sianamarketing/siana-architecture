@@ -2,26 +2,56 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import SiteLayout from "@/components/site/SiteLayout";
 import SEO from "@/components/site/SEO";
+import FirmMark from "@/components/site/FirmMark";
+import ProjectFeature from "@/components/site/ProjectFeature";
 import {
-  SPRINGFIELD_FACETS,
+  EXPERIENCE_MATRIX,
+  GUIDE_SECTIONS,
   SPRINGFIELD_FIRMS,
   SPRINGFIELD_PLACE,
-  firmsForFacet,
+  guideProject,
+  officeLine,
 } from "@/data/architectPlaces";
+
+const profileUrl = (slug: string) => `/d/architects/${slug}`;
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ItemList",
-  name: SPRINGFIELD_PLACE.title,
-  itemListOrder: "https://schema.org/ItemListUnordered",
-  numberOfItems: SPRINGFIELD_FIRMS.length,
-  itemListElement: SPRINGFIELD_FIRMS.map((firm) => ({
-    "@type": "Organization",
-    name: firm.name,
-    url: firm.website,
-    address: firm.office,
-  })),
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Directory", item: "https://sianaarchitecture.com/d/" },
+        { "@type": "ListItem", position: 2, name: "Architects", item: "https://sianaarchitecture.com/d/architects" },
+        { "@type": "ListItem", position: 3, name: "Springfield, Missouri", item: `https://sianaarchitecture.com${SPRINGFIELD_PLACE.path}` },
+      ],
+    },
+    {
+      "@type": "ItemList",
+      name: SPRINGFIELD_PLACE.title,
+      itemListOrder: "https://schema.org/ItemListUnordered",
+      numberOfItems: SPRINGFIELD_FIRMS.length,
+      itemListElement: SPRINGFIELD_FIRMS.map((firm) => ({
+        "@type": "Organization",
+        name: firm.name,
+        url: `https://sianaarchitecture.com${profileUrl(firm.slug)}`,
+        sameAs: firm.website,
+      })),
+    },
+  ],
 };
+
+function RegistrationLines({ firmSlug }: { firmSlug: string }) {
+  const firm = SPRINGFIELD_FIRMS.find((item) => item.slug === firmSlug);
+  if (!firm) return null;
+  return (
+    <div className="font-body text-[15px] leading-snug">
+      {firm.registration.map((item) => (
+        <p key={item.place}>{item.status === "Not verified" ? `${item.place}: Not verified` : item.status}</p>
+      ))}
+    </div>
+  );
+}
 
 export default function ArchitectPlace() {
   return (
@@ -35,7 +65,7 @@ export default function ArchitectPlace() {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       <div className="vogue-titles home-paper pb-16" style={{ paddingTop: 76 }}>
-        <div className="mx-auto max-w-[980px] px-6 lg:px-10 py-8">
+        <div className="mx-auto max-w-[1040px] px-6 lg:px-10 py-8">
           <nav aria-label="Breadcrumb" className="font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
             <Link to="/d/" className="hover:text-ink">Directory</Link>
             <span aria-hidden="true"> / </span>
@@ -52,31 +82,42 @@ export default function ArchitectPlace() {
             <h2 id="offices-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Offices</h2>
             <ul className="mt-4 md:hidden space-y-3">
               {SPRINGFIELD_FIRMS.map((firm) => (
-                <li key={firm.slug} className="border border-ink/15 px-4 py-3">
-                  <a href={`#${firm.slug}`} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</a>
-                  <p className="mt-1 font-body text-ink-soft text-[15px]">{firm.office}</p>
+                <li key={firm.slug} id={`${firm.slug}-card`} className="border border-ink/15 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <FirmMark profile={firm} />
+                    <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
+                  </div>
+                  <p className="mt-2 font-body text-ink-soft text-[15px]">{officeLine(firm)}</p>
+                  <p className="mt-2 font-body text-ink text-[15px] leading-snug">{firm.experience}</p>
+                  <div className="mt-2"><RegistrationLines firmSlug={firm.slug} /></div>
                   <a href={firm.website} className="mt-2 inline-block font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
                 </li>
               ))}
             </ul>
-            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15">
-              <table className="w-full min-w-[640px] text-left">
+            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Springfield offices. Scroll sideways if a column is out of view.">
+              <table className="w-full min-w-[760px] text-left">
                 <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
                   <tr>
                     <th className="px-4 py-3 font-medium">Practice</th>
+                    <th className="px-4 py-3 font-medium">Project experience</th>
+                    <th className="px-4 py-3 font-medium">Architect registration</th>
                     <th className="px-4 py-3 font-medium">Springfield office</th>
-                    <th className="px-4 py-3 font-medium">Website</th>
                   </tr>
                 </thead>
                 <tbody>
                   {SPRINGFIELD_FIRMS.map((firm) => (
-                    <tr key={firm.slug} className="border-t border-ink/10 align-top">
+                    <tr key={firm.slug} id={firm.slug} className="border-t border-ink/10 align-top scroll-mt-28">
                       <th scope="row" className="px-4 py-3 font-normal">
-                        <a href={`#${firm.slug}`} className="text-ink hover:underline">{firm.name}</a>
+                        <div className="flex items-center gap-3">
+                          <FirmMark profile={firm} />
+                          <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
+                        </div>
                       </th>
-                      <td className="px-4 py-3 font-body text-[15px]">{firm.office}</td>
+                      <td className="px-4 py-3 font-body text-[15px] leading-snug">{firm.experience}</td>
+                      <td className="px-4 py-3"><RegistrationLines firmSlug={firm.slug} /></td>
                       <td className="px-4 py-3 font-body text-[15px]">
-                        <a href={firm.website} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+                        {officeLine(firm)}
+                        <a href={firm.website} className="mt-1 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
                       </td>
                     </tr>
                   ))}
@@ -85,55 +126,91 @@ export default function ArchitectPlace() {
             </div>
           </section>
 
-          <section className="mt-12" aria-labelledby="practices-heading">
-            <h2 id="practices-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Practices</h2>
-            <div className="mt-6 space-y-8">
-              {SPRINGFIELD_FIRMS.map((firm) => (
-                <article key={firm.slug} id={firm.slug} className="scroll-mt-28 border-t border-ink/15 pt-6">
-                  <h3 className="text-ink" style={{ fontWeight: 400, fontSize: "1.6rem" }}>{firm.name}</h3>
-                  <p className="mt-2 font-body text-ink-soft text-[15px]">{firm.office}</p>
-                  <p className="mt-3 max-w-2xl font-body text-ink text-[16px] leading-relaxed">{firm.summary}</p>
-                  <ul className="mt-4 space-y-3">
-                    {firm.projects.map((project) => (
-                      <li key={project.url}>
-                        <a href={project.url} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">{project.title}, external</a>
-                        <span className="mt-1 block font-body text-ink-soft text-[14px]">{project.location}. {project.status}. {project.note}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </section>
+          {GUIDE_SECTIONS.map((section) => (
+            <section key={section.id} id={section.id} className="scroll-mt-28 mt-14" aria-labelledby={`${section.id}-heading`}>
+              <h2 id={`${section.id}-heading`} className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>{section.title}</h2>
+              <p className="mt-3 max-w-2xl font-body text-ink text-[16px] leading-relaxed">{section.intro}</p>
+              <div className="mt-4">
+                {section.rows.map((row) => {
+                  const match = guideProject(row);
+                  if (!match) return null;
+                  return (
+                    <ProjectFeature
+                      key={`${row.firmSlug}-${row.projectName}`}
+                      id={row.anchor}
+                      project={match.project}
+                      firmName={match.firm.name}
+                      firmPath={profileUrl(match.firm.slug)}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          ))}
 
-          <section className="mt-14" aria-labelledby="facets-heading">
-            <h2 id="facets-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Work</h2>
-            <div className="mt-6 space-y-8">
-              {SPRINGFIELD_FACETS.map((facet) => (
-                <div key={facet.id} id={facet.id} className="scroll-mt-28">
-                  <h3 className="text-ink" style={{ fontWeight: 400, fontSize: "1.35rem" }}>{facet.label}</h3>
-                  <p className="mt-2 max-w-2xl font-body text-ink-soft text-[15px] leading-relaxed">{facet.intro}</p>
-                  <ul className="mt-3 space-y-1">
-                    {firmsForFacet(facet).map((firm) => (
-                      <li key={firm.slug}>
-                        <a href={`#${firm.slug}`} className="font-body text-ink text-[15px] underline underline-offset-4">{firm.name}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+          <section id="practice-types" className="scroll-mt-28 mt-14" aria-labelledby="practice-types-heading">
+            <h2 id="practice-types-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Practice types and specialist briefs</h2>
+            <div className="mt-4 max-w-2xl space-y-3 font-body text-ink text-[16px] leading-relaxed">
+              <p id="boutique">Arkifex Studios describes itself as a boutique firm.</p>
+              <p id="engineering">Buxton Kubik Dodd Design Collective describes architecture, engineering, and interior design in one firm, and says in-house engineering was added in 2013.</p>
+              <p id="luxury">Township 28 is described as luxury apartments. The Caesars Republic article describes that Scottsdale hotel as luxury.</p>
+              <p id="resorts">Chateau on the Lake in Branson is a portfolio credit. The page does not state the scope.</p>
+            </div>
+
+            <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.35rem" }}>By kind of work</h3>
+            <ul className="mt-4 md:hidden space-y-3">
+              {EXPERIENCE_MATRIX.map((row) => {
+                const firm = SPRINGFIELD_FIRMS.find((item) => item.slug === row.slug);
+                if (!firm) return null;
+                return (
+                  <li key={row.slug} className="border border-ink/15 px-4 py-3">
+                    <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.05rem" }}>{firm.name}</Link>
+                    {row.homes && <p className="mt-2 font-body text-[15px]"><span className="text-ink-soft">Homes. </span>{row.homes}</p>}
+                    {row.commercial && <p className="mt-1 font-body text-[15px]"><span className="text-ink-soft">Commercial and public. </span>{row.commercial}</p>}
+                    <p className="mt-1 font-body text-ink-soft text-[14px]">{row.note}</p>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Work by practice. Scroll sideways if a column is out of view.">
+              <table className="w-full min-w-[720px] text-left">
+                <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Practice</th>
+                    <th className="px-4 py-3 font-medium">Homes</th>
+                    <th className="px-4 py-3 font-medium">Commercial and public</th>
+                    <th className="px-4 py-3 font-medium">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {EXPERIENCE_MATRIX.map((row) => {
+                    const firm = SPRINGFIELD_FIRMS.find((item) => item.slug === row.slug);
+                    if (!firm) return null;
+                    return (
+                      <tr key={row.slug} className="border-t border-ink/10 align-top">
+                        <th scope="row" className="px-4 py-3 font-normal">
+                          <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
+                        </th>
+                        <td className="px-4 py-3 font-body text-[15px]">{row.homes}</td>
+                        <td className="px-4 py-3 font-body text-[15px]">{row.commercial}</td>
+                        <td className="px-4 py-3 font-body text-[15px]">{row.note}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </section>
 
           <details className="mt-14 border border-ink/15 px-4 py-3">
             <summary className="cursor-pointer font-body text-ink text-[16px] min-h-11">Sources</summary>
             <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">
-              Checked {SPRINGFIELD_PLACE.checked}. The list order is an editorial selection. Office addresses come from each practice website. A project city can differ from the Springfield office. Practice-site photographs are not reproduced.
+              Checked {SPRINGFIELD_PLACE.checked} in the Active Licensee Only search at the <a href="https://mopro.mo.gov/license/s/license-search" className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Missouri licensee search, external</a>. Detail pages do not separately label a record Active. Personal records list a Springfield architect and do not name an employer. The practice pages supply that association, except the Baron Design corporation record, which names Janet Rothberg White as person in charge and shows certificate 2003003845. The about page states 2003003845-D. Rita Baron returned no match in that active-only search, which does not establish a licence status for her. Firm certificates for the other practices were not opened. The list order is an editorial selection. Office addresses come from each practice website. A project city can differ from the Springfield office. Logos are the practices' own marks, shown small to identify them. They are not Creative Commons images. N·FORM Architecture is named in type. Project photographs are not shown.
             </p>
             <ul className="mt-3 space-y-2">
               {SPRINGFIELD_FIRMS.map((firm) => (
-                <li key={firm.website}>
-                  <a href={firm.website} className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">{firm.name}, external</a>
+                <li key={firm.slug}>
+                  <Link to={profileUrl(firm.slug)} className="font-body text-ink text-[15px] underline underline-offset-4">{firm.name}</Link>
                 </li>
               ))}
             </ul>

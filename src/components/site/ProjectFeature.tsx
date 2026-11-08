@@ -35,7 +35,7 @@ export default function ProjectFeature({
           </p>
         )}
         <p className="mt-2 font-body text-ink-soft text-[14px]">
-          {place}{showStatus ? `. ${project.status}` : ""}
+          {[place, showStatus ? project.status : ""].filter(Boolean).join(". ")}
         </p>
         {project.summary && <p className="mt-2 max-w-2xl font-body text-ink text-[16px] leading-relaxed">{project.summary}</p>}
       </div>

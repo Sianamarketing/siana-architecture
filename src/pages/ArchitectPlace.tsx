@@ -43,14 +43,9 @@ const jsonLd = {
 
 function RegistrationLines({ firmSlug }: { firmSlug: string }) {
   const firm = SPRINGFIELD_FIRMS.find((item) => item.slug === firmSlug);
-  if (!firm) return null;
-  return (
-    <div className="font-body text-[15px] leading-snug">
-      {firm.registration.map((item) => (
-        <p key={item.place}>{item.status === "Not verified" ? `${item.place}: Not verified` : item.status}</p>
-      ))}
-    </div>
-  );
+  const architect = firm?.registration.find((item) => item.status.startsWith("Missouri registered architect: "));
+  if (!architect) return null;
+  return <p className="font-body text-[15px] leading-snug">{architect.status.replace("Missouri registered architect: ", "")}</p>;
 }
 
 export default function ArchitectPlace() {
@@ -151,10 +146,10 @@ export default function ArchitectPlace() {
           <section id="practice-types" className="scroll-mt-28 mt-14" aria-labelledby="practice-types-heading">
             <h2 id="practice-types-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Practice types and specialist briefs</h2>
             <div className="mt-4 max-w-2xl space-y-3 font-body text-ink text-[16px] leading-relaxed">
-              <p id="boutique">Arkifex Studios describes itself as a boutique firm.</p>
-              <p id="engineering">Buxton Kubik Dodd Design Collective describes architecture, engineering, and interior design in one firm, and says in-house engineering was added in 2013.</p>
-              <p id="luxury">Township 28 is described as luxury apartments. The Caesars Republic article describes that Scottsdale hotel as luxury.</p>
-              <p id="resorts">Chateau on the Lake in Branson is a portfolio credit. The page does not state the scope.</p>
+              <p id="boutique">Arkifex Studios is a boutique firm.</p>
+              <p id="engineering">Buxton Kubik Dodd Design Collective practices architecture, engineering, and interior design. In-house engineering was added in 2013.</p>
+              <p id="luxury">Township 28 is a luxury apartment community. Caesars Republic Scottsdale is a luxury hotel.</p>
+              <p id="resorts">Chateau on the Lake is in Branson, in the BKD portfolio.</p>
             </div>
 
             <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.35rem" }}>By kind of work</h3>
@@ -205,7 +200,7 @@ export default function ArchitectPlace() {
           <details className="mt-14 border border-ink/15 px-4 py-3">
             <summary className="cursor-pointer font-body text-ink text-[16px] min-h-11">Sources</summary>
             <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">
-              Checked {SPRINGFIELD_PLACE.checked} in the Active Licensee Only search at the <a href="https://mopro.mo.gov/license/s/license-search" className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Missouri licensee search, external</a>. Detail pages do not separately label a record Active. Personal records list a Springfield architect and do not name an employer. The practice pages supply that association, except the Baron Design corporation record, which names Janet Rothberg White as person in charge and shows certificate 2003003845. The about page states 2003003845-D. Rita Baron returned no match in that active-only search, which does not establish a licence status for her. Firm certificates for the other practices were not opened. The list order is an editorial selection. Office addresses come from each practice website. A project city can differ from the Springfield office. Logos are the practices' own marks, shown small to identify them. They are not Creative Commons images. N·FORM Architecture is named in type. Project photographs are not shown.
+              Checked {SPRINGFIELD_PLACE.checked} in the Active Licensee Only search at the <a href="https://mopro.mo.gov/license/s/license-search" className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Missouri licensee search, external</a>. Detail pages do not label a record Active. Baron Design & Associates, LLC is Architectural Corporation no. 2003003845. The firm site gives 2003003845-D. Janet Rothberg White, no. 003658, is the architect in charge. Rita Baron: not verified. Firm certificates for the other practices: not verified. The list order is an editorial selection. Logos are the practices' own marks, shown small to identify them, and are not Creative Commons images. N·FORM Architecture is named in type. Project photographs are not shown.
             </p>
             <ul className="mt-3 space-y-2">
               {SPRINGFIELD_FIRMS.map((firm) => (

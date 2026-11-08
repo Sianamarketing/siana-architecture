@@ -151,11 +151,11 @@ describe("directory page", () => {
     expect(names).toHaveLength(9);
     expect(within(offices).getByRole("columnheader", { name: "Project experience" })).toBeInTheDocument();
     expect(within(offices).getByRole("columnheader", { name: "Architect registration" })).toBeInTheDocument();
-    expect(within(offices).getByText("Missouri registered architect: Janet Rothberg White, no. 003658")).toBeInTheDocument();
-    expect(within(offices).getByText("Missouri Architectural Corporation no. 2003003845")).toBeInTheDocument();
-    expect(within(offices).getByText("Rita Baron, principal: Not verified")).toBeInTheDocument();
-    expect(within(offices).getAllByText("Firm certificate of authority: Not verified")).toHaveLength(8);
-    expect(within(offices).getByText("Missouri registered architect: Tyler D. Hellweg, no. 2015000181")).toBeInTheDocument();
+    expect(within(offices).getByText("Janet Rothberg White, no. 003658")).toBeInTheDocument();
+    expect(within(offices).getByText("Tyler D. Hellweg, no. 2015000181")).toBeInTheDocument();
+    expect(within(offices).queryByText("Firm certificate of authority: Not verified")).not.toBeInTheDocument();
+    expect(screen.queryByText(/page states/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/custom-house/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();
     expect(within(offices).getByRole("link", { name: "Baron Design & Associates, LLC" })).toHaveAttribute("href", "/d/architects/baron-design-associates");
     expect(screen.getByRole("heading", { name: "Homes and residential buildings" })).toBeInTheDocument();
@@ -179,7 +179,10 @@ describe("directory page", () => {
     expect(screen.getByText("Missouri registered architect: Janet Rothberg White, no. 003658")).toBeInTheDocument();
     expect(screen.getByText("Architect in charge")).toBeInTheDocument();
     expect(screen.getByText("Rita Baron, principal")).toBeInTheDocument();
+    expect(screen.getByText("Firm certificate of authority")).toBeInTheDocument();
     expect(screen.getAllByText("Not verified").length).toBeGreaterThan(0);
+    expect(document.body.textContent).not.toMatch(/page states/i);
+    expect(document.body.textContent).not.toMatch(/custom-house/);
     expect(document.body.textContent).toMatch(/2003003845-D/);
     expect(document.querySelector('a[href="https://mopro.mo.gov/license/s/license-search"]')).toBeTruthy();
     expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();

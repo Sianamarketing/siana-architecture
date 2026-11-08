@@ -197,7 +197,7 @@ export default function ArchitectProfile() {
                           <div className={person.image ? "p-5" : ""}>
                             <p className="text-ink" style={{ fontSize: "1.4rem" }}>{person.name}</p>
                             <p className="mt-1 font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.12em" }}>{person.role}</p>
-                            <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">{person.note}</p>
+                            {person.note ? <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">{person.note}</p> : null}
                             {person.image && <ImageCredit image={person.image} />}
                           </div>
                         </li>

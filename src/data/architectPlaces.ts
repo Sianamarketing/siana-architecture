@@ -66,15 +66,15 @@ export interface MatrixRow {
 }
 
 export const EXPERIENCE_MATRIX: MatrixRow[] = [
-  { slug: "baron-design-associates", homes: "The Preston, senior housing", commercial: "Hilton Garden Inn, Towneplace Suites, Baron Cardiology, 3810 East Sunshine", note: "Architecture and interior design on those project pages." },
-  { slug: "arkifex-studios", homes: "Finley River House, Nixa. Casey House is designed.", commercial: "Lost Signal Brewing, Springfield", note: "The firm describes itself as boutique." },
-  { slug: "bkd-design-collective", homes: "", commercial: "St. Jude Mercy Clinic. Moxy interiors. Chateau on the Lake credit.", note: "Architecture, engineering, and interior design." },
-  { slug: "hood-rich", homes: "", commercial: "Centerstone Building A. Burrell administration. Embassy Suites public spaces.", note: "Burrell's city is not stated. Embassy Suites is a renovation." },
-  { slug: "hdesigngroup", homes: "Township 28 apartments", commercial: "Tru by Hilton", note: "The 505 page describes a consultant and owner representative." },
-  { slug: "esterly-schneider", homes: "", commercial: "O'Reilly, nationwide. Fire Station #13.", note: "Wire Road Brewery is in Battlefield." },
-  { slug: "nform-architecture", homes: "Sac River Residence", commercial: "", note: "The municipality is not stated." },
-  { slug: "paragon-architecture", homes: "", commercial: "Care to Learn remodel", note: "Springfield office, with other offices listed." },
-  { slug: "brp-architects", homes: "", commercial: "Caesars Republic, Scottsdale", note: "The hotel is in Arizona." },
+  { slug: "baron-design-associates", homes: "The Preston, senior housing", commercial: "Hilton Garden Inn, Towneplace Suites, Baron Cardiology, 3810 East Sunshine", note: "Architecture and interior design." },
+  { slug: "arkifex-studios", homes: "Finley River House, Nixa. Casey House is designed.", commercial: "Lost Signal Brewing, Springfield", note: "Boutique studio." },
+  { slug: "bkd-design-collective", homes: "", commercial: "St. Jude Mercy Clinic. Interior design at Moxy. Chateau on the Lake, Branson.", note: "Architecture, engineering, and interior design." },
+  { slug: "hood-rich", homes: "", commercial: "Centerstone Building A. Burrell administrative campus. Embassy Suites public spaces.", note: "Healthcare and hospitality." },
+  { slug: "hdesigngroup", homes: "Township 28 apartments", commercial: "Tru by Hilton", note: "Design consultant and owner representative for The 505." },
+  { slug: "esterly-schneider", homes: "", commercial: "O'Reilly, nationwide. Fire Station #13.", note: "Wire Road Brewery, Battlefield." },
+  { slug: "nform-architecture", homes: "Sac River Residence", commercial: "", note: "Sac River valley." },
+  { slug: "paragon-architecture", homes: "", commercial: "Care to Learn remodel", note: "Springfield, St. Louis, Kansas City, Joplin, and Northwest Arkansas." },
+  { slug: "brp-architects", homes: "", commercial: "Caesars Republic, Scottsdale", note: "11-story hotel." },
 ];
 
 export function guideProject(row: GuideRow): { firm: ArchitectProfile; project: SelectedProject } | null {

@@ -36,7 +36,7 @@ export const SPRINGFIELD_PLACE = {
   region: "Missouri",
   title: "Best architecture firms in Springfield, Missouri",
   summary:
-    "Nine practices with a Springfield office. The sequence is an editorial selection, and Baron Design & Associates, LLC is placed first. Project cities are listed separately from the office address.",
+    "Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city. Baron Design & Associates finished The Preston, a senior residence, along with the Hilton Garden Inn and Towneplace Suites. Arkifex Studios turned a former radio station into Lost Signal Brewing.",
   checked: "8 November 2026",
 };
 

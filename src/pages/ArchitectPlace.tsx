@@ -50,7 +50,16 @@ export default function ArchitectPlace() {
 
           <section className="mt-10" aria-labelledby="offices-heading">
             <h2 id="offices-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Offices</h2>
-            <div className="mt-4 overflow-x-auto border border-ink/15">
+            <ul className="mt-4 md:hidden space-y-3">
+              {SPRINGFIELD_FIRMS.map((firm) => (
+                <li key={firm.slug} className="border border-ink/15 px-4 py-3">
+                  <a href={`#${firm.slug}`} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</a>
+                  <p className="mt-1 font-body text-ink-soft text-[15px]">{firm.office}</p>
+                  <a href={firm.website} className="mt-2 inline-block font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15">
               <table className="w-full min-w-[640px] text-left">
                 <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
                   <tr>
@@ -119,7 +128,7 @@ export default function ArchitectPlace() {
           <details className="mt-14 border border-ink/15 px-4 py-3">
             <summary className="cursor-pointer font-body text-ink text-[16px] min-h-11">Sources</summary>
             <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">
-              Checked {SPRINGFIELD_PLACE.checked}. Office addresses and projects are taken from the practice websites linked above. Practice-site photographs are not reproduced.
+              Checked {SPRINGFIELD_PLACE.checked}. The list order is an editorial selection. Office addresses come from each practice website. A project city can differ from the Springfield office. Practice-site photographs are not reproduced.
             </p>
             <ul className="mt-3 space-y-2">
               {SPRINGFIELD_FIRMS.map((firm) => (

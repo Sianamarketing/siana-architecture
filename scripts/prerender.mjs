@@ -252,14 +252,14 @@ async function main() {
       path: `/d/${slug}`,
       title: `${label} - Directory - Siana Architecture`,
       description: architects
-        ? "Architect credits copied from published buildings."
+        ? "Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work."
         : `${label} has no listings yet.`,
       image: OG_DEFAULT,
       content:
         `<nav>Directory / ${label}</nav>` +
         `<h1>${label}</h1>` +
         (architects
-          ? `<p>Guides for practices with a local office, then architect lines copied from published buildings.</p><p><a href="/d/architects/springfield-missouri">Best architecture firms in Springfield, Missouri</a></p><p><a href="/d/">Back to Directory</a></p>`
+          ? `<p>Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work.</p><p><a href="/d/architects/springfield-missouri">Best architecture firms in Springfield, Missouri</a></p><p><a href="/d/">Back to Directory</a></p>`
           : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
     }));
     n++;
@@ -267,7 +267,7 @@ async function main() {
   write("/d/architects/springfield-missouri", renderPage(template, {
     path: "/d/architects/springfield-missouri",
     title: "Best architecture firms in Springfield, Missouri - Siana Architecture",
-    description: "Nine practices with a Springfield office. Baron Design & Associates, LLC is placed first in an editorial selection.",
+    description: "Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city.",
     image: OG_DEFAULT,
     jsonld: {
       "@context": "https://schema.org",
@@ -279,7 +279,7 @@ async function main() {
     content:
       `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Springfield, Missouri</nav>` +
       `<h1>Best architecture firms in Springfield, Missouri</h1>` +
-      `<p>Nine practices with a Springfield office. The sequence is an editorial selection, and Baron Design &amp; Associates, LLC is placed first.</p>` +
+      `<p>Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city. Baron Design &amp; Associates finished The Preston, a senior residence, along with the Hilton Garden Inn and Towneplace Suites.</p>` +
       `<ul>` +
       ["Baron Design & Associates, LLC", "Arkifex Studios", "Buxton Kubik Dodd Design Collective", "Hood-Rich Architecture", "hdesigngroup", "Esterly, Schneider & Associates", "N·FORM Architecture", "Paragon Architecture", "BRP Architects"]
         .map((name) => `<li>${name}</li>`).join("") +

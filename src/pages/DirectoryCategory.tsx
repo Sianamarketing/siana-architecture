@@ -87,7 +87,7 @@ export default function DirectoryCategory() {
       <SEO
         title={`${category.label} - Directory - Siana Architecture`}
         description={showCredits
-          ? "Architect credits copied from published buildings. A shared credit stays one line. Locations are the buildings, not offices."
+          ? "Architect credits on published buildings, and a guide to Springfield, Missouri."
           : `${category.label} has no listings yet.`}
         canonical={`https://sianaarchitecture.com/d/${category.slug}`}
       />
@@ -103,7 +103,7 @@ export default function DirectoryCategory() {
           </h1>
           <p className="mt-4 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
             {showCredits
-              ? "Guides for practices with a local office, then architect lines copied from published buildings."
+              ? "Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work."
               : "No published listings in this category yet."}
           </p>
           {showCredits && <ArchitectsPlaces />}
@@ -172,8 +172,8 @@ export default function DirectoryCategory() {
                 </div>
                 <p className="mt-3 max-w-2xl font-body text-ink-soft text-[15px]">
                   {showCredits
-                    ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} from published buildings. A credit that names several people stays one line. Places are the cities recorded on the buildings.`
-                    : "Places are the cities recorded on the buildings."}
+                    ? `${allCredits.length} architect ${allCredits.length === 1 ? "credit" : "credits"} on published buildings. A shared credit stays one line. The place is the city of the building.`
+                    : "The place is the city of the building."}
                 </p>
                 {visible.filter((entry) => profileForCredit(entry.name)).map((entry) => (
                   <p key={entry.id} className="mt-3">
@@ -312,7 +312,7 @@ export default function DirectoryCategory() {
                   How this list is made
                 </h2>
                 <div className="mt-4 max-w-2xl space-y-3">
-                  <Faq question="How are the credits stored?">Each line is the architect field on a published building, copied as stored. A shared credit stays one line. A place is the city recorded on the building.</Faq>
+                  <Faq question="How are the credits stored?">Each line is the architect field on a published building. A shared credit stays one line. The place is the city of the building.</Faq>
                   <Faq question="What does a credit line cover?">A credit can name a practice, one person, or several people together. It stays one line. One of those lines, Herzog & de Meuron, also has a practice page.</Faq>
                   <Faq question="What do the places refer to?">The city recorded on the published building.</Faq>
                   <Faq question="What about the other categories?">Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet.</Faq>

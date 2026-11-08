@@ -704,8 +704,14 @@
   font-synthesis: none;
 }
 
+.us-state-map {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .us-state-map svg {
   width: 100%;
+  max-width: 100%;
   height: auto;
   display: block;
 }

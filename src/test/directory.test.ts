@@ -38,6 +38,8 @@ describe("directory", () => {
     expect(filterDirectoryEntries(entries, { query: "" })).toHaveLength(2);
     expect(filterDirectoryEntries(entries, { category: "tools", query: "berlin" })).toEqual([]);
     expect(filterDirectoryEntries(entries, { category: "architects", query: "missing" })).toEqual([]);
+    expect(filterDirectoryEntries(entries, { category: "architects", city: "Berlin" })).toHaveLength(2);
+    expect(filterDirectoryEntries(entries, { category: "architects", city: "Lisbon" })).toEqual([]);
   });
 
   it("counts reading time only from real copy", () => {

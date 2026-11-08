@@ -16,6 +16,8 @@ export interface DirectorySourceProject {
   name: string;
   architect: string | null;
   city?: string | null;
+  style?: string | null;
+  category?: string | null;
   updated_at?: string | null;
   image?: string | null;
   imageAlt?: string | null;
@@ -25,6 +27,8 @@ export interface DirectoryBuildingRef {
   slug: string;
   name: string;
   city: string | null;
+  style: string | null;
+  category: string | null;
 }
 
 export interface DirectoryEntry {
@@ -77,7 +81,13 @@ export function architectEntries(projects: DirectorySourceProject[]): DirectoryE
     const lead = withImage || ordered[0];
     const image = usableDirectoryImage(lead.image);
     const buildingsList = ordered
-      .map((project) => ({ slug: project.slug, name: project.name, city: project.city?.trim() || null }))
+      .map((project) => ({
+        slug: project.slug,
+        name: project.name,
+        city: project.city?.trim() || null,
+        style: project.style?.trim() || null,
+        category: project.category?.trim() || null,
+      }))
       .sort((a, b) => a.name.localeCompare(b.name));
     entries.push({
       id: name,
@@ -100,16 +110,38 @@ export function architectEntries(projects: DirectorySourceProject[]): DirectoryE
  */
 export function filterDirectoryEntries(
   entries: DirectoryEntry[],
-  options: { query?: string | null; category?: string | null },
+  options: { query?: string | null; category?: string | null; city?: string | null; style?: string | null },
 ): DirectoryEntry[] {
   const category = options.category || "all";
   if (category !== "all" && category !== "architects") return [];
   const query = String(options.query || "").trim().toLowerCase();
-  if (!query) return entries;
+  const city = String(options.city || "").trim().toLowerCase();
+  const style = String(options.style || "").trim().toLowerCase();
   return entries.filter((entry) => {
-    const fields = [entry.name, ...entry.buildingsList.flatMap((building) => [building.name, building.city || ""])];
+    if (city && city !== "all" && !entry.buildingsList.some((building) => (building.city || "").toLowerCase() === city)) return false;
+    if (style && style !== "all" && !entry.buildingsList.some((building) => (building.style || "").toLowerCase() === style)) return false;
+    if (!query) return true;
+    const fields = [entry.name, ...entry.buildingsList.flatMap((building) => [building.name, building.city || "", building.style || ""])];
     return fields.some((field) => field.toLowerCase().includes(query));
   });
+}
+
+/** A public table of the credit lines. No scores, fees, or office addresses. */
+export function creditTableCsv(entries: DirectoryEntry[]): string {
+  const cell = (value: string) => `"${value.replace(/"/g, '""')}"`;
+  const lines = ["credit,building,project location,style,project"];
+  for (const entry of entries) {
+    for (const building of entry.buildingsList) {
+      lines.push([
+        cell(entry.name),
+        cell(building.name),
+        cell(building.city || ""),
+        cell(building.style || ""),
+        cell(`/projects/${building.slug}`),
+      ].join(","));
+    }
+  }
+  return lines.join("\n");
 }
 
 export function directoryCategory(slug: string | null | undefined) {

@@ -91,6 +91,8 @@ describe("directory page", () => {
     expect(await screen.findByRole("heading", { name: "Architects" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to Directory" })).toHaveAttribute("href", "/d/");
     expect(await screen.findByText("Le Corbusier")).toBeInTheDocument();
+    expect(screen.queryByText(/best for/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: "Score" })).not.toBeInTheDocument();
     expect(screen.queryByText("Gerd Hänska, Magdalena Hänska, with Kurt Schmersow")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
     expect(await screen.findByText("Gerd Hänska, Magdalena Hänska, with Kurt Schmersow")).toBeInTheDocument();
@@ -100,6 +102,7 @@ describe("directory page", () => {
     renderAt("/d/tools");
     expect(await screen.findByRole("heading", { name: "Tools" })).toBeInTheDocument();
     expect(screen.getByText("No listings yet.")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Credits on published buildings" })).not.toBeInTheDocument();
     expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();
   });
 

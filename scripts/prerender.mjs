@@ -259,7 +259,7 @@ async function main() {
         `<nav>Directory / ${label}</nav>` +
         `<h1>${label}</h1>` +
         (architects
-          ? `<p>These lines are copied from the architect field on published buildings. They are not checked business profiles.</p><p><a href="/d/">Back to Directory</a></p>`
+          ? `<p>These lines are copied from the architect field on published buildings. They are not checked business profiles, and a shared credit stays one line. A place is the building, not an office.</p><p><a href="/d/">Back to Directory</a></p>`
           : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
     }));
     n++;

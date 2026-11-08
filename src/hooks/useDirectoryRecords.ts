@@ -12,6 +12,7 @@ export interface DirectoryStory {
   category: string | null;
   hero_image_url: string | null;
   body: string | null;
+  linked_project_ids?: string[] | null;
 }
 
 export function useDirectoryRecords() {
@@ -26,7 +27,7 @@ export function useDirectoryRecords() {
     (async () => {
       const { data: projects } = await supabase
         .from("projects")
-        .select("id, slug, name, architect, created_at, updated_at, latitude, longitude, city:cities(name, slug, country)")
+        .select("id, slug, name, architect, style, category, created_at, updated_at, latitude, longitude, city:cities(name, slug, country)")
         .eq("status", "published");
       const { data: images } = await supabase
         .from("project_images")
@@ -34,10 +35,9 @@ export function useDirectoryRecords() {
         .order("position");
       const { data: posts } = await supabase
         .from("posts")
-        .select("id, slug, title, excerpt, category, hero_image_url, body")
+        .select("id, slug, title, excerpt, category, hero_image_url, body, linked_project_ids")
         .eq("status", "published")
-        .order("published_at", { ascending: false })
-        .limit(4);
+        .order("published_at", { ascending: false });
       if (cancelled) return;
       const imagesByProject = new Map<string, RecentImageInput[]>();
       const imageByProject = new Map<string, { src: string; alt: string | null }>();
@@ -72,6 +72,8 @@ export function useDirectoryRecords() {
           name: project.name,
           architect: project.architect,
           city: city?.name || null,
+          style: project.style,
+          category: project.category,
           updated_at: project.updated_at,
           image: image?.src || null,
           imageAlt: image?.alt || null,

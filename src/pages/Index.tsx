@@ -120,13 +120,11 @@ const Index = () => {
               <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-accent-terra" />
               An independent guide to the built world
             </p>
-            <h1 className="home-hero-title mt-6 text-ink">
-              <span className="taste-line block">Explore the</span>
-              <span className="taste-line block">world of</span>
-              <span className="taste-line block italic text-accent-terra">architecture</span>
-              <span className="taste-line block italic text-accent-terra">&amp; design</span>
+            <h1 className="home-hero-title mt-8 text-ink">
+              <span className="block">Explore the world</span>
+              <span className="block">of architecture &amp; design</span>
             </h1>
-            <div className="taste-follow mt-auto pt-10 md:pt-12 flex items-end justify-between gap-6">
+            <div className="mt-auto pt-10 md:pt-12 flex items-end justify-between gap-6">
               <div className="max-w-sm">
                 <p className="font-body text-ink-soft text-[16px] leading-relaxed">
                   Stories and reviews about architecture, the people who shape it, and the tools and ideas behind the places we live.
@@ -148,7 +146,7 @@ const Index = () => {
           </div>
 
           <figure className="lg:col-span-6 xl:col-span-7 min-w-0 flex flex-col">
-            <Link to={HERO_PHOTO.href} className="taste-photo relative block flex-1 min-h-[240px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]">
+            <Link to={HERO_PHOTO.href} className="home-hero-photo relative block flex-1 min-h-[240px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]">
               <img src={HERO_PHOTO.src} alt={HERO_PHOTO.alt} className="w-full h-full object-cover object-[center_42%] bg-paper-mid aspect-[4/3] lg:aspect-auto lg:absolute lg:inset-0" />
             </Link>
             <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
@@ -181,7 +179,7 @@ const Index = () => {
             </p>
             <Link
               to="/atlas"
-              className="taste-action pointer-events-auto inline-flex items-center justify-center h-12 px-6 mt-8 bg-accent-terra text-white font-mono uppercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+              className="pointer-events-auto inline-flex items-center justify-center h-12 px-6 mt-8 bg-accent-terra text-white font-mono uppercase hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
               style={{ fontSize: 13, letterSpacing: "0.14em" }}
             >
               Open map

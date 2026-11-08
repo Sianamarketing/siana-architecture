@@ -95,7 +95,8 @@ describe("homepage taste preview", () => {
     expect(home).toBeTruthy();
     const title = screen.getByRole("heading", { level: 1, name: /explore the world of architecture/i });
     expect(title.className).toContain("home-hero-title");
-    expect(title.getAttribute("style") || "").not.toMatch(/Garamond/);
+    expect(title.className).not.toMatch(/italic|text-accent/);
+    expect(title.getAttribute("style") || "").not.toMatch(/Garamond|Bodoni/);
     expect(screen.getByRole("link", { name: "Open map" })).toHaveAttribute("href", "/atlas");
     expect(document.querySelector('a[href="#home-map"]')).toHaveAttribute("aria-label", "Map");
   });

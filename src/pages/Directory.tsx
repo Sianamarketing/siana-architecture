@@ -3,6 +3,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SiteLayout from "@/components/site/SiteLayout";
 import SEO from "@/components/site/SEO";
+import RecentBuildingsCarousel from "@/components/site/RecentBuildingsCarousel";
+import ResearchCoverageMap, { type CoveragePin } from "@/components/site/ResearchCoverageMap";
 import {
   DIRECTORY_CATEGORIES,
   architectEntries,
@@ -13,8 +15,8 @@ import {
   type DirectoryEntry,
   type DirectorySlug,
 } from "@/lib/directory";
+import { selectRecentSlides, type BuildingSlide, type RecentImageInput } from "@/lib/recentBuildings";
 
-const serif = "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif";
 const PAGE_SIZE = 8;
 
 interface Story {
@@ -27,12 +29,6 @@ interface Story {
   body: string | null;
 }
 
-interface CityLink {
-  slug: string;
-  name: string;
-  buildings: number;
-}
-
 export default function Directory() {
   const [params, setParams] = useSearchParams();
   const requested = directoryCategory(params.get("category"));
@@ -40,8 +36,9 @@ export default function Directory() {
   const query = params.get("q") || "";
   const [draft, setDraft] = useState(query);
   const [entries, setEntries] = useState<DirectoryEntry[]>([]);
-  const [cities, setCities] = useState<CityLink[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
+  const [slides, setSlides] = useState<BuildingSlide[]>([]);
+  const [pins, setPins] = useState<CoveragePin[]>([]);
   const [ready, setReady] = useState(false);
   const [shown, setShown] = useState(PAGE_SIZE);
 
@@ -54,11 +51,11 @@ export default function Directory() {
     (async () => {
       const { data: projects } = await supabase
         .from("projects")
-        .select("id, slug, name, architect, updated_at, city:cities(name, slug)")
+        .select("id, slug, name, architect, created_at, updated_at, latitude, longitude, city:cities(name, slug, country)")
         .eq("status", "published");
       const { data: images } = await supabase
         .from("project_images")
-        .select("project_id, alt, storage_path, is_hero, position")
+        .select("project_id, alt, storage_path, is_hero, position, author, license, license_url, kind")
         .order("position");
       const { data: posts } = await supabase
         .from("posts")
@@ -67,20 +64,31 @@ export default function Directory() {
         .order("published_at", { ascending: false })
         .limit(4);
       if (cancelled) return;
+      const imagesByProject = new Map<string, RecentImageInput[]>();
       const imageByProject = new Map<string, { src: string; alt: string | null }>();
       (images || []).forEach((image) => {
+        if (!image.project_id) return;
+        const list = imagesByProject.get(image.project_id) || [];
+        list.push(image);
+        imagesByProject.set(image.project_id, list);
         const src = usableDirectoryImage(image.storage_path);
-        if (!src || !image.project_id) return;
+        if (!src) return;
         const current = imageByProject.get(image.project_id);
         if (!current || image.is_hero) imageByProject.set(image.project_id, { src, alt: image.alt });
       });
-      const cityCounts = new Map<string, CityLink>();
+      const coverage: CoveragePin[] = [];
       const sources = (projects || []).map((project) => {
         const city = Array.isArray(project.city) ? project.city[0] : project.city;
-        if (city?.slug && city.name) {
-          const current = cityCounts.get(city.slug) || { slug: city.slug, name: city.name, buildings: 0 };
-          current.buildings += 1;
-          cityCounts.set(city.slug, current);
+        if (project.latitude != null && project.longitude != null) {
+          coverage.push({
+            slug: project.slug,
+            name: project.name,
+            latitude: project.latitude,
+            longitude: project.longitude,
+            city: city?.name || null,
+            citySlug: city?.slug || null,
+            country: city?.country || null,
+          });
         }
         const image = imageByProject.get(project.id);
         return {
@@ -94,7 +102,13 @@ export default function Directory() {
           imageAlt: image?.alt || null,
         };
       });
-      setCities([...cityCounts.values()].sort((a, b) => b.buildings - a.buildings || a.name.localeCompare(b.name)));
+      setSlides(selectRecentSlides((projects || []).map((project) => ({
+        slug: project.slug,
+        name: project.name,
+        created_at: project.created_at,
+        images: imagesByProject.get(project.id) || [],
+      }))));
+      setPins(coverage);
       setEntries(architectEntries(sources));
       setStories((posts || []) as Story[]);
       setReady(true);
@@ -142,58 +156,61 @@ export default function Directory() {
         description="Search architect credits on published buildings. Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet."
         canonical="https://sianaarchitecture.com/directory"
       />
-      <section className="text-white" style={{ background: "#bf3a18", paddingTop: 76 }}>
-        <div className="mx-auto max-w-[760px] px-6 text-center" style={{ paddingTop: "4.75rem", paddingBottom: "4.75rem" }}>
-          <h1 className="font-body text-white" style={{ fontWeight: 500, fontSize: "clamp(2rem, 4vw, 3.15rem)", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
-            <span className="block">Find the people</span>
-            <span className="block">and tools behind architecture.</span>
-          </h1>
-          <p className="mt-5 font-body text-[16px] leading-relaxed" style={{ color: "#fff" }}>
-            Architect credits from published buildings. A shared credit stays one line.
-          </p>
-          <form role="search" onSubmit={onSearch} className="mx-auto mt-12 max-w-[520px] text-left">
-            <label htmlFor="directory-search" className="font-body" style={{ fontSize: 14, color: "#fff" }}>
-              Search
-            </label>
-            <div className="mt-2 flex items-center gap-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.85)" }}>
-              <input
-                id="directory-search"
-                name="q"
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                aria-label="Search architect credits, buildings, or cities"
-                placeholder="Credits, buildings, or cities"
-                className="min-w-0 flex-1 h-12 bg-transparent font-body text-[16px] text-white placeholder:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-              />
-              <button
-                type="submit"
-                className="inline-flex h-12 shrink-0 items-center gap-2 font-body text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                style={{ fontSize: 16 }}
-              >
+      <section className="vogue-titles home-paper border-b border-ink/10" style={{ paddingTop: 76 }}>
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10 py-6 lg:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 lg:items-center">
+          <div className="min-w-0">
+            <p className="font-mono uppercase text-warm-gray mb-3" style={{ fontSize: 12, letterSpacing: "0.16em" }}>Directory</p>
+            <h1 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2rem, 3.4vw, 3.15rem)", lineHeight: 1.08 }}>
+              <span className="block">Find the people</span>
+              <span className="block">and tools behind architecture.</span>
+            </h1>
+            <p className="mt-4 max-w-md font-body text-ink-soft text-[16px] leading-relaxed">
+              Architect credits from published buildings. A shared credit stays one line.
+            </p>
+            <form role="search" onSubmit={onSearch} className="mt-6 max-w-md">
+              <label htmlFor="directory-search" className="font-body text-ink" style={{ fontSize: 14 }}>
                 Search
-                <span aria-hidden="true">↗</span>
+              </label>
+              <div className="mt-1 flex items-center gap-4 border-b border-ink/40">
+                <input
+                  id="directory-search"
+                  name="q"
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  aria-label="Search architect credits, buildings, or cities"
+                  placeholder="Credits, buildings, or cities"
+                  className="min-w-0 flex-1 h-12 bg-transparent font-body text-[16px] text-ink placeholder:text-ink-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+                />
+                <button
+                  type="submit"
+                  className="inline-flex h-12 shrink-0 items-center gap-2 font-body text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+                  style={{ fontSize: 16 }}
+                >
+                  Search
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+            </form>
+            {query && (
+              <button
+                type="button"
+                onClick={() => writeParams({ q: "" })}
+                className="mt-3 font-body text-ink underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[hsl(var(--accent))]"
+                style={{ fontSize: 15 }}
+              >
+                Clear search
               </button>
-            </div>
-          </form>
-          {query && (
-            <button
-              type="button"
-              onClick={() => writeParams({ q: "" })}
-              className="mt-5 font-body text-white underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-              style={{ fontSize: 15 }}
-            >
-              Clear search
-            </button>
-          )}
+            )}
+          </div>
+          <RecentBuildingsCarousel slides={slides} />
         </div>
       </section>
 
-      <div className="home-paper pb-8">
+      <div className="vogue-titles home-paper pb-8">
         <div className="mx-auto max-w-[1100px] px-6 lg:px-10">
-          <h2 className="mt-14 text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.6rem)" }}>
-            Browse by category
-          </h2>
-          <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <section aria-labelledby="directory-categories" className="mt-8 lg:mt-6">
+          <h2 id="directory-categories" className="sr-only">Browse by category</h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {DIRECTORY_CATEGORIES.map((category) => {
               const selected = tab === category.slug;
               return (
@@ -211,10 +228,11 @@ export default function Directory() {
               );
             })}
           </ul>
+          </section>
 
           {asked && (
             <div id="directory-panel" className="pt-14">
-              <h2 id="directory-results-heading" className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}>
+              <h2 id="directory-results-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: 1.1 }}>
                 {showCredits ? "Architects behind the buildings" : label}
               </h2>
               {showCredits && (
@@ -253,29 +271,21 @@ export default function Directory() {
             </div>
           )}
 
-          {cities.length > 0 && (
-            <section className="mt-16" aria-labelledby="directory-cities">
-              <h2 id="directory-cities" className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}>
-                Buildings by city
-              </h2>
-              <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {cities.map((city) => (
-                  <li key={city.slug}>
-                    <Link to={`/cities/${city.slug}`} className="block border border-ink/15 bg-paper px-5 py-4 hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]">
-                      <span className="block font-display text-ink" style={{ fontSize: "1.35rem" }}>{city.name}</span>
-                      <span className="mt-1 block font-mono uppercase text-warm-gray" style={{ fontSize: 12, letterSpacing: "0.12em" }}>
-                        {city.buildings} {city.buildings === 1 ? "building" : "buildings"}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <section className="mt-16" aria-labelledby="directory-coverage">
+            <h2 id="directory-coverage" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: 1.1 }}>
+              Where the research is
+            </h2>
+            <p className="mt-3 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
+              Published buildings with a recorded location. The filters use the countries and cities already on those entries.
+            </p>
+            <div className="mt-6">
+              <ResearchCoverageMap pins={pins} />
+            </div>
+          </section>
 
           <section className="mt-16 mb-8" aria-labelledby="directory-research">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <h2 id="directory-research" className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)" }}>
+              <h2 id="directory-research" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.8rem, 3vw, 2.5rem)", lineHeight: 1.1 }}>
                 Latest research
               </h2>
               <Link to="/practice" className="font-mono uppercase text-ink border-b border-ink pb-0.5 self-start" style={{ fontSize: 12, letterSpacing: "0.14em" }}>
@@ -386,7 +396,7 @@ function CreditCard({ entry, compact }: { entry: DirectoryEntry; compact?: boole
         <img src={entry.image} alt={entry.alt} className="mb-4 w-full h-40 object-cover" />
       )}
       <p className="font-mono uppercase text-accent-terra" style={{ fontSize: 12, letterSpacing: "0.14em" }}>Architect credit</p>
-      <h3 className="mt-1 text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: compact ? "1.35rem" : "1.6rem", lineHeight: 1.15 }}>
+      <h3 className="mt-1 text-ink" style={{ fontWeight: 400, fontSize: compact ? "1.35rem" : "1.6rem", lineHeight: 1.15 }}>
         {entry.name}
       </h3>
       <ul className="mt-2 space-y-1">

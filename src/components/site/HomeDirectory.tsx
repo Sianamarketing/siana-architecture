@@ -70,7 +70,7 @@ export default function HomeDirectory() {
             <p id="directory-heading" className="font-mono uppercase text-warm-gray mb-4" style={{ fontSize: 12, letterSpacing: "0.18em" }}>
               03 / The directory
             </p>
-            <h2 className="text-ink" style={{ fontFamily: "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif", fontWeight: 400, fontSize: "clamp(2.4rem, 4.6vw, 4.2rem)", lineHeight: 0.96 }}>
+            <h2 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.4rem, 4.6vw, 4.2rem)", lineHeight: 1.05 }}>
               Find your people
               <span className="block">and tools.</span>
             </h2>

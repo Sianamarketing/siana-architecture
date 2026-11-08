@@ -48,6 +48,21 @@ const esc = (s) =>
 const stripHtml = (s) => String(s ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 const clamp = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
 
+function researchCityList(projects, cities) {
+  const counts = new Map();
+  for (const project of projects) {
+    const name = project.city?.name;
+    if (!name || project.latitude == null || project.longitude == null) continue;
+    counts.set(name, (counts.get(name) || 0) + 1);
+  }
+  const items = cities.filter((city) => counts.has(city.name));
+  if (!items.length) return "<p>No published location is on file.</p>";
+  return `<ul>` + items.map((city) => {
+    const count = counts.get(city.name);
+    return `<li><a href="/cities/${esc(city.slug)}">${esc(city.name)}</a>${city.country ? " - " + esc(city.country) : ""}, ${count} published ${count === 1 ? "building" : "buildings"}</li>`;
+  }).join("") + `</ul>`;
+}
+
 async function fetchRows(query) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
@@ -221,6 +236,9 @@ async function main() {
       `<li><a href="/directory?category=marketing-agency">Marketing Agency</a></li>` +
       `</ul>` +
       `<p>Interior designers, product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
+      `<h2>Where the research is</h2>` +
+      `<p>Published buildings with a recorded location.</p>` +
+      researchCityList(projects, cities) +
       (posts.length
         ? `<h2>Latest research</h2><ul>` + posts.slice(0, 4).map((p) => li(`/practice/${p.slug}`, p.title, p.category || p.excerpt)).join("") + `</ul>`
         : ""),

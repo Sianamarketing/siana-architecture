@@ -689,3 +689,17 @@
     min-height: 520px;
   }
 }
+
+/* Homepage and directory titles. GFS Didot is the open Didot
+   (Greek Font Society, SIL OFL 1.1). Roman only; no synthetic italic. */
+.vogue-titles h1,
+.vogue-titles h2,
+.vogue-titles h3,
+.vogue-titles .font-display,
+.vogue-titles .font-display-black,
+.vogue-titles .title-face {
+  font-family: "GFS Didot", Didot, "Bodoni MT", "Times New Roman", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+}

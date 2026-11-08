@@ -21,8 +21,6 @@ const HERO_PHOTO = {
   href: "/projects/unite-d-habitation-berlin",
 };
 
-const serif = "'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif";
-
 const Index = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -115,6 +113,7 @@ const Index = () => {
       </Helmet>
       <Navbar />
 
+      <div className="vogue-titles">
       <section className="border-b border-ink/10" style={{ paddingTop: 76 }}>
         <div className="mx-auto max-w-[1440px] px-6 lg:px-12 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-[minmax(0,42%)_minmax(0,56%)] lg:justify-between gap-8 lg:gap-6 lg:min-h-[calc(100vh-76px)]">
           <div className="flex flex-col">
@@ -122,11 +121,11 @@ const Index = () => {
               <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-accent-terra" />
               An independent guide to the built world
             </p>
-            <h1 className="mt-6 text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.8rem, 6.8vw, 4.5rem)", lineHeight: 0.92, letterSpacing: "-0.02em" }}>
+            <h1 className="mt-6 text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.8rem, 6.2vw, 4.4rem)", lineHeight: 1.02, letterSpacing: "-0.02em" }}>
               <span className="block">Explore the</span>
-              <span className="block">World of</span>
-              <span className="block italic text-accent-terra">Architecture</span>
-              <span className="block italic text-accent-terra">&amp; Design</span>
+              <span className="block">world of</span>
+              <span className="block text-accent-terra">architecture</span>
+              <span className="block text-accent-terra">&amp; design</span>
             </h1>
             <div className="mt-auto pt-12 md:pt-16 flex items-end justify-between gap-6">
               <div className="max-w-sm">
@@ -175,7 +174,7 @@ const Index = () => {
         />
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-6">
           <div className="text-center max-w-[640px]">
-            <h2 className="text-ink" style={{ fontFamily: serif, fontWeight: 400, fontSize: "clamp(2.4rem, 4.4vw, 3.8rem)", lineHeight: 0.98 }}>
+            <h2 className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(2.4rem, 4.4vw, 3.8rem)", lineHeight: 1.05 }}>
               Explore the map
             </h2>
             <p className="mt-4 font-body text-ink-soft text-[16px] leading-relaxed">
@@ -199,6 +198,7 @@ const Index = () => {
       <HomeDirectory />
       <HomeResearch />
       <Footer />
+      </div>
     </div>
   );
 };

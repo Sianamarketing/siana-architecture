@@ -58,6 +58,9 @@ describe("directory page", () => {
     expect(screen.queryByText("Le Corbusier")).not.toBeInTheDocument();
     expect(screen.queryByText("Architect credits")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "All" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Browse by category" })).toHaveClass("sr-only");
+    expect(screen.getByRole("heading", { name: "Where the research is" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Buildings by city" })).not.toBeInTheDocument();
     for (const name of CATEGORIES) {
       expect(screen.getByRole("button", { name })).toBeInTheDocument();
     }

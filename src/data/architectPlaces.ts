@@ -89,3 +89,71 @@ export function guideProject(row: GuideRow): { firm: ArchitectProfile; project: 
 export function officeLine(firm: ArchitectProfile): string {
   return firm.offices[0]?.role ?? firm.based;
 }
+
+/** Existing editorial order, limited to practices with a verified commercial project. */
+export const COMMERCIAL_SLUGS = [
+  "baron-design-associates",
+  "arkifex-studios",
+  "bkd-design-collective",
+  "hood-rich",
+  "hdesigngroup",
+  "esterly-schneider",
+  "paragon-architecture",
+  "brp-architects",
+];
+
+/** Existing editorial order, without Baron Design. */
+export const RESIDENTIAL_SLUGS = [
+  "arkifex-studios",
+  "hdesigngroup",
+  "nform-architecture",
+];
+
+export function firmsBySlugs(slugs: string[]): ArchitectProfile[] {
+  return slugs.map((slug) => springfieldBySlug(slug)).filter((firm): firm is ArchitectProfile => Boolean(firm));
+}
+
+export interface InteriorStudio {
+  name: string;
+  office: string;
+  website: string;
+  summary: string;
+  markSrc: string | null;
+  markOnInk: boolean;
+}
+
+/** Checked 18 November 2026 from each practice website. No NCIDQ or Missouri interior licence was confirmed, so the hub does not show a credential column. */
+export const INTERIOR_STUDIOS: InteriorStudio[] = [
+  {
+    name: "Andrea Nesbitt Designs",
+    office: "1727 South Chapel Drive, Springfield, MO 65809",
+    website: "https://anesbittdesigns.com/",
+    summary: "Commercial interiors for businesses, hotels, restaurants, and retailers.",
+    markSrc: "/directory-marks/andrea-nesbitt-designs.png",
+    markOnInk: false,
+  },
+  {
+    name: "Ella Belle Designs",
+    office: "Springfield, Missouri",
+    website: "https://www.ellabelledesigns.us/",
+    summary: "Full-service interior design studio, established in 2019, for Springfield and nearby.",
+    markSrc: "/directory-marks/ella-belle-designs.png",
+    markOnInk: true,
+  },
+  {
+    name: "Ellecor Design",
+    office: "1951 E McDaniel St, Springfield, MO 65802",
+    website: "https://ellecordesign.com/",
+    summary: "Interior design for remodels, new houses, and home decor. Haden Long, the lead designer, holds an interior design degree from Missouri State University and is a member of ASID.",
+    markSrc: "/directory-marks/ellecor-design.png",
+    markOnInk: true,
+  },
+  {
+    name: "Lindsay Lattner Interiors",
+    office: "1860 W Arbor St, Suite 104, Springfield, MO 65807",
+    website: "https://www.lindsaylattnerinteriors.com/",
+    summary: "Full-service residential design for new construction and large renovations since 2016.",
+    markSrc: "/directory-marks/lindsay-lattner-interiors.png",
+    markOnInk: false,
+  },
+];

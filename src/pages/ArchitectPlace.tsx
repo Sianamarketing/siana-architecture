@@ -3,15 +3,17 @@ import { Helmet } from "react-helmet-async";
 import SiteLayout from "@/components/site/SiteLayout";
 import SEO from "@/components/site/SEO";
 import FirmMark from "@/components/site/FirmMark";
-import ProjectFeature from "@/components/site/ProjectFeature";
 import {
-  EXPERIENCE_MATRIX,
-  GUIDE_SECTIONS,
+  COMMERCIAL_SLUGS,
+  INTERIOR_STUDIOS,
+  RESIDENTIAL_SLUGS,
   SPRINGFIELD_FIRMS,
   SPRINGFIELD_PLACE,
-  guideProject,
+  firmsBySlugs,
   officeLine,
+  type InteriorStudio,
 } from "@/data/architectPlaces";
+import type { ArchitectProfile } from "@/data/architectProfiles";
 
 const profileUrl = (slug: string) => `/d/architects/${slug}`;
 
@@ -72,9 +74,19 @@ export default function ArchitectPlace() {
             {SPRINGFIELD_PLACE.title}
           </h1>
           <p className="mt-4 max-w-2xl font-body text-ink text-[17px] leading-relaxed">{SPRINGFIELD_PLACE.summary}</p>
+          <nav aria-label="On this page" className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+            {[
+              ["#best", "Best architecture firms"],
+              ["#commercial", "Commercial architects"],
+              ["#residential", "Residential architects"],
+              ["#interior-design", "Interior design"],
+            ].map(([href, label]) => (
+              <a key={href} href={href} className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>{label}</a>
+            ))}
+          </nav>
 
-          <section className="mt-10" aria-labelledby="offices-heading">
-            <h2 id="offices-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Offices</h2>
+          <section id="best" className="scroll-mt-28 mt-10" aria-labelledby="offices-heading">
+            <h2 id="offices-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Best architecture firms in Springfield</h2>
             <ul className="mt-4 md:hidden space-y-3">
               {SPRINGFIELD_FIRMS.map((firm) => (
                 <li key={firm.slug} id={`${firm.slug}-card`} className="border border-ink/15 px-4 py-3">
@@ -121,77 +133,68 @@ export default function ArchitectPlace() {
             </div>
           </section>
 
-          {GUIDE_SECTIONS.map((section) => (
-            <section key={section.id} id={section.id} className="scroll-mt-28 mt-14" aria-labelledby={`${section.id}-heading`}>
-              <h2 id={`${section.id}-heading`} className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>{section.title}</h2>
-              <p className="mt-3 max-w-2xl font-body text-ink text-[16px] leading-relaxed">{section.intro}</p>
-              <div className="mt-4">
-                {section.rows.map((row) => {
-                  const match = guideProject(row);
-                  if (!match) return null;
-                  return (
-                    <ProjectFeature
-                      key={`${row.firmSlug}-${row.projectName}`}
-                      id={row.anchor}
-                      project={match.project}
-                      firmName={match.firm.name}
-                      firmPath={profileUrl(match.firm.slug)}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          ))}
+          <CategoryTable
+            id="commercial"
+            title="Commercial architects"
+            intro="Hotels, clinics, offices, restaurants, and civic buildings from Springfield practices."
+            firms={firmsBySlugs(COMMERCIAL_SLUGS)}
+          />
+          <CategoryTable
+            id="residential"
+            title="Residential architects"
+            intro="A completed house in Nixa, apartments in Galloway Village, and a house in the Sac River valley."
+            firms={firmsBySlugs(RESIDENTIAL_SLUGS)}
+          />
 
-          <section id="practice-types" className="scroll-mt-28 mt-14" aria-labelledby="practice-types-heading">
-            <h2 id="practice-types-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Practice types and specialist briefs</h2>
-            <div className="mt-4 max-w-2xl space-y-3 font-body text-ink text-[16px] leading-relaxed">
-              <p id="boutique">Arkifex Studios is a boutique firm.</p>
-              <p id="engineering">Buxton Kubik Dodd Design Collective practices architecture, engineering, and interior design. In-house engineering was added in 2013.</p>
-              <p id="luxury">Township 28 is a luxury apartment community. Caesars Republic Scottsdale is a luxury hotel.</p>
-              <p id="resorts">Chateau on the Lake is in Branson, in the BKD portfolio.</p>
-            </div>
-
-            <h3 className="mt-8 text-ink" style={{ fontWeight: 400, fontSize: "1.35rem" }}>By kind of work</h3>
+          <section id="interior-design" className="scroll-mt-28 mt-14" aria-labelledby="interior-heading">
+            <h2 id="interior-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Interior design</h2>
+            <p className="mt-3 max-w-2xl font-body text-ink text-[16px] leading-relaxed">Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice.</p>
             <ul className="mt-4 md:hidden space-y-3">
-              {EXPERIENCE_MATRIX.map((row) => {
-                const firm = SPRINGFIELD_FIRMS.find((item) => item.slug === row.slug);
-                if (!firm) return null;
-                return (
-                  <li key={row.slug} className="border border-ink/15 px-4 py-3">
-                    <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.05rem" }}>{firm.name}</Link>
-                    {row.homes && <p className="mt-2 font-body text-[15px]"><span className="text-ink-soft">Homes. </span>{row.homes}</p>}
-                    {row.commercial && <p className="mt-1 font-body text-[15px]"><span className="text-ink-soft">Commercial and public. </span>{row.commercial}</p>}
-                    <p className="mt-1 font-body text-ink-soft text-[14px]">{row.note}</p>
-                  </li>
-                );
-              })}
+              <InteriorBaronCard />
+              {INTERIOR_STUDIOS.map((studio) => (
+                <li key={studio.website} className="border border-ink/15 px-4 py-3">
+                  <StudioName studio={studio} />
+                  <p className="mt-2 font-body text-ink text-[15px] leading-snug">{studio.summary}</p>
+                  <p className="mt-2 font-body text-ink-soft text-[15px]">{studio.office}</p>
+                  <a href={studio.website} className="mt-2 inline-block font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+                </li>
+              ))}
             </ul>
-            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Work by practice. Scroll sideways if a column is out of view.">
+            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Interior design studios. Scroll sideways if a column is out of view.">
               <table className="w-full min-w-[720px] text-left">
                 <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
                   <tr>
                     <th className="px-4 py-3 font-medium">Practice</th>
-                    <th className="px-4 py-3 font-medium">Homes</th>
-                    <th className="px-4 py-3 font-medium">Commercial and public</th>
-                    <th className="px-4 py-3 font-medium">Note</th>
+                    <th className="px-4 py-3 font-medium">Work</th>
+                    <th className="px-4 py-3 font-medium">Springfield office</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {EXPERIENCE_MATRIX.map((row) => {
-                    const firm = SPRINGFIELD_FIRMS.find((item) => item.slug === row.slug);
-                    if (!firm) return null;
-                    return (
-                      <tr key={row.slug} className="border-t border-ink/10 align-top">
-                        <th scope="row" className="px-4 py-3 font-normal">
-                          <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
-                        </th>
-                        <td className="px-4 py-3 font-body text-[15px]">{row.homes}</td>
-                        <td className="px-4 py-3 font-body text-[15px]">{row.commercial}</td>
-                        <td className="px-4 py-3 font-body text-[15px]">{row.note}</td>
-                      </tr>
-                    );
-                  })}
+                  <tr className="border-t border-ink/10 align-top">
+                    <th scope="row" className="px-4 py-3 font-normal">
+                      <div className="flex items-center gap-3">
+                        <FirmMark profile={SPRINGFIELD_FIRMS[0]} />
+                        <Link to={profileUrl(SPRINGFIELD_FIRMS[0].slug)} className="text-ink hover:underline">{SPRINGFIELD_FIRMS[0].name}</Link>
+                      </div>
+                    </th>
+                    <td className="px-4 py-3 font-body text-[15px] leading-snug">Architecture and interior design for The Preston, Towneplace Suites, Hilton Garden Inn, Baron Cardiology, and 3810 East Sunshine.</td>
+                    <td className="px-4 py-3 font-body text-[15px]">
+                      {officeLine(SPRINGFIELD_FIRMS[0])}
+                      <a href={SPRINGFIELD_FIRMS[0].website} className="mt-1 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+                    </td>
+                  </tr>
+                  {INTERIOR_STUDIOS.map((studio) => (
+                    <tr key={studio.website} className="border-t border-ink/10 align-top">
+                      <th scope="row" className="px-4 py-3 font-normal">
+                        <StudioName studio={studio} />
+                      </th>
+                      <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.summary}</td>
+                      <td className="px-4 py-3 font-body text-[15px]">
+                        {studio.office}
+                        <a href={studio.website} className="mt-1 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -200,7 +203,7 @@ export default function ArchitectPlace() {
           <details className="mt-14 border border-ink/15 px-4 py-3">
             <summary className="cursor-pointer font-body text-ink text-[16px] min-h-11">Sources</summary>
             <p className="mt-3 font-body text-ink-soft text-[15px] leading-relaxed">
-              Checked {SPRINGFIELD_PLACE.checked} in the Active Licensee Only search at the <a href="https://mopro.mo.gov/license/s/license-search" className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Missouri licensee search, external</a>. Detail pages do not label a record Active. Baron Design & Associates, LLC is Architectural Corporation no. 2003003845. The firm site gives 2003003845-D. Janet Rothberg White, no. 003658, is the architect in charge. Rita Baron: not verified. Firm certificates for the other practices: not verified. The list order is an editorial selection. Logos are the practices' own marks, shown small to identify them, and are not Creative Commons images. N·FORM Architecture is named in type. Project photographs are not shown.
+              Checked {SPRINGFIELD_PLACE.checked} in the Active Licensee Only search at the <a href="https://mopro.mo.gov/license/s/license-search" className="underline underline-offset-4" target="_blank" rel="noopener noreferrer">Missouri licensee search, external</a>. Detail pages do not label a record Active. Baron Design & Associates, LLC is Architectural Corporation no. 2003003845. The firm site gives 2003003845-D. Janet Rothberg White, no. 003658, is the architect in charge. Rita Baron: not verified. Firm certificates for the other architecture practices: not verified. Interior studios checked 18 November 2026. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown.
             </p>
             <ul className="mt-3 space-y-2">
               {SPRINGFIELD_FIRMS.map((firm) => (
@@ -208,6 +211,15 @@ export default function ArchitectPlace() {
                   <Link to={profileUrl(firm.slug)} className="font-body text-ink text-[15px] underline underline-offset-4">{firm.name}</Link>
                 </li>
               ))}
+              <li><a href="https://baron-design.com/about" className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Baron Design, about, external</a></li>
+              {INTERIOR_STUDIOS.map((studio) => (
+                <li key={studio.website}>
+                  <a href={studio.website} className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">{studio.name}, external</a>
+                </li>
+              ))}
+              <li><a href="https://anesbittdesigns.com/contact" className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Andrea Nesbitt Designs, contact, external</a></li>
+              <li><a href="https://ellecordesign.com/meet-our-staff/" className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Ellecor Design, team, external</a></li>
+              <li><a href="https://ellecordesign.com/contact/" className="font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Ellecor Design, contact, external</a></li>
             </ul>
           </details>
 
@@ -217,5 +229,80 @@ export default function ArchitectPlace() {
         </div>
       </div>
     </SiteLayout>
+  );
+}
+
+function CategoryTable({ id, title, intro, firms }: { id: string; title: string; intro: string; firms: ArchitectProfile[] }) {
+  return (
+    <section id={id} className="scroll-mt-28 mt-14" aria-labelledby={`${id}-heading`}>
+      <h2 id={`${id}-heading`} className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>{title}</h2>
+      <p className="mt-3 max-w-2xl font-body text-ink text-[16px] leading-relaxed">{intro}</p>
+      <ul className="mt-4 md:hidden space-y-3">
+        {firms.map((firm) => (
+          <li key={firm.slug} className="border border-ink/15 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <FirmMark profile={firm} />
+              <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
+            </div>
+            <p className="mt-2 font-body text-ink text-[15px] leading-snug">{firm.experience}</p>
+            <div className="mt-2"><RegistrationLines firmSlug={firm.slug} /></div>
+            <p className="mt-2 font-body text-ink-soft text-[15px]">{officeLine(firm)}</p>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label={`${title}. Scroll sideways if a column is out of view.`}>
+        <table className="w-full min-w-[760px] text-left">
+          <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
+            <tr>
+              <th className="px-4 py-3 font-medium">Practice</th>
+              <th className="px-4 py-3 font-medium">Project experience</th>
+              <th className="px-4 py-3 font-medium">Architect registration</th>
+              <th className="px-4 py-3 font-medium">Springfield office</th>
+            </tr>
+          </thead>
+          <tbody>
+            {firms.map((firm) => (
+              <tr key={firm.slug} className="border-t border-ink/10 align-top">
+                <th scope="row" className="px-4 py-3 font-normal">
+                  <div className="flex items-center gap-3">
+                    <FirmMark profile={firm} />
+                    <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
+                  </div>
+                </th>
+                <td className="px-4 py-3 font-body text-[15px] leading-snug">{firm.experience}</td>
+                <td className="px-4 py-3"><RegistrationLines firmSlug={firm.slug} /></td>
+                <td className="px-4 py-3 font-body text-[15px]">{officeLine(firm)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function InteriorBaronCard() {
+  const firm = SPRINGFIELD_FIRMS[0];
+  return (
+    <li className="border border-ink/15 px-4 py-3">
+      <div className="flex items-center gap-3">
+        <FirmMark profile={firm} />
+        <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
+      </div>
+      <p className="mt-2 font-body text-ink text-[15px] leading-snug">Architecture and interior design for The Preston, Towneplace Suites, Hilton Garden Inn, Baron Cardiology, and 3810 East Sunshine.</p>
+      <p className="mt-2 font-body text-ink-soft text-[15px]">{officeLine(firm)}</p>
+      <a href={firm.website} className="mt-2 inline-block font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+    </li>
+  );
+}
+
+function StudioName({ studio }: { studio: InteriorStudio }) {
+  return (
+    <div className="flex items-center gap-3">
+      {studio.markSrc && (
+        <img src={studio.markSrc} alt="" className={`${studio.markOnInk ? "bg-ink px-1.5 py-1" : ""} h-7 max-w-[8.5rem] w-auto object-contain`} />
+      )}
+      <a href={studio.website} className="text-ink hover:underline" style={{ fontSize: "1.05rem" }} target="_blank" rel="noopener noreferrer">{studio.name}</a>
+    </div>
   );
 }

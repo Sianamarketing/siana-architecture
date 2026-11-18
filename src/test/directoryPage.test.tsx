@@ -158,10 +158,20 @@ describe("directory page", () => {
     expect(screen.queryByText(/custom-house/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();
     expect(within(offices).getByRole("link", { name: "Baron Design & Associates, LLC" })).toHaveAttribute("href", "/d/architects/baron-design-associates");
-    expect(screen.getByRole("heading", { name: "Homes and residential buildings" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Commercial and public-facing projects" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Practice types and specialist briefs" })).toBeInTheDocument();
-    for (const id of ["healthcare", "hotels", "restaurants", "renovations", "houses", "boutique", "engineering", "luxury"]) {
+    expect(screen.getByRole("heading", { name: "Best architecture firms in Springfield" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Commercial architects" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Residential architects" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Interior design" })).toBeInTheDocument();
+    const tables = screen.getAllByRole("table");
+    const commercial = within(tables[1]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
+    const residential = within(tables[2]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
+    expect(commercial[0]).toBe("Baron Design & Associates, LLC");
+    expect(commercial).not.toContain("N·FORM Architecture");
+    expect(residential).not.toContain("Baron Design & Associates, LLC");
+    expect(residential).toEqual(["Arkifex Studios", "hdesigngroup", "N·FORM Architecture"]);
+    expect(screen.getAllByRole("link", { name: "Andrea Nesbitt Designs" }).some((link) => link.getAttribute("href") === "https://anesbittdesigns.com/")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Ellecor Design" }).some((link) => link.getAttribute("href") === "https://ellecordesign.com/")).toBe(true);
+    for (const id of ["best", "commercial", "residential", "interior-design"]) {
       expect(document.getElementById(id)).toBeTruthy();
     }
     expect(screen.queryByRole("columnheader", { name: "Score" })).not.toBeInTheDocument();

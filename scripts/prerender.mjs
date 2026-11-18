@@ -284,9 +284,9 @@ async function main() {
       ["Baron Design & Associates, LLC", "Arkifex Studios", "Buxton Kubik Dodd Design Collective", "Hood-Rich Architecture", "hdesigngroup", "Esterly, Schneider & Associates", "N·FORM Architecture", "Paragon Architecture", "BRP Architects"]
         .map((name, index) => `<li><a href="/d/architects/${["baron-design-associates","arkifex-studios","bkd-design-collective","hood-rich","hdesigngroup","esterly-schneider","nform-architecture","paragon-architecture","brp-architects"][index]}">${esc(name)}</a></li>`).join("") +
       `</ul>` +
-      `<h2>Commercial architects</h2><p>Baron Design &amp; Associates, LLC, Arkifex Studios, Buxton Kubik Dodd Design Collective, Hood-Rich Architecture, hdesigngroup, Esterly, Schneider &amp; Associates, Paragon Architecture, and BRP Architects.</p>` +
-      `<h2>Residential architects</h2><p>Arkifex Studios, hdesigngroup, and N·FORM Architecture.</p>` +
-      `<h2>Interior design</h2><ul>` +
+      `<h2>Best commercial architects in Springfield</h2><p>Baron Design &amp; Associates, LLC, Arkifex Studios, Buxton Kubik Dodd Design Collective, Hood-Rich Architecture, hdesigngroup, Esterly, Schneider &amp; Associates, Paragon Architecture, and BRP Architects.</p>` +
+      `<h2>Best residential architects in Springfield</h2><p>Arkifex Studios, hdesigngroup, and N·FORM Architecture.</p>` +
+      `<h2>Best interior designers in Springfield</h2><ul>` +
       `<li><a href="https://baron-design.com/about">Baron Design &amp; Associates, LLC</a></li>` +
       `<li><a href="https://anesbittdesigns.com/">Andrea Nesbitt Designs</a></li>` +
       `<li><a href="https://www.ellabelledesigns.us/">Ella Belle Designs</a></li>` +

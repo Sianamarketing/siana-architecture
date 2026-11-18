@@ -159,9 +159,12 @@ describe("directory page", () => {
     expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();
     expect(within(offices).getByRole("link", { name: "Baron Design & Associates, LLC" })).toHaveAttribute("href", "/d/architects/baron-design-associates");
     expect(screen.getByRole("heading", { name: "Best architecture firms in Springfield" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Commercial architects" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Residential architects" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Interior design" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Best commercial architects in Springfield" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Best residential architects in Springfield" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Best interior designers in Springfield" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Best commercial architects in Springfield" })).toHaveAttribute("href", "#commercial");
+    expect(screen.getByRole("link", { name: "Best residential architects in Springfield" })).toHaveAttribute("href", "#residential");
+    expect(screen.getByRole("link", { name: "Best interior designers in Springfield" })).toHaveAttribute("href", "#interior-design");
     const tables = screen.getAllByRole("table");
     const commercial = within(tables[1]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
     const residential = within(tables[2]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());

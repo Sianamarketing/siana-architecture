@@ -76,10 +76,10 @@ export default function ArchitectPlace() {
           <p className="mt-4 max-w-2xl font-body text-ink text-[17px] leading-relaxed">{SPRINGFIELD_PLACE.summary}</p>
           <nav aria-label="On this page" className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
             {[
-              ["#best", "Best architecture firms"],
-              ["#commercial", "Commercial architects"],
-              ["#residential", "Residential architects"],
-              ["#interior-design", "Interior design"],
+              ["#best", "Best architecture firms in Springfield"],
+              ["#commercial", "Best commercial architects in Springfield"],
+              ["#residential", "Best residential architects in Springfield"],
+              ["#interior-design", "Best interior designers in Springfield"],
             ].map(([href, label]) => (
               <a key={href} href={href} className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>{label}</a>
             ))}
@@ -135,19 +135,19 @@ export default function ArchitectPlace() {
 
           <CategoryTable
             id="commercial"
-            title="Commercial architects"
+            title="Best commercial architects in Springfield"
             intro="Hotels, clinics, offices, restaurants, and civic buildings from Springfield practices."
             firms={firmsBySlugs(COMMERCIAL_SLUGS)}
           />
           <CategoryTable
             id="residential"
-            title="Residential architects"
+            title="Best residential architects in Springfield"
             intro="A completed house in Nixa, apartments in Galloway Village, and a house in the Sac River valley."
             firms={firmsBySlugs(RESIDENTIAL_SLUGS)}
           />
 
           <section id="interior-design" className="scroll-mt-28 mt-14" aria-labelledby="interior-heading">
-            <h2 id="interior-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Interior design</h2>
+            <h2 id="interior-heading" className="text-ink" style={{ fontWeight: 400, fontSize: "clamp(1.7rem, 3vw, 2.4rem)" }}>Best interior designers in Springfield</h2>
             <p className="mt-3 max-w-2xl font-body text-ink text-[16px] leading-relaxed">Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice.</p>
             <ul className="mt-4 md:hidden space-y-3">
               <InteriorBaronCard />
@@ -160,7 +160,7 @@ export default function ArchitectPlace() {
                 </li>
               ))}
             </ul>
-            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Interior design studios. Scroll sideways if a column is out of view.">
+            <div className="mt-4 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Best interior designers in Springfield. Scroll sideways if a column is out of view.">
               <table className="w-full min-w-[720px] text-left">
                 <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
                   <tr>

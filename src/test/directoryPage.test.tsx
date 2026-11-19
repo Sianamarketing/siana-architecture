@@ -196,6 +196,10 @@ describe("directory page", () => {
     expect(within(screen.getAllByRole("table")[0]).getByText("Rufus Leon Louderback, no. 2003010225")).toBeInTheDocument();
     expect(within(screen.getAllByRole("table")[0]).getByText("Residential designer. Missouri architect registration: not verified.")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Burkholder Architecture" }).some((link) => link.getAttribute("href") === "https://www.burkholderarchitecture.com/")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Finley River House" }).some((link) => link.getAttribute("href") === "https://www.arkifexstudios.com/work/finleyriverhouse")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Natural Bridge II" }).some((link) => link.getAttribute("href") === "https://www.cookhausdesign.com/copy-of-buddy-trl")).toBe(true);
+    expect(screen.getByRole("columnheader", { name: "Signature style" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Standout home" })).toBeInTheDocument();
     residential.unmount();
 
     renderAt("/d/interior-designers/springfield-missouri");

@@ -193,8 +193,16 @@ export const RESIDENTIAL_GUIDE = {
   summary: "A completed house in Nixa, apartments in Galloway Village, a house in the Sac River valley, and custom houses in Republic, Springfield, and Ozark.",
   card: "Houses in Nixa, Republic, Springfield, and the Sac River valley, and apartments in Galloway Village.",
   sourcesNote:
-    "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Tyler D. Hellweg, no. 2015000181, Robert Christopher Haik, no. 007461, and Jennifer Lynn Wilson, no. 2001029971. Firm certificates of authority for those three practices: not verified. Checked 19 November 2026 in the Active Licensee Search at the same portal: Nathan Scott Burkholder, Architect, no. 2018041156, Springfield, expires 12/31/2026. Burkholder Architecture, LLC is an Architectural Corporation in Springfield. Rufus Leon Louderback, Architect, no. 2003010225, Nixa, expires 12/31/2027. The search for Jeremy Cook did not return an architect record. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown.",
+    "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Tyler D. Hellweg, no. 2015000181, Robert Christopher Haik, no. 007461, and Jennifer Lynn Wilson, no. 2001029971. Firm certificates of authority for those three practices: not verified. Checked 19 November 2026 in the Active Licensee Search at the same portal: Nathan Scott Burkholder, Architect, no. 2018041156, Springfield, expires 12/31/2026. Burkholder Architecture, LLC is an Architectural Corporation in Springfield. Rufus Leon Louderback, Architect, no. 2003010225, Nixa, expires 12/31/2027. The search for Jeremy Cook did not return an architect record. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown. The project pages do not grant reuse of the photographs.",
 };
+
+export interface ResidentialFacts {
+  style: string;
+  standout: string;
+  standoutUrl: string;
+  sizeSetting: string;
+  bestFor: string;
+}
 
 export interface ResidentialStudio {
   name: string;
@@ -204,7 +212,33 @@ export interface ResidentialStudio {
   registration: string;
   markSrc: string | null;
   markOnInk: boolean;
+  facts: ResidentialFacts;
 }
+
+/** Phrases and figures are taken from each practice's own project pages. */
+export const RESIDENTIAL_FACTS: Record<string, ResidentialFacts> = {
+  "arkifex-studios": {
+    style: "Modern farmhouse vernacular",
+    standout: "Finley River House",
+    standoutUrl: "https://www.arkifexstudios.com/work/finleyriverhouse",
+    sizeSetting: "5,500 sq ft in Nixa, and a Springfield remodel",
+    bestFor: "New houses and remodels",
+  },
+  hdesigngroup: {
+    style: "Modern eclectic apartments",
+    standout: "Township 28",
+    standoutUrl: "https://hdesigngroup.com/project/township-28",
+    sizeSetting: "133,100 sq ft, 138 apartments in Galloway Village",
+    bestFor: "Luxury apartments for families",
+  },
+  "nform-architecture": {
+    style: "Stone and cedar rainscreen",
+    standout: "Sac River Residence",
+    standoutUrl: "https://nformarc.com/project/sac-river-residence/",
+    sizeSetting: "8,000 sq ft, Sac River valley",
+    bestFor: "A large custom house",
+  },
+};
 
 /** Added 19 November 2026. Baron Design stays off this list. These rows link out. They do not have profile pages. */
 export const RESIDENTIAL_STUDIOS: ResidentialStudio[] = [
@@ -216,6 +250,13 @@ export const RESIDENTIAL_STUDIOS: ResidentialStudio[] = [
     registration: "Nathan Scott Burkholder, no. 2018041156",
     markSrc: "/directory-marks/burkholder-architecture.png",
     markOnInk: true,
+    facts: {
+      style: "High-performance custom homes",
+      standout: "Lineage",
+      standoutUrl: "https://www.burkholderarchitecture.com/residential-portfolio/lineage",
+      sizeSetting: "4,060 to 6,144 sq ft, Republic and Kimberling City",
+      bestFor: "New houses and additions",
+    },
   },
   {
     name: "OZMO",
@@ -225,6 +266,13 @@ export const RESIDENTIAL_STUDIOS: ResidentialStudio[] = [
     registration: "Rufus Leon Louderback, no. 2003010225",
     markSrc: "/directory-marks/ozmo.png",
     markOnInk: false,
+    facts: {
+      style: "Lakeside and container houses",
+      standout: "Louderback Residence 3",
+      standoutUrl: "https://ozmo.llc/louderback-residence",
+      sizeSetting: "2,820 sq ft, plus houses in Springfield and on Table Rock",
+      bestFor: "Custom houses, large and small",
+    },
   },
   {
     name: "Cook Haus Design",
@@ -234,6 +282,13 @@ export const RESIDENTIAL_STUDIOS: ResidentialStudio[] = [
     registration: "Residential designer. Missouri architect registration: not verified.",
     markSrc: "/directory-marks/cook-haus-design.png",
     markOnInk: false,
+    facts: {
+      style: "Ozark mountain and modern",
+      standout: "Natural Bridge II",
+      standoutUrl: "https://www.cookhausdesign.com/copy-of-buddy-trl",
+      sizeSetting: "3,000 to 10,000 sq ft, Springfield, Ozark, and Table Rock",
+      bestFor: "New houses and renovations",
+    },
   },
 ];
 
@@ -341,6 +396,8 @@ export function residentialSourceLinks(): SourceLink[] {
     { label: "OZMO, Louderback Residence 3, external", href: "https://ozmo.llc/louderback-residence" },
     { label: "OZMO, residential work, external", href: "https://ozmo.llc/residential-1" },
     { label: "Cook Haus Design, about, external", href: "https://www.cookhausdesign.com/about" },
+    { label: "Cook Haus Design, Natural Bridge II, external", href: "https://www.cookhausdesign.com/copy-of-buddy-trl" },
+    { label: "Burkholder Architecture, Kimberling, external", href: "https://www.burkholderarchitecture.com/residential-portfolio/kimberling" },
   ];
 }
 

@@ -7,12 +7,14 @@ import FirmMark from "@/components/site/FirmMark";
 import {
   BARON_INTERIOR_WORK,
   INTERIOR_STUDIOS,
+  RESIDENTIAL_FACTS,
   RESIDENTIAL_STUDIOS,
   SPRINGFIELD_FIRMS,
   documentTitle,
   officeLine,
   springfieldGuideCards,
   type InteriorStudio,
+  type ResidentialFacts,
   type ResidentialStudio,
   type SourceLink,
 } from "@/data/architectPlaces";
@@ -131,6 +133,7 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
               <FirmMark profile={firm} />
               <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
             </div>
+            <ResidentialFactsBlock facts={RESIDENTIAL_FACTS[firm.slug]} />
             <p className="mt-2 font-body text-ink text-[15px] leading-snug">{firm.experience}</p>
             <div className="mt-2"><RegistrationLines firm={firm} /></div>
             <p className="mt-2 font-body text-ink-soft text-[15px]">{officeLine(firm)}</p>
@@ -140,6 +143,7 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
         {RESIDENTIAL_STUDIOS.map((studio) => (
           <li key={studio.website} className="border border-ink/15 px-4 py-3">
             <StudioName studio={studio} />
+            <ResidentialFactsBlock facts={studio.facts} />
             <p className="mt-2 font-body text-ink text-[15px] leading-snug">{studio.experience}</p>
             <p className="mt-2 font-body text-[15px] leading-snug">{studio.registration}</p>
             <p className="mt-2 font-body text-ink-soft text-[15px]">{studio.office}</p>
@@ -148,34 +152,43 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
         ))}
       </ul>
       <div className="mt-8 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Best residential architects in Springfield. Scroll sideways if a column is out of view.">
-        <table className="w-full min-w-[760px] text-left">
+        <table className="w-full text-left" style={{ minWidth: 1480 }}>
           <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
             <tr>
               <th className="px-4 py-3 font-medium">Practice</th>
+              <th className="px-4 py-3 font-medium">Signature style</th>
+              <th className="px-4 py-3 font-medium">Standout home</th>
+              <th className="px-4 py-3 font-medium">Typical size and setting</th>
+              <th className="px-4 py-3 font-medium">Best for</th>
               <th className="px-4 py-3 font-medium">Project experience</th>
               <th className="px-4 py-3 font-medium">Architect registration</th>
               <th className="px-4 py-3 font-medium">Springfield office</th>
             </tr>
           </thead>
           <tbody>
-            {firms.map((firm) => (
-              <tr key={firm.slug} className="border-t border-ink/10 align-top">
-                <th scope="row" className="px-4 py-3 font-normal">
-                  <div className="flex items-center gap-3">
-                    <FirmMark profile={firm} />
-                    <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
-                  </div>
-                </th>
-                <td className="px-4 py-3 font-body text-[15px] leading-snug">{firm.experience}</td>
-                <td className="px-4 py-3"><RegistrationLines firm={firm} /></td>
-                <td className="px-4 py-3 font-body text-[15px]">{officeLine(firm)}</td>
-              </tr>
-            ))}
+            {firms.map((firm) => {
+              const facts = RESIDENTIAL_FACTS[firm.slug];
+              return (
+                <tr key={firm.slug} className="border-t border-ink/10 align-top">
+                  <th scope="row" className="px-4 py-3 font-normal">
+                    <div className="flex items-center gap-3">
+                      <FirmMark profile={firm} />
+                      <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
+                    </div>
+                  </th>
+                  <FactCells facts={facts} />
+                  <td className="px-4 py-3 font-body text-[15px] leading-snug">{firm.experience}</td>
+                  <td className="px-4 py-3"><RegistrationLines firm={firm} /></td>
+                  <td className="px-4 py-3 font-body text-[15px]">{officeLine(firm)}</td>
+                </tr>
+              );
+            })}
             {RESIDENTIAL_STUDIOS.map((studio) => (
               <tr key={studio.website} className="border-t border-ink/10 align-top">
                 <th scope="row" className="px-4 py-3 font-normal">
                   <StudioName studio={studio} />
                 </th>
+                <FactCells facts={studio.facts} />
                 <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.experience}</td>
                 <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.registration}</td>
                 <td className="px-4 py-3 font-body text-[15px]">
@@ -300,6 +313,41 @@ export function GuideCards({ currentPath, className = "mt-14" }: { currentPath: 
         ))}
       </ul>
     </nav>
+  );
+}
+
+function FactCells({ facts }: { facts: ResidentialFacts }) {
+  return (
+    <>
+      <td className="px-4 py-3 font-body text-[15px] leading-snug">{facts.style}</td>
+      <td className="px-4 py-3 font-body text-[15px] leading-snug">
+        <a href={facts.standoutUrl} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">{facts.standout}</a>
+      </td>
+      <td className="px-4 py-3 font-body text-[15px] leading-snug">{facts.sizeSetting}</td>
+      <td className="px-4 py-3 font-body text-[15px] leading-snug">{facts.bestFor}</td>
+    </>
+  );
+}
+
+function ResidentialFactsBlock({ facts }: { facts: ResidentialFacts }) {
+  const rows = [
+    ["Signature style", facts.style],
+    ["Size and setting", facts.sizeSetting],
+    ["Best for", facts.bestFor],
+  ];
+  return (
+    <div className="mt-3 space-y-2">
+      {rows.map(([label, value]) => (
+        <p key={label} className="font-body text-[15px] leading-snug">
+          <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>{label}</span>
+          <span className="mt-0.5 block text-ink">{value}</span>
+        </p>
+      ))}
+      <p className="font-body text-[15px] leading-snug">
+        <span className="font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>Standout home</span>
+        <a href={facts.standoutUrl} className="mt-0.5 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">{facts.standout}</a>
+      </p>
+    </div>
   );
 }
 

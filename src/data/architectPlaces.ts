@@ -190,11 +190,52 @@ export const RESIDENTIAL_GUIDE = {
   path: "/d/architects/springfield-missouri/residential",
   title: "Best residential architects in Springfield, Missouri",
   crumb: "Residential",
-  summary: "A completed house in Nixa, apartments in Galloway Village, and a house in the Sac River valley.",
-  card: "A house in Nixa, apartments in Galloway Village, and a house in the Sac River valley.",
+  summary: "A completed house in Nixa, apartments in Galloway Village, a house in the Sac River valley, and custom houses in Republic, Springfield, and Ozark.",
+  card: "Houses in Nixa, Republic, Springfield, and the Sac River valley, and apartments in Galloway Village.",
   sourcesNote:
-    "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Tyler D. Hellweg, no. 2015000181, Robert Christopher Haik, no. 007461, and Jennifer Lynn Wilson, no. 2001029971. Firm certificates of authority: not verified. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown.",
+    "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Tyler D. Hellweg, no. 2015000181, Robert Christopher Haik, no. 007461, and Jennifer Lynn Wilson, no. 2001029971. Firm certificates of authority for those three practices: not verified. Checked 19 November 2026 in the Active Licensee Search at the same portal: Nathan Scott Burkholder, Architect, no. 2018041156, Springfield, expires 12/31/2026. Burkholder Architecture, LLC is an Architectural Corporation in Springfield. Rufus Leon Louderback, Architect, no. 2003010225, Nixa, expires 12/31/2027. The search for Jeremy Cook did not return an architect record. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown.",
 };
+
+export interface ResidentialStudio {
+  name: string;
+  office: string;
+  website: string;
+  experience: string;
+  registration: string;
+  markSrc: string | null;
+  markOnInk: boolean;
+}
+
+/** Added 19 November 2026. Baron Design stays off this list. These rows link out. They do not have profile pages. */
+export const RESIDENTIAL_STUDIOS: ResidentialStudio[] = [
+  {
+    name: "Burkholder Architecture",
+    office: "Springfield, MO 65802",
+    website: "https://www.burkholderarchitecture.com/",
+    experience: "Lineage, a 4,060 square foot custom residence in Republic.",
+    registration: "Nathan Scott Burkholder, no. 2018041156",
+    markSrc: "/directory-marks/burkholder-architecture.png",
+    markOnInk: true,
+  },
+  {
+    name: "OZMO",
+    office: "1801 West Riverdale Drive, Nixa, MO 65714",
+    website: "https://ozmo.llc/",
+    experience: "Louderback Residence 3, a four-bedroom house, and Linear Residence, a house in progress in Springfield.",
+    registration: "Rufus Leon Louderback, no. 2003010225",
+    markSrc: "/directory-marks/ozmo.png",
+    markOnInk: false,
+  },
+  {
+    name: "Cook Haus Design",
+    office: "Springfield, MO 65809",
+    website: "https://www.cookhausdesign.com/",
+    experience: "Natural Bridge II, a new 6,000 square foot house in Springfield, and Crashing Creeks, a new house in Ozark.",
+    registration: "Residential designer. Missouri architect registration: not verified.",
+    markSrc: "/directory-marks/cook-haus-design.png",
+    markOnInk: false,
+  },
+];
 
 export const INTERIOR_GUIDE = {
   id: "interior",
@@ -286,7 +327,7 @@ export function commercialSourceLinks(): SourceLink[] {
 
 export function residentialSourceLinks(): SourceLink[] {
   return [
-    { label: "Missouri licensee search, external", href: MISSOURI_SEARCH },
+    { label: "Missouri licensee search, external", href: "https://pr.mo.gov/licensee-search.asp" },
     ...profileLinks(RESIDENTIAL_SLUGS),
     ...projectLinks([
       ["arkifex-studios", "Finley River House"],
@@ -294,6 +335,12 @@ export function residentialSourceLinks(): SourceLink[] {
       ["hdesigngroup", "Township 28"],
       ["nform-architecture", "Sac River Residence"],
     ]),
+    ...RESIDENTIAL_STUDIOS.map((studio) => ({ label: `${studio.name}, external`, href: studio.website })),
+    { label: "Burkholder Architecture, Lineage, external", href: "https://www.burkholderarchitecture.com/residential-portfolio/lineage" },
+    { label: "OZMO, about, external", href: "https://ozmo.llc/about" },
+    { label: "OZMO, Louderback Residence 3, external", href: "https://ozmo.llc/louderback-residence" },
+    { label: "OZMO, residential work, external", href: "https://ozmo.llc/residential-1" },
+    { label: "Cook Haus Design, about, external", href: "https://www.cookhausdesign.com/about" },
   ];
 }
 

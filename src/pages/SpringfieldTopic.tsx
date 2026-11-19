@@ -1,10 +1,11 @@
 import { useParams } from "react-router-dom";
 import NotFound from "@/pages/NotFound";
-import { FirmGuideTable, GuideCards, GuideShell, GuideSources, InteriorGuideTable } from "@/components/site/SpringfieldGuide";
+import { FirmGuideTable, GuideCards, GuideShell, GuideSources, InteriorGuideTable, ResidentialGuideTable } from "@/components/site/SpringfieldGuide";
 import {
   COMMERCIAL_SLUGS,
   INTERIOR_STUDIOS,
   RESIDENTIAL_SLUGS,
+  RESIDENTIAL_STUDIOS,
   SPRINGFIELD_FIRMS,
   SPRINGFIELD_PLACE,
   TOPIC_GUIDES,
@@ -39,7 +40,10 @@ export default function SpringfieldTopic({ id }: { id?: TopicId }) {
         { name: SPRINGFIELD_FIRMS[0].name, url: `${SITE}/d/architects/${SPRINGFIELD_FIRMS[0].slug}` },
         ...INTERIOR_STUDIOS.map((studio) => ({ name: studio.name, url: studio.website })),
       ]
-    : firms.map((firm) => ({ name: firm.name, url: `${SITE}/d/architects/${firm.slug}` }));
+    : [
+        ...firms.map((firm) => ({ name: firm.name, url: `${SITE}/d/architects/${firm.slug}` })),
+        ...(topic === "residential" ? RESIDENTIAL_STUDIOS.map((studio) => ({ name: studio.name, url: studio.website })) : []),
+      ];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -76,7 +80,7 @@ export default function SpringfieldTopic({ id }: { id?: TopicId }) {
       ]}
       jsonLd={jsonLd}
     >
-      {topic === "interior" ? <InteriorGuideTable /> : <FirmGuideTable firms={firms} label={guide.title} />}
+      {topic === "interior" ? <InteriorGuideTable /> : topic === "residential" ? <ResidentialGuideTable firms={firms} /> : <FirmGuideTable firms={firms} label={guide.title} />}
       <GuideCards currentPath={guide.path} />
       <GuideSources note={guide.sourcesNote} links={links} />
     </GuideShell>

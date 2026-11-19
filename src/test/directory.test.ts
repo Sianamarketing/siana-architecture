@@ -94,6 +94,9 @@ describe("directory", () => {
     expect(commercialSourceLinks().some((link) => link.label === "St. Jude Mercy Clinic, external" || link.href.includes("st-jude"))).toBe(true);
     expect(residentialSourceLinks().map((link) => link.label)).toContain("N·FORM Architecture");
     expect(residentialSourceLinks().some((link) => link.href.includes("lostsignal"))).toBe(false);
+    expect(residentialSourceLinks().some((link) => link.href === "https://www.burkholderarchitecture.com/residential-portfolio/lineage")).toBe(true);
+    expect(residentialSourceLinks().some((link) => link.href === "https://ozmo.llc/louderback-residence")).toBe(true);
+    expect(residentialSourceLinks().some((link) => link.href.includes("baron-design"))).toBe(false);
     expect(interiorSourceLinks().some((link) => link.href === "https://anesbittdesigns.com/")).toBe(true);
     expect(interiorSourceLinks().some((link) => link.href.includes("mopro"))).toBe(false);
     expect(commercialSourceLinks().filter((link) => link.href.includes("lostsignal"))).toHaveLength(1);

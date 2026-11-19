@@ -189,8 +189,13 @@ describe("directory page", () => {
     const residential = renderAt("/d/architects/springfield-missouri/residential");
     expect(await screen.findByRole("heading", { name: "Best residential architects in Springfield, Missouri" })).toBeInTheDocument();
     const residentialNames = within(screen.getAllByRole("table")[0]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
-    expect(residentialNames).toEqual(["Arkifex Studios", "hdesigngroup", "N·FORM Architecture"]);
-    expect(screen.queryByRole("link", { name: "Baron Design & Associates, LLC" })).not.toBeInTheDocument();
+    expect(residentialNames).toEqual(["Arkifex Studios", "hdesigngroup", "N·FORM Architecture", "Burkholder Architecture", "OZMO", "Cook Haus Design"]);
+    expect(residentialNames).not.toContain("Baron Design & Associates, LLC");
+    expect(within(screen.getAllByRole("table")[0]).getByText("Lineage, a 4,060 square foot custom residence in Republic.")).toBeInTheDocument();
+    expect(within(screen.getAllByRole("table")[0]).getByText("Nathan Scott Burkholder, no. 2018041156")).toBeInTheDocument();
+    expect(within(screen.getAllByRole("table")[0]).getByText("Rufus Leon Louderback, no. 2003010225")).toBeInTheDocument();
+    expect(within(screen.getAllByRole("table")[0]).getByText("Residential designer. Missouri architect registration: not verified.")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Burkholder Architecture" }).some((link) => link.getAttribute("href") === "https://www.burkholderarchitecture.com/")).toBe(true);
     residential.unmount();
 
     renderAt("/d/interior-designers/springfield-missouri");

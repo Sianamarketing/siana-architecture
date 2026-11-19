@@ -7,11 +7,13 @@ import FirmMark from "@/components/site/FirmMark";
 import {
   BARON_INTERIOR_WORK,
   INTERIOR_STUDIOS,
+  RESIDENTIAL_STUDIOS,
   SPRINGFIELD_FIRMS,
   documentTitle,
   officeLine,
   springfieldGuideCards,
   type InteriorStudio,
+  type ResidentialStudio,
   type SourceLink,
 } from "@/data/architectPlaces";
 import type { ArchitectProfile } from "@/data/architectProfiles";
@@ -109,6 +111,76 @@ export function FirmGuideTable({ firms, label }: { firms: ArchitectProfile[]; la
                 <td className="px-4 py-3 font-body text-[15px]">
                   {officeLine(firm)}
                   <a href={firm.website} className="mt-1 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) {
+  return (
+    <>
+      <ul className="mt-8 md:hidden space-y-3">
+        {firms.map((firm) => (
+          <li key={firm.slug} className="border border-ink/15 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <FirmMark profile={firm} />
+              <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
+            </div>
+            <p className="mt-2 font-body text-ink text-[15px] leading-snug">{firm.experience}</p>
+            <div className="mt-2"><RegistrationLines firm={firm} /></div>
+            <p className="mt-2 font-body text-ink-soft text-[15px]">{officeLine(firm)}</p>
+            <a href={firm.website} className="mt-2 inline-block font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+          </li>
+        ))}
+        {RESIDENTIAL_STUDIOS.map((studio) => (
+          <li key={studio.website} className="border border-ink/15 px-4 py-3">
+            <StudioName studio={studio} />
+            <p className="mt-2 font-body text-ink text-[15px] leading-snug">{studio.experience}</p>
+            <p className="mt-2 font-body text-[15px] leading-snug">{studio.registration}</p>
+            <p className="mt-2 font-body text-ink-soft text-[15px]">{studio.office}</p>
+            <a href={studio.website} className="mt-2 inline-block font-body text-ink text-[15px] underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-8 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Best residential architects in Springfield. Scroll sideways if a column is out of view.">
+        <table className="w-full min-w-[760px] text-left">
+          <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
+            <tr>
+              <th className="px-4 py-3 font-medium">Practice</th>
+              <th className="px-4 py-3 font-medium">Project experience</th>
+              <th className="px-4 py-3 font-medium">Architect registration</th>
+              <th className="px-4 py-3 font-medium">Springfield office</th>
+            </tr>
+          </thead>
+          <tbody>
+            {firms.map((firm) => (
+              <tr key={firm.slug} className="border-t border-ink/10 align-top">
+                <th scope="row" className="px-4 py-3 font-normal">
+                  <div className="flex items-center gap-3">
+                    <FirmMark profile={firm} />
+                    <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
+                  </div>
+                </th>
+                <td className="px-4 py-3 font-body text-[15px] leading-snug">{firm.experience}</td>
+                <td className="px-4 py-3"><RegistrationLines firm={firm} /></td>
+                <td className="px-4 py-3 font-body text-[15px]">{officeLine(firm)}</td>
+              </tr>
+            ))}
+            {RESIDENTIAL_STUDIOS.map((studio) => (
+              <tr key={studio.website} className="border-t border-ink/10 align-top">
+                <th scope="row" className="px-4 py-3 font-normal">
+                  <StudioName studio={studio} />
+                </th>
+                <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.experience}</td>
+                <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.registration}</td>
+                <td className="px-4 py-3 font-body text-[15px]">
+                  {studio.office}
+                  <a href={studio.website} className="mt-1 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
                 </td>
               </tr>
             ))}
@@ -237,7 +309,7 @@ function RegistrationLines({ firm }: { firm: ArchitectProfile }) {
   return <p className="font-body text-[15px] leading-snug">{architect.status.replace("Missouri registered architect: ", "")}</p>;
 }
 
-function StudioName({ studio }: { studio: InteriorStudio }) {
+function StudioName({ studio }: { studio: InteriorStudio | ResidentialStudio }) {
   return (
     <div className="flex items-center gap-3">
       {studio.markSrc && (

@@ -295,7 +295,7 @@ async function main() {
   n++;
   const springfieldTopics = [
     ["/d/architects/springfield-missouri/commercial", "Best commercial architects in Springfield, Missouri", "Hotels, clinics, offices, restaurants, and civic buildings from Springfield practices.", "Baron Design & Associates, LLC, Arkifex Studios, Buxton Kubik Dodd Design Collective, Hood-Rich Architecture, hdesigngroup, Esterly, Schneider & Associates, Paragon Architecture, and BRP Architects."],
-    ["/d/architects/springfield-missouri/residential", "Best residential architects in Springfield, Missouri", "A completed house in Nixa, apartments in Galloway Village, and a house in the Sac River valley.", "Arkifex Studios, hdesigngroup, and N·FORM Architecture."],
+    ["/d/architects/springfield-missouri/residential", "Best residential architects in Springfield, Missouri", "A completed house in Nixa, apartments in Galloway Village, a house in the Sac River valley, and custom houses in Republic, Springfield, and Ozark.", "Arkifex Studios, hdesigngroup, N·FORM Architecture, Burkholder Architecture, OZMO, and Cook Haus Design."],
     ["/d/interior-designers/springfield-missouri", "Best interior designers in Springfield, Missouri", "Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice.", "Baron Design & Associates, LLC, Andrea Nesbitt Designs, Ella Belle Designs, Ellecor Design, and Lindsay Lattner Interiors."],
   ];
   for (const [path, title, description, names] of springfieldTopics) {

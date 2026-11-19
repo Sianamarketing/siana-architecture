@@ -195,7 +195,7 @@ async function main() {
         : "") +
 
       `<h2>The directory</h2>` +
-      `<p>Find architects credited on published buildings. Interior designers, product manufacturers, designers, tools, and marketing agencies will be listed when there are records to show.</p>` +
+      `<p>Find architects credited on published buildings. Interior designers have a Springfield guide. Product manufacturers, designers, tools, and marketing agencies will be listed when there are records to show.</p>` +
       (architects.size
         ? `<ul>` + [...architects.entries()].slice(0, 24).map(([name, slug]) => li(`/projects/${slug}`, name, "Architect")).join("") + `</ul>`
         : `<p>Nothing listed here yet.</p>`) +
@@ -238,7 +238,7 @@ async function main() {
       `<h2>Browse by category</h2><ul>` +
       directoryCategories.map(([slug, label]) => `<li><a href="/d/${slug}">${label}</a></li>`).join("") +
       `</ul>` +
-      `<p>Interior designers, product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
+      `<p>Interior designers have a Springfield guide. Product manufacturers, designers, tools, and marketing agencies: no listings yet.</p>` +
       `<h2>Where the research is</h2>` +
       `<p>Published buildings with a recorded location.</p>` +
       researchCityList(projects, cities) +
@@ -253,14 +253,18 @@ async function main() {
       title: `${label} - Directory - Siana Architecture`,
       description: architects
         ? "Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work."
-        : `${label} has no listings yet.`,
+        : slug === "interior-designers"
+          ? "Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice."
+          : `${label} has no listings yet.`,
       image: OG_DEFAULT,
       content:
         `<nav>Directory / ${label}</nav>` +
         `<h1>${label}</h1>` +
         (architects
           ? `<p>Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work.</p><p><a href="/d/architects/springfield-missouri">Best architecture firms in Springfield, Missouri</a></p><p><a href="/d/">Back to Directory</a></p>`
-          : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
+          : slug === "interior-designers"
+            ? `<p>Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice.</p><p><a href="/d/interior-designers/springfield-missouri">Best interior designers in Springfield, Missouri</a></p><p><a href="/d/">Back to Directory</a></p>`
+            : `<p>No listings yet.</p><p><a href="/d/">Back to Directory</a></p>`),
     }));
     n++;
   }
@@ -280,12 +284,41 @@ async function main() {
       `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / Springfield, Missouri</nav>` +
       `<h1>Best architecture firms in Springfield, Missouri</h1>` +
       `<p>Springfield offices have completed senior housing, hotels, a cardiology clinic, and a brewery restaurant in the city. Baron Design &amp; Associates finished The Preston, a senior residence, along with the Hilton Garden Inn and Towneplace Suites.</p>` +
-      `<ul>` +
+      `<h2>Best architecture firms in Springfield</h2><ul>` +
       ["Baron Design & Associates, LLC", "Arkifex Studios", "Buxton Kubik Dodd Design Collective", "Hood-Rich Architecture", "hdesigngroup", "Esterly, Schneider & Associates", "N·FORM Architecture", "Paragon Architecture", "BRP Architects"]
         .map((name, index) => `<li><a href="/d/architects/${["baron-design-associates","arkifex-studios","bkd-design-collective","hood-rich","hdesigngroup","esterly-schneider","nform-architecture","paragon-architecture","brp-architects"][index]}">${esc(name)}</a></li>`).join("") +
-      `</ul>`,
+      `</ul>` +
+      `<p><a href="/d/architects/springfield-missouri/commercial">Best commercial architects in Springfield</a></p>` +
+      `<p><a href="/d/architects/springfield-missouri/residential">Best residential architects in Springfield</a></p>` +
+      `<p><a href="/d/interior-designers/springfield-missouri">Best interior designers in Springfield</a></p>`,
   }));
   n++;
+  const springfieldTopics = [
+    ["/d/architects/springfield-missouri/commercial", "Best commercial architects in Springfield, Missouri", "Hotels, clinics, offices, restaurants, and civic buildings from Springfield practices.", "Baron Design & Associates, LLC, Arkifex Studios, Buxton Kubik Dodd Design Collective, Hood-Rich Architecture, hdesigngroup, Esterly, Schneider & Associates, Paragon Architecture, and BRP Architects."],
+    ["/d/architects/springfield-missouri/residential", "Best residential architects in Springfield, Missouri", "A completed house in Nixa, apartments in Galloway Village, a house in the Sac River valley, and custom houses in Republic, Springfield, and Ozark.", "Arkifex Studios, hdesigngroup, N·FORM Architecture, Burkholder Architecture, OZMO, and Cook Haus Design."],
+    ["/d/interior-designers/springfield-missouri", "Best interior designers in Springfield, Missouri", "Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice.", "Baron Design & Associates, LLC, Andrea Nesbitt Designs, Ella Belle Designs, Ellecor Design, and Lindsay Lattner Interiors."],
+  ];
+  for (const [path, title, description, names] of springfieldTopics) {
+    write(path, renderPage(template, {
+      path,
+      title: `${title} in 2026 - Siana Architecture`,
+      description,
+      image: OG_DEFAULT,
+      jsonld: {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: title,
+        itemListOrder: "https://schema.org/ItemListUnordered",
+      },
+      content:
+        `<nav><a href="/d/">Directory</a> / <a href="/d/architects">Architects</a> / <a href="/d/architects/springfield-missouri">Springfield, Missouri</a> / ${esc(title.replace(" in Springfield, Missouri", ""))}</nav>` +
+        `<h1>${esc(title)}</h1>` +
+        `<p>${esc(description)}</p>` +
+        `<p>${esc(names)}</p>` +
+        `<p><a href="/d/architects/springfield-missouri">Best architecture firms in Springfield, Missouri</a></p>`,
+    }));
+    n++;
+  }
   const springfieldProfiles = [
     ["baron-design-associates", "Baron Design & Associates, LLC", "Springfield practice for senior housing, clinics, hotels, and offices, with architecture and interior design named on the project pages.", "3810 E. Sunshine St., Suite 101", "65809", "Missouri registered architect: Janet Rothberg White, no. 003658. Firm certificate of authority: Missouri Architectural Corporation no. 2003003845. Rita Baron, principal: Not verified."],
     ["arkifex-studios", "Arkifex Studios", "Springfield studio for houses and commercial work, including a completed house in Nixa and a brewery restaurant in a former radio station.", "301 W Walnut St", "65806", "Missouri registered architect: Tyler D. Hellweg, no. 2015000181. Firm certificate of authority: Not verified."],

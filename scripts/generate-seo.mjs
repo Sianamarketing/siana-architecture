@@ -84,6 +84,9 @@ function buildSitemap({ cities, projects, journal, resources }) {
     urlEntry("/d/marketing-agency", TODAY, "monthly", "0.4"),
     urlEntry("/d/architects/herzog-de-meuron", TODAY, "monthly", "0.5"),
     urlEntry("/d/architects/springfield-missouri", TODAY, "monthly", "0.5"),
+    urlEntry("/d/architects/springfield-missouri/commercial", TODAY, "monthly", "0.5"),
+    urlEntry("/d/architects/springfield-missouri/residential", TODAY, "monthly", "0.5"),
+    urlEntry("/d/interior-designers/springfield-missouri", TODAY, "monthly", "0.5"),
     ...[
       "baron-design-associates",
       "arkifex-studios",
@@ -156,6 +159,9 @@ function buildLlms({ cities, projects, journal, resources }) {
     `- [Architects](${SITE_URL}/d/architects): Credits on published buildings.\n` +
     `- [Herzog & de Meuron](${SITE_URL}/d/architects/herzog-de-meuron): Practice profile.\n` +
     `- [Springfield, Missouri](${SITE_URL}/d/architects/springfield-missouri): Practices with a Springfield office.\n` +
+    `- [Best commercial architects in Springfield, Missouri](${SITE_URL}/d/architects/springfield-missouri/commercial): Commercial work from Springfield practices.\n` +
+    `- [Best residential architects in Springfield, Missouri](${SITE_URL}/d/architects/springfield-missouri/residential): Houses and apartments from Springfield practices.\n` +
+    `- [Best interior designers in Springfield, Missouri](${SITE_URL}/d/interior-designers/springfield-missouri): Baron Design and four Springfield studios.\n` +
     `- [Baron Design & Associates, LLC](${SITE_URL}/d/architects/baron-design-associates): Springfield office profile.\n` +
     `- [Arkifex Studios](${SITE_URL}/d/architects/arkifex-studios): Springfield office profile.\n` +
     `- [Buxton Kubik Dodd Design Collective](${SITE_URL}/d/architects/bkd-design-collective): Springfield office profile.\n` +

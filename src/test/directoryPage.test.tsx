@@ -6,6 +6,7 @@ import Directory from "@/pages/Directory";
 import DirectoryCategory from "@/pages/DirectoryCategory";
 import ArchitectProfile from "@/pages/ArchitectProfile";
 import ArchitectPlace from "@/pages/ArchitectPlace";
+import SpringfieldTopic from "@/pages/SpringfieldTopic";
 
 function DirectoryLegacyRedirect() {
   const [params] = useSearchParams();
@@ -57,6 +58,8 @@ function renderAt(path: string) {
           <Route path="/d" element={<Directory />} />
           <Route path="/d/" element={<Directory />} />
           <Route path="/d/architects/springfield-missouri" element={<ArchitectPlace />} />
+          <Route path="/d/architects/springfield-missouri/:topic" element={<SpringfieldTopic />} />
+          <Route path="/d/interior-designers/springfield-missouri" element={<SpringfieldTopic id="interior" />} />
           <Route path="/d/architects/:profileSlug" element={<ArchitectProfile />} />
           <Route path="/d/:slug" element={<DirectoryCategory />} />
           <Route path="/directory" element={<DirectoryLegacyRedirect />} />
@@ -158,16 +161,63 @@ describe("directory page", () => {
     expect(screen.queryByText(/custom-house/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/unlicensed/i)).not.toBeInTheDocument();
     expect(within(offices).getByRole("link", { name: "Baron Design & Associates, LLC" })).toHaveAttribute("href", "/d/architects/baron-design-associates");
-    expect(screen.getByRole("heading", { name: "Homes and residential buildings" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Commercial and public-facing projects" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Practice types and specialist briefs" })).toBeInTheDocument();
-    for (const id of ["healthcare", "hotels", "restaurants", "renovations", "houses", "boutique", "engineering", "luxury"]) {
-      expect(document.getElementById(id)).toBeTruthy();
-    }
+    expect(screen.getByRole("heading", { name: "Best architecture firms in Springfield" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Best commercial architects in Springfield" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Best commercial architects in Springfield/ })).toHaveAttribute("href", "/d/architects/springfield-missouri/commercial");
+    expect(screen.getByRole("link", { name: /Best residential architects in Springfield/ })).toHaveAttribute("href", "/d/architects/springfield-missouri/residential");
+    expect(screen.getByRole("link", { name: /Best interior designers in Springfield/ })).toHaveAttribute("href", "/d/interior-designers/springfield-missouri");
+    expect(screen.getAllByRole("table")).toHaveLength(1);
+    expect(screen.queryByText("Andrea Nesbitt Designs")).not.toBeInTheDocument();
     expect(screen.queryByRole("columnheader", { name: "Score" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Largest firms" })).not.toBeInTheDocument();
     expect(screen.getAllByText("3810 E. Sunshine St., Suite 101, Springfield, MO 65809").length).toBeGreaterThan(0);
     expect(screen.queryByText(/placed first/i)).not.toBeInTheDocument();
+  });
+
+  it("opens commercial, residential, and interior guides as their own pages", async () => {
+    const commercial = renderAt("/d/architects/springfield-missouri/commercial");
+    expect(await screen.findByRole("heading", { name: "Best commercial architects in Springfield, Missouri" })).toBeInTheDocument();
+    const commercialNames = within(screen.getAllByRole("table")[0]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
+    expect(commercialNames[0]).toBe("Baron Design & Associates, LLC");
+    expect(commercialNames).not.toContain("N·FORM Architecture");
+    expect(screen.getByRole("link", { name: "Springfield, Missouri" })).toHaveAttribute("href", "/d/architects/springfield-missouri");
+    expect(screen.getByRole("link", { name: /Best residential architects in Springfield/ })).toHaveAttribute("href", "/d/architects/springfield-missouri/residential");
+    expect(screen.queryByRole("link", { name: /Best commercial architects in Springfield/ })).not.toBeInTheDocument();
+    expect(screen.queryByText("Andrea Nesbitt Designs")).not.toBeInTheDocument();
+    commercial.unmount();
+
+    const residential = renderAt("/d/architects/springfield-missouri/residential");
+    expect(await screen.findByRole("heading", { name: "Best residential architects in Springfield, Missouri" })).toBeInTheDocument();
+    const residentialNames = within(screen.getAllByRole("table")[0]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
+    expect(residentialNames).toEqual(["Arkifex Studios", "hdesigngroup", "N·FORM Architecture", "Burkholder Architecture", "OZMO", "Cook Haus Design"]);
+    expect(residentialNames).not.toContain("Baron Design & Associates, LLC");
+    expect(within(screen.getAllByRole("table")[0]).getByText("Lineage, a 4,060 square foot custom residence in Republic.")).toBeInTheDocument();
+    expect(within(screen.getAllByRole("table")[0]).getByText("Nathan Scott Burkholder, no. 2018041156")).toBeInTheDocument();
+    expect(within(screen.getAllByRole("table")[0]).getByText("Rufus Leon Louderback, no. 2003010225")).toBeInTheDocument();
+    expect(within(screen.getAllByRole("table")[0]).getByText("Residential designer. Missouri architect registration: not verified.")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Burkholder Architecture" }).some((link) => link.getAttribute("href") === "https://www.burkholderarchitecture.com/")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Finley River House" }).some((link) => link.getAttribute("href") === "https://www.arkifexstudios.com/work/finleyriverhouse")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Natural Bridge II" }).some((link) => link.getAttribute("href") === "https://www.cookhausdesign.com/copy-of-buddy-trl")).toBe(true);
+    expect(screen.getByRole("columnheader", { name: "Signature style" })).toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: "Standout home" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("5,500 sq ft in Nixa, and a Springfield remodel").length).toBeGreaterThan(0);
+    residential.unmount();
+
+    renderAt("/d/interior-designers/springfield-missouri");
+    expect(await screen.findByRole("heading", { name: "Best interior designers in Springfield, Missouri" })).toBeInTheDocument();
+    const interiorNames = within(screen.getAllByRole("table")[0]).getAllByRole("rowheader").map((cell) => cell.textContent?.replace(/\s+/g, " ").trim());
+    expect(interiorNames[0]).toBe("Baron Design & Associates, LLC");
+    expect(interiorNames).toEqual(["Baron Design & Associates, LLC", "Andrea Nesbitt Designs", "Ella Belle Designs", "Ellecor Design", "Lindsay Lattner Interiors"]);
+    expect(screen.queryByRole("columnheader", { name: "Architect registration" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Andrea Nesbitt Designs" }).some((link) => link.getAttribute("href") === "https://anesbittdesigns.com/")).toBe(true);
+    expect(screen.getByRole("link", { name: "Springfield, Missouri" })).toHaveAttribute("href", "/d/architects/springfield-missouri");
+    expect(screen.queryByText("N·FORM Architecture")).not.toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/—|–/);
+  });
+
+  it("treats an unknown Springfield topic as not found", async () => {
+    renderAt("/d/architects/springfield-missouri/clinics");
+    expect(await screen.findByRole("heading", { name: "404" })).toBeInTheDocument();
   });
 
   it("opens a Springfield profile with registration still not verified", async () => {

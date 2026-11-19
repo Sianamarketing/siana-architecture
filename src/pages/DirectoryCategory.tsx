@@ -7,6 +7,7 @@ import ResearchCoverageMap from "@/components/site/ResearchCoverageMap";
 import { creditTableCsv, directoryCategory, filterDirectoryEntries, readMinutes, type DirectoryEntry } from "@/lib/directory";
 import { profileForCredit } from "@/data/architectProfiles";
 import ArchitectsPlaces from "@/components/site/ArchitectsPlaces";
+import { INTERIOR_GUIDE } from "@/data/architectPlaces";
 import { useDirectoryRecords } from "@/hooks/useDirectoryRecords";
 
 const PREVIEW = 6;
@@ -38,6 +39,7 @@ export default function DirectoryCategory() {
   if (!category) return <NotFound />;
 
   const showCredits = category.slug === "architects" && allCredits.length > 0;
+  const interiorGuide = category.slug === "interior-designers";
   const cities = unique(allCredits.flatMap((entry) => entry.buildingsList.map((building) => building.city)));
   const styles = unique(allCredits.flatMap((entry) => entry.buildingsList.map((building) => building.style)));
   const shown = tableOpen ? visible : visible.slice(0, PREVIEW);
@@ -88,7 +90,9 @@ export default function DirectoryCategory() {
         title={`${category.label} - Directory - Siana Architecture`}
         description={showCredits
           ? "Architect credits on published buildings, and a guide to Springfield, Missouri."
-          : `${category.label} has no listings yet.`}
+          : interiorGuide
+            ? INTERIOR_GUIDE.summary
+            : `${category.label} has no listings yet.`}
         canonical={`https://sianaarchitecture.com/d/${category.slug}`}
       />
       <div className="vogue-titles home-paper pb-16" style={{ paddingTop: 76 }}>
@@ -104,11 +108,22 @@ export default function DirectoryCategory() {
           <p className="mt-4 max-w-2xl font-body text-ink-soft text-[16px] leading-relaxed">
             {showCredits
               ? "Springfield, Missouri, with senior housing, hotels, clinics, and a brewery restaurant among the local work."
-              : "No published listings in this category yet."}
+              : interiorGuide
+                ? INTERIOR_GUIDE.summary
+                : "No published listings in this category yet."}
           </p>
           {showCredits && <ArchitectsPlaces />}
+          {interiorGuide && (
+            <Link
+              to={INTERIOR_GUIDE.path}
+              className="mt-8 block max-w-md border border-ink/15 px-4 py-4 hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--accent))]"
+            >
+              <span className="block text-ink" style={{ fontSize: "1.35rem", lineHeight: 1.15 }}>{INTERIOR_GUIDE.title}</span>
+              <span className="mt-2 block font-body text-ink-soft text-[15px]">{INTERIOR_GUIDE.card}</span>
+            </Link>
+          )}
 
-          <form role="search" onSubmit={onSearch} className="mt-8 max-w-xl">
+          {!interiorGuide && <form role="search" onSubmit={onSearch} className="mt-8 max-w-xl">
             <label htmlFor="category-search" className="font-body text-ink" style={{ fontSize: 14 }}>
               Search {category.label}
             </label>
@@ -123,8 +138,8 @@ export default function DirectoryCategory() {
               />
               <button type="submit" className="sr-only">Search</button>
             </div>
-          </form>
-          {query && (
+          </form>}
+          {query && !interiorGuide && (
             <button type="button" onClick={() => write({ q: "" })} className="mt-3 font-body text-ink underline underline-offset-4" style={{ fontSize: 15 }}>
               Clear search
             </button>
@@ -143,9 +158,9 @@ export default function DirectoryCategory() {
 
           {!ready ? (
             <p className="mt-10 font-body text-ink-soft">Loading the directory.</p>
-          ) : !showCredits ? (
+          ) : !showCredits && !interiorGuide ? (
             <p className="mt-10 font-body text-ink text-[16px]">No listings yet.</p>
-          ) : (
+          ) : showCredits ? (
             <>
               {sections.length > 1 && (
                 <nav aria-label="On this page" className="sticky top-[76px] z-20 mt-8 -mx-6 px-6 py-3 overflow-x-auto bg-white/95 border-y border-ink/10">
@@ -315,11 +330,11 @@ export default function DirectoryCategory() {
                   <Faq question="How are the credits stored?">Each line is the architect field on a published building. A shared credit stays one line. The place is the city of the building.</Faq>
                   <Faq question="What does a credit line cover?">A credit can name a practice, one person, or several people together. It stays one line. One of those lines, Herzog & de Meuron, also has a practice page.</Faq>
                   <Faq question="What do the places refer to?">The city recorded on the published building.</Faq>
-                  <Faq question="What about the other categories?">Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet.</Faq>
+                  <Faq question="What about the other categories?">Interior designers have a Springfield guide. Product manufacturers, designers, tools, and marketing agencies have no listings yet.</Faq>
                 </div>
               </section>
             </>
-          )}
+          ) : null}
 
           <p className="mt-12">
             <Link to="/d/" className="font-mono uppercase text-ink border-b border-ink pb-0.5" style={{ fontSize: 12, letterSpacing: "0.14em" }}>

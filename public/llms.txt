@@ -74,6 +74,9 @@ Siana documents notable architecture across global cities and writes about it wi
 - [Architects](https://sianaarchitecture.com/d/architects): Credits on published buildings.
 - [Herzog & de Meuron](https://sianaarchitecture.com/d/architects/herzog-de-meuron): Practice profile.
 - [Springfield, Missouri](https://sianaarchitecture.com/d/architects/springfield-missouri): Practices with a Springfield office.
+- [Best commercial architects in Springfield, Missouri](https://sianaarchitecture.com/d/architects/springfield-missouri/commercial): Commercial work from Springfield practices.
+- [Best residential architects in Springfield, Missouri](https://sianaarchitecture.com/d/architects/springfield-missouri/residential): Houses and apartments from Springfield practices.
+- [Best interior designers in Springfield, Missouri](https://sianaarchitecture.com/d/interior-designers/springfield-missouri): Baron Design and four Springfield studios.
 - [Baron Design & Associates, LLC](https://sianaarchitecture.com/d/architects/baron-design-associates): Springfield office profile.
 - [Arkifex Studios](https://sianaarchitecture.com/d/architects/arkifex-studios): Springfield office profile.
 - [Buxton Kubik Dodd Design Collective](https://sianaarchitecture.com/d/architects/bkd-design-collective): Springfield office profile.

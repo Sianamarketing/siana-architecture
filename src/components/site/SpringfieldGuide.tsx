@@ -79,7 +79,7 @@ export function FirmGuideTable({ firms, label }: { firms: ArchitectProfile[]; la
         {firms.map((firm) => (
           <li key={firm.slug} className="border border-ink/15 px-4 py-3">
             <div className="flex items-center gap-3">
-              <FirmMark profile={firm} />
+              <FirmMark profile={firm} compact />
               <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
             </div>
             <p className="mt-2 font-body text-ink text-[15px] leading-snug">{firm.experience}</p>
@@ -104,7 +104,7 @@ export function FirmGuideTable({ firms, label }: { firms: ArchitectProfile[]; la
               <tr key={firm.slug} id={firm.slug} className="border-t border-ink/10 align-top">
                 <th scope="row" className="px-4 py-3 font-normal">
                   <div className="flex items-center gap-3">
-                    <FirmMark profile={firm} />
+                    <FirmMark profile={firm} compact />
                     <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
                   </div>
                 </th>
@@ -130,7 +130,7 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
         {firms.map((firm) => (
           <li key={firm.slug} className="border border-ink/15 px-4 py-3">
             <div className="flex items-center gap-3">
-              <FirmMark profile={firm} />
+              <FirmMark profile={firm} compact />
               <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
             </div>
             <ResidentialFactsBlock facts={RESIDENTIAL_FACTS[firm.slug]} />
@@ -151,18 +151,16 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
           </li>
         ))}
       </ul>
-      <div className="mt-8 hidden md:block overflow-x-auto border border-ink/15" tabIndex={0} role="region" aria-label="Best residential architects in Springfield. Scroll sideways if a column is out of view.">
-        <table className="w-full text-left" style={{ minWidth: 1480 }}>
-          <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 11, letterSpacing: "0.12em" }}>
+      <div className="mt-8 hidden md:block border border-ink/15" role="region" aria-label="Best residential architects in Springfield">
+        <table className="w-full table-fixed text-left">
+          <thead className="bg-paper-warm font-mono uppercase text-warm-gray" style={{ fontSize: 10, letterSpacing: "0.08em" }}>
             <tr>
-              <th className="px-4 py-3 font-medium">Practice</th>
-              <th className="px-4 py-3 font-medium">Signature style</th>
-              <th className="px-4 py-3 font-medium">Standout home</th>
-              <th className="px-4 py-3 font-medium">Typical size and setting</th>
-              <th className="px-4 py-3 font-medium">Best for</th>
-              <th className="px-4 py-3 font-medium">Project experience</th>
-              <th className="px-4 py-3 font-medium">Architect registration</th>
-              <th className="px-4 py-3 font-medium">Springfield office</th>
+              <th className="w-[18%] px-2 py-2 font-medium">Practice</th>
+              <th className="w-[18%] px-2 py-2 font-medium">Signature style</th>
+              <th className="w-[14%] px-2 py-2 font-medium">Best for</th>
+              <th className="w-[22%] px-2 py-2 font-medium">Project experience</th>
+              <th className="w-[14%] px-2 py-2 font-medium">Architect registration</th>
+              <th className="w-[14%] px-2 py-2 font-medium">Springfield office</th>
             </tr>
           </thead>
           <tbody>
@@ -170,28 +168,42 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
               const facts = RESIDENTIAL_FACTS[firm.slug];
               return (
                 <tr key={firm.slug} className="border-t border-ink/10 align-top">
-                  <th scope="row" className="px-4 py-3 font-normal">
-                    <div className="flex items-center gap-3">
-                      <FirmMark profile={firm} />
-                      <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
+                  <th scope="row" className="px-2 py-2 font-normal">
+                    <div className="flex items-center gap-2">
+                      <FirmMark profile={firm} compact />
+                      <Link to={profileUrl(firm.slug)} className="text-ink hover:underline" style={{ fontSize: 14 }}>{firm.name}</Link>
                     </div>
                   </th>
-                  <FactCells facts={facts} />
-                  <td className="px-4 py-3 font-body text-[15px] leading-snug">{firm.experience}</td>
-                  <td className="px-4 py-3"><RegistrationLines firm={firm} /></td>
-                  <td className="px-4 py-3 font-body text-[15px]">{officeLine(firm)}</td>
+                  <td className="px-2 py-2 font-body text-[13px] leading-snug">
+                    <span className="block">{facts.style}</span>
+                    <span className="mt-1 block text-ink-soft">{facts.sizeSetting}</span>
+                  </td>
+                  <td className="px-2 py-2 font-body text-[13px] leading-snug">{facts.bestFor}</td>
+                  <td className="px-2 py-2 font-body text-[13px] leading-snug">
+                    <span className="block">{firm.experience}</span>
+                    <a href={facts.standoutUrl} className="mt-1 inline-block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">{facts.standout}</a>
+                  </td>
+                  <td className="px-2 py-2 text-[13px]"><RegistrationLines firm={firm} /></td>
+                  <td className="px-2 py-2 font-body text-[13px] leading-snug">{officeLine(firm)}</td>
                 </tr>
               );
             })}
             {RESIDENTIAL_STUDIOS.map((studio) => (
               <tr key={studio.website} className="border-t border-ink/10 align-top">
-                <th scope="row" className="px-4 py-3 font-normal">
+                <th scope="row" className="px-2 py-2 font-normal">
                   <StudioName studio={studio} />
                 </th>
-                <FactCells facts={studio.facts} />
-                <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.experience}</td>
-                <td className="px-4 py-3 font-body text-[15px] leading-snug">{studio.registration}</td>
-                <td className="px-4 py-3 font-body text-[15px]">
+                <td className="px-2 py-2 font-body text-[13px] leading-snug">
+                  <span className="block">{studio.facts.style}</span>
+                  <span className="mt-1 block text-ink-soft">{studio.facts.sizeSetting}</span>
+                </td>
+                <td className="px-2 py-2 font-body text-[13px] leading-snug">{studio.facts.bestFor}</td>
+                <td className="px-2 py-2 font-body text-[13px] leading-snug">
+                  <span className="block">{studio.experience}</span>
+                  <a href={studio.facts.standoutUrl} className="mt-1 inline-block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">{studio.facts.standout}</a>
+                </td>
+                <td className="px-2 py-2 font-body text-[13px] leading-snug">{studio.registration}</td>
+                <td className="px-2 py-2 font-body text-[13px] leading-snug">
                   {studio.office}
                   <a href={studio.website} className="mt-1 block text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">Practice website, external</a>
                 </td>
@@ -211,7 +223,7 @@ export function InteriorGuideTable() {
       <ul className="mt-8 md:hidden space-y-3">
         <li className="border border-ink/15 px-4 py-3">
           <div className="flex items-center gap-3">
-            <FirmMark profile={baron} />
+            <FirmMark profile={baron} compact />
             <Link to={profileUrl(baron.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{baron.name}</Link>
           </div>
           <p className="mt-2 font-body text-ink text-[15px] leading-snug">{BARON_INTERIOR_WORK}</p>
@@ -240,7 +252,7 @@ export function InteriorGuideTable() {
             <tr className="border-t border-ink/10 align-top">
               <th scope="row" className="px-4 py-3 font-normal">
                 <div className="flex items-center gap-3">
-                  <FirmMark profile={baron} />
+                  <FirmMark profile={baron} compact />
                   <Link to={profileUrl(baron.slug)} className="text-ink hover:underline">{baron.name}</Link>
                 </div>
               </th>
@@ -316,19 +328,6 @@ export function GuideCards({ currentPath, className = "mt-14" }: { currentPath: 
   );
 }
 
-function FactCells({ facts }: { facts: ResidentialFacts }) {
-  return (
-    <>
-      <td className="px-4 py-3 font-body text-[15px] leading-snug">{facts.style}</td>
-      <td className="px-4 py-3 font-body text-[15px] leading-snug">
-        <a href={facts.standoutUrl} className="text-ink underline underline-offset-4" target="_blank" rel="noopener noreferrer">{facts.standout}</a>
-      </td>
-      <td className="px-4 py-3 font-body text-[15px] leading-snug">{facts.sizeSetting}</td>
-      <td className="px-4 py-3 font-body text-[15px] leading-snug">{facts.bestFor}</td>
-    </>
-  );
-}
-
 function ResidentialFactsBlock({ facts }: { facts: ResidentialFacts }) {
   const rows = [
     ["Signature style", facts.style],
@@ -354,16 +353,16 @@ function ResidentialFactsBlock({ facts }: { facts: ResidentialFacts }) {
 function RegistrationLines({ firm }: { firm: ArchitectProfile }) {
   const architect = firm.registration.find((item) => item.status.startsWith("Missouri registered architect: "));
   if (!architect) return null;
-  return <p className="font-body text-[15px] leading-snug">{architect.status.replace("Missouri registered architect: ", "")}</p>;
+  return <p className="font-body text-[13px] leading-snug">{architect.status.replace("Missouri registered architect: ", "")}</p>;
 }
 
 function StudioName({ studio }: { studio: InteriorStudio | ResidentialStudio }) {
   return (
     <div className="flex items-center gap-3">
       {studio.markSrc && (
-        <img src={studio.markSrc} alt="" className={`${studio.markOnInk ? "bg-ink px-1.5 py-1" : ""} h-7 max-w-[8.5rem] w-auto object-contain`} />
+        <img src={studio.markSrc} alt="" className={`${studio.markOnInk ? "bg-ink px-1" : ""} h-6 max-h-[26px] max-w-[4.5rem] w-auto shrink-0 object-contain`} />
       )}
-      <a href={studio.website} className="text-ink hover:underline" style={{ fontSize: "1.05rem" }} target="_blank" rel="noopener noreferrer">{studio.name}</a>
+      <a href={studio.website} className="text-ink hover:underline" style={{ fontSize: 14 }} target="_blank" rel="noopener noreferrer">{studio.name}</a>
     </div>
   );
 }

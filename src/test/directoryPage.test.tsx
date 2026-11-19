@@ -199,7 +199,8 @@ describe("directory page", () => {
     expect(screen.getAllByRole("link", { name: "Finley River House" }).some((link) => link.getAttribute("href") === "https://www.arkifexstudios.com/work/finleyriverhouse")).toBe(true);
     expect(screen.getAllByRole("link", { name: "Natural Bridge II" }).some((link) => link.getAttribute("href") === "https://www.cookhausdesign.com/copy-of-buddy-trl")).toBe(true);
     expect(screen.getByRole("columnheader", { name: "Signature style" })).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "Standout home" })).toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: "Standout home" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("5,500 sq ft in Nixa, and a Springfield remodel").length).toBeGreaterThan(0);
     residential.unmount();
 
     renderAt("/d/interior-designers/springfield-missouri");

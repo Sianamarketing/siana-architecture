@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SPRINGFIELD_PLACE } from "@/data/architectPlaces";
+import { COMMERCIAL_GUIDE, INTERIOR_GUIDE, RESIDENTIAL_GUIDE, SPRINGFIELD_PLACE, commercialSourceLinks, documentTitle, hubSourceLinks, interiorSourceLinks, residentialSourceLinks } from "@/data/architectPlaces";
 import { profileBySlug, profileForCredit, profileStructuredData } from "@/data/architectProfiles";
 import { SPRINGFIELD_PROFILES } from "@/data/springfieldProfiles";
 import { architectEntries, filterDirectoryEntries, readMinutes, usableDirectoryImage } from "@/lib/directory";
@@ -79,9 +79,24 @@ describe("directory", () => {
   it("keeps the Springfield heading and puts 2026 only in the document title", () => {
     expect(SPRINGFIELD_PLACE.title).toBe("Best architecture firms in Springfield, Missouri");
     expect(SPRINGFIELD_PLACE.edition).toBe("2026");
-    expect(`${SPRINGFIELD_PLACE.title} in ${SPRINGFIELD_PLACE.edition} - Siana Architecture`).toBe(
+    expect(documentTitle(SPRINGFIELD_PLACE.title)).toBe(
       "Best architecture firms in Springfield, Missouri in 2026 - Siana Architecture",
     );
+    expect(documentTitle(COMMERCIAL_GUIDE.title)).toBe("Best commercial architects in Springfield, Missouri in 2026 - Siana Architecture");
+    expect(documentTitle(RESIDENTIAL_GUIDE.title)).toBe("Best residential architects in Springfield, Missouri in 2026 - Siana Architecture");
+    expect(documentTitle(INTERIOR_GUIDE.title)).toBe("Best interior designers in Springfield, Missouri in 2026 - Siana Architecture");
+    expect(COMMERCIAL_GUIDE.path).toBe("/d/architects/springfield-missouri/commercial");
+    expect(RESIDENTIAL_GUIDE.path).toBe("/d/architects/springfield-missouri/residential");
+    expect(INTERIOR_GUIDE.path).toBe("/d/interior-designers/springfield-missouri");
+    expect(hubSourceLinks().some((link) => link.href.includes("anesbitt"))).toBe(false);
+    expect(commercialSourceLinks().some((link) => link.href.includes("lostsignal"))).toBe(true);
+    expect(commercialSourceLinks().some((link) => link.href.includes("finley"))).toBe(false);
+    expect(commercialSourceLinks().some((link) => link.label === "St. Jude Mercy Clinic, external" || link.href.includes("st-jude"))).toBe(true);
+    expect(residentialSourceLinks().map((link) => link.label)).toContain("N·FORM Architecture");
+    expect(residentialSourceLinks().some((link) => link.href.includes("lostsignal"))).toBe(false);
+    expect(interiorSourceLinks().some((link) => link.href === "https://anesbittdesigns.com/")).toBe(true);
+    expect(interiorSourceLinks().some((link) => link.href.includes("mopro"))).toBe(false);
+    expect(commercialSourceLinks().filter((link) => link.href.includes("lostsignal"))).toHaveLength(1);
   });
 
   it("counts reading time only from real copy", () => {

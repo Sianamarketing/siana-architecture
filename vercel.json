@@ -24,6 +24,8 @@
     { "source": "/cities/:slug", "destination": "/api/not-found" },
     { "source": "/practice/:slug", "destination": "/api/not-found" },
     { "source": "/projects/:slug", "destination": "/api/not-found" },
+    { "source": "/d/architects/springfield-missouri/:guide", "destination": "/api/not-found" },
+    { "source": "/d/interior-designers/:place", "destination": "/api/not-found" },
     { "source": "/d/architects/:profile", "destination": "/api/not-found" },
     { "source": "/d/:slug", "destination": "/api/not-found" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }

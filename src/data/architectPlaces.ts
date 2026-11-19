@@ -122,7 +122,7 @@ export interface InteriorStudio {
   markOnInk: boolean;
 }
 
-/** Checked 18 November 2026 from each practice website. No NCIDQ or Missouri interior licence was confirmed, so the hub does not show a credential column. */
+/** Checked 18 November 2026 from each practice website. No credential column: an NCIDQ or Missouri interior record was not part of the confirmed sources. */
 export const INTERIOR_STUDIOS: InteriorStudio[] = [
   {
     name: "Andrea Nesbitt Designs",
@@ -157,3 +157,160 @@ export const INTERIOR_STUDIOS: InteriorStudio[] = [
     markOnInk: false,
   },
 ];
+
+export interface GuideCard {
+  path: string;
+  title: string;
+  card: string;
+}
+
+export interface SourceLink {
+  label: string;
+  href: string;
+}
+
+export const BARON_INTERIOR_WORK =
+  "Architecture and interior design for The Preston, Towneplace Suites, Hilton Garden Inn, Baron Cardiology, and 3810 East Sunshine.";
+
+const MISSOURI_SEARCH = "https://mopro.mo.gov/license/s/license-search";
+
+export const COMMERCIAL_GUIDE = {
+  id: "commercial",
+  path: "/d/architects/springfield-missouri/commercial",
+  title: "Best commercial architects in Springfield, Missouri",
+  crumb: "Commercial",
+  summary: "Hotels, clinics, offices, restaurants, and civic buildings from Springfield practices.",
+  card: "Hotels, clinics, offices, and restaurants.",
+  sourcesNote:
+    "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Baron Design & Associates, LLC is Architectural Corporation no. 2003003845. The firm site gives 2003003845-D. Janet Rothberg White, no. 003658, is the architect in charge. Rita Baron: not verified. Firm certificates for the other practices on this page: not verified. Logos are each practice's own mark, shown small to identify the firm. Project photographs are not shown.",
+};
+
+export const RESIDENTIAL_GUIDE = {
+  id: "residential",
+  path: "/d/architects/springfield-missouri/residential",
+  title: "Best residential architects in Springfield, Missouri",
+  crumb: "Residential",
+  summary: "A completed house in Nixa, apartments in Galloway Village, and a house in the Sac River valley.",
+  card: "A house in Nixa, apartments in Galloway Village, and a house in the Sac River valley.",
+  sourcesNote:
+    "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Tyler D. Hellweg, no. 2015000181, Robert Christopher Haik, no. 007461, and Jennifer Lynn Wilson, no. 2001029971. Firm certificates of authority: not verified. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown.",
+};
+
+export const INTERIOR_GUIDE = {
+  id: "interior",
+  path: "/d/interior-designers/springfield-missouri",
+  title: "Best interior designers in Springfield, Missouri",
+  crumb: "Interior design",
+  summary: "Baron Design includes interiors with its architecture. Four other studios keep a Springfield practice.",
+  card: "Baron Design, and four Springfield studios.",
+  sourcesNote:
+    "Baron Design names architecture and interior design for The Preston, Towneplace Suites, Baron Cardiology, 3810 East Sunshine, and Hilton Garden Inn. Andrea Nesbitt Designs, Ella Belle Designs, Ellecor Design, and Lindsay Lattner Interiors were checked 18 November 2026. Logos are each practice's own mark, shown small to identify the firm. Project photographs are not shown.",
+};
+
+export const TOPIC_GUIDES = {
+  commercial: COMMERCIAL_GUIDE,
+  residential: RESIDENTIAL_GUIDE,
+  interior: INTERIOR_GUIDE,
+} as const;
+
+export type TopicId = keyof typeof TOPIC_GUIDES;
+
+export function documentTitle(title: string): string {
+  return `${title} in ${SPRINGFIELD_PLACE.edition} - Siana Architecture`;
+}
+
+export function springfieldGuideCards(currentPath: string): GuideCard[] {
+  const cards: GuideCard[] = [
+    {
+      path: SPRINGFIELD_PLACE.path,
+      title: "Best architecture firms in Springfield",
+      card: "Nine Springfield offices, with hotels, clinics, houses, and a brewery restaurant.",
+    },
+    { path: COMMERCIAL_GUIDE.path, title: "Best commercial architects in Springfield", card: COMMERCIAL_GUIDE.card },
+    { path: RESIDENTIAL_GUIDE.path, title: "Best residential architects in Springfield", card: RESIDENTIAL_GUIDE.card },
+    { path: INTERIOR_GUIDE.path, title: "Best interior designers in Springfield", card: INTERIOR_GUIDE.card },
+  ];
+  return cards.filter((card) => card.path !== currentPath);
+}
+
+function profileLinks(slugs: string[]): SourceLink[] {
+  return firmsBySlugs(slugs).map((firm) => ({ label: firm.name, href: `/d/architects/${firm.slug}` }));
+}
+
+function projectLinks(pairs: [string, string][]): SourceLink[] {
+  const seen = new Set<string>();
+  return pairs.flatMap(([slug, name]) => {
+    const project = springfieldBySlug(slug)?.projects.find((item) => item.name === name);
+    if (!project || seen.has(project.sourceUrl)) return [];
+    seen.add(project.sourceUrl);
+    return [{ label: `${project.sourceLabel}, external`, href: project.sourceUrl }];
+  });
+}
+
+export const HUB_SOURCES_NOTE =
+  "Checked 8 November 2026 in the Active Licensee Only search at the Missouri licensee search. Detail pages do not label a record Active. Baron Design & Associates, LLC is Architectural Corporation no. 2003003845. The firm site gives 2003003845-D. Janet Rothberg White, no. 003658, is the architect in charge. Rita Baron: not verified. Firm certificates for the other architecture practices: not verified. Logos are each practice's own mark, shown small to identify the firm. N·FORM Architecture is named in type. Project photographs are not shown.";
+
+export function hubSourceLinks(): SourceLink[] {
+  return [
+    { label: "Missouri licensee search, external", href: MISSOURI_SEARCH },
+    ...profileLinks(SPRINGFIELD_FIRMS.map((firm) => firm.slug)),
+  ];
+}
+
+export function commercialSourceLinks(): SourceLink[] {
+  return [
+    { label: "Missouri licensee search, external", href: MISSOURI_SEARCH },
+    ...profileLinks(COMMERCIAL_SLUGS),
+    ...projectLinks([
+      ["baron-design-associates", "The Preston"],
+      ["baron-design-associates", "Towneplace Suites"],
+      ["baron-design-associates", "Baron Cardiology"],
+      ["baron-design-associates", "3810 East Sunshine"],
+      ["baron-design-associates", "Hilton Garden Inn"],
+      ["arkifex-studios", "Lost Signal Brewing"],
+      ["bkd-design-collective", "St. Jude Mercy Clinic"],
+      ["bkd-design-collective", "Moxy Springfield Downtown"],
+      ["bkd-design-collective", "Chateau on the Lake Resort, Spa and Convention Center"],
+      ["hood-rich", "Centerstone Building A Renovation + Addition"],
+      ["hood-rich", "Burrell Behavioral Health administrative campus"],
+      ["hood-rich", "Embassy Suites - Montgomery"],
+      ["hdesigngroup", "Tru by Hilton"],
+      ["esterly-schneider", "O'Reilly Auto Parts"],
+      ["esterly-schneider", "Wire Road Brewery"],
+      ["esterly-schneider", "City of Springfield Fire Station #13"],
+      ["paragon-architecture", "Care to Learn | Infill & Remodel"],
+      ["brp-architects", "Caesars Republic Scottsdale"],
+    ]),
+  ];
+}
+
+export function residentialSourceLinks(): SourceLink[] {
+  return [
+    { label: "Missouri licensee search, external", href: MISSOURI_SEARCH },
+    ...profileLinks(RESIDENTIAL_SLUGS),
+    ...projectLinks([
+      ["arkifex-studios", "Finley River House"],
+      ["arkifex-studios", "Casey House Remodel and Restoration"],
+      ["hdesigngroup", "Township 28"],
+      ["nform-architecture", "Sac River Residence"],
+    ]),
+  ];
+}
+
+export function interiorSourceLinks(): SourceLink[] {
+  return [
+    { label: "Baron Design & Associates, LLC", href: "/d/architects/baron-design-associates" },
+    { label: "Baron Design, about, external", href: "https://baron-design.com/about" },
+    ...projectLinks([
+      ["baron-design-associates", "The Preston"],
+      ["baron-design-associates", "Towneplace Suites"],
+      ["baron-design-associates", "Baron Cardiology"],
+      ["baron-design-associates", "3810 East Sunshine"],
+      ["baron-design-associates", "Hilton Garden Inn"],
+    ]),
+    ...INTERIOR_STUDIOS.map((studio) => ({ label: `${studio.name}, external`, href: studio.website })),
+    { label: "Andrea Nesbitt Designs, contact, external", href: "https://anesbittdesigns.com/contact" },
+    { label: "Ellecor Design, team, external", href: "https://ellecordesign.com/meet-our-staff/" },
+    { label: "Ellecor Design, contact, external", href: "https://ellecordesign.com/contact/" },
+  ];
+}

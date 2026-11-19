@@ -48,7 +48,7 @@ export default function Directory() {
     <SiteLayout>
       <SEO
         title="Directory - Siana Architecture"
-        description="Search architect credits on published buildings. Interior designers, product manufacturers, designers, tools, and marketing agencies have no listings yet."
+        description="Search architect credits on published buildings. Interior designers have a Springfield guide. Product manufacturers, designers, tools, and marketing agencies have no listings yet."
         canonical="https://sianaarchitecture.com/d/"
       />
       <div className="vogue-titles home-paper pb-8" style={{ paddingTop: 76 }}>

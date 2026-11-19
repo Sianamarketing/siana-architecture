@@ -27,6 +27,7 @@ const Directory = lazy(() => import("./pages/Directory.tsx"));
 const DirectoryCategory = lazy(() => import("./pages/DirectoryCategory.tsx"));
 const ArchitectProfile = lazy(() => import("./pages/ArchitectProfile.tsx"));
 const ArchitectPlace = lazy(() => import("./pages/ArchitectPlace.tsx"));
+const SpringfieldTopic = lazy(() => import("./pages/SpringfieldTopic.tsx"));
 const Resources = lazy(() => import("./pages/Resources.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -102,6 +103,8 @@ const App = () => (
             <Route path="/d" element={<Directory />} />
             <Route path="/d/" element={<Directory />} />
             <Route path="/d/architects/springfield-missouri" element={<ArchitectPlace />} />
+            <Route path="/d/architects/springfield-missouri/:topic" element={<SpringfieldTopic />} />
+            <Route path="/d/interior-designers/springfield-missouri" element={<SpringfieldTopic id="interior" />} />
             <Route path="/d/architects/:profileSlug" element={<ArchitectProfile />} />
             <Route path="/d/:slug" element={<DirectoryCategory />} />
             <Route path="/directory" element={<DirectoryLegacyRedirect />} />

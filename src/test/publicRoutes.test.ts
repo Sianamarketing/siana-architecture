@@ -30,6 +30,9 @@ describe("published routes", () => {
     expect(sitemap).toContain("https://sianaarchitecture.com/cities/berlin");
     expect(sitemap).toContain("https://sianaarchitecture.com/d/architects/herzog-de-meuron");
     expect(sitemap).toContain("https://sianaarchitecture.com/d/architects/springfield-missouri");
+    expect(sitemap).toContain("https://sianaarchitecture.com/d/architects/springfield-missouri/commercial");
+    expect(sitemap).toContain("https://sianaarchitecture.com/d/architects/springfield-missouri/residential");
+    expect(sitemap).toContain("https://sianaarchitecture.com/d/interior-designers/springfield-missouri");
     expect(prerender).toContain("write(`/d/architects/${slug}`");
     for (const slug of ["baron-design-associates", "arkifex-studios", "bkd-design-collective", "hood-rich", "hdesigngroup", "esterly-schneider", "nform-architecture", "paragon-architecture", "brp-architects"]) {
       expect(sitemap).toContain(`https://sianaarchitecture.com/d/architects/${slug}`);
@@ -37,6 +40,11 @@ describe("published routes", () => {
     }
     expect(prerender).toContain('title: "Best architecture firms in Springfield, Missouri in 2026 - Siana Architecture"');
     expect(prerender).toContain("<h1>Best architecture firms in Springfield, Missouri</h1>");
+    expect(prerender).toContain('title: `${title} in 2026 - Siana Architecture`');
+    expect(prerender).toContain('"/d/architects/springfield-missouri/commercial"');
+    expect(prerender).toContain('"/d/architects/springfield-missouri/residential"');
+    expect(prerender).toContain('"/d/interior-designers/springfield-missouri"');
+    expect(prerender).toContain("<h1>${esc(title)}</h1>");
     expect(prerender).toContain("ProfessionalService");
     expect(prerender).toContain("BreadcrumbList");
     expect(sitemap).not.toContain("https://sianaarchitecture.com/journal/");

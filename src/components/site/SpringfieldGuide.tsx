@@ -78,7 +78,7 @@ export function FirmGuideTable({ firms, label }: { firms: ArchitectProfile[]; la
       <ul className="mt-8 md:hidden space-y-3">
         {firms.map((firm) => (
           <li key={firm.slug} className="border border-ink/15 px-4 py-3">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col items-start gap-1">
               <FirmMark profile={firm} compact />
               <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
             </div>
@@ -103,7 +103,7 @@ export function FirmGuideTable({ firms, label }: { firms: ArchitectProfile[]; la
             {firms.map((firm) => (
               <tr key={firm.slug} id={firm.slug} className="border-t border-ink/10 align-top">
                 <th scope="row" className="px-4 py-3 font-normal">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-start gap-1">
                     <FirmMark profile={firm} compact />
                     <Link to={profileUrl(firm.slug)} className="text-ink hover:underline">{firm.name}</Link>
                   </div>
@@ -129,7 +129,7 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
       <ul className="mt-8 md:hidden space-y-3">
         {firms.map((firm) => (
           <li key={firm.slug} className="border border-ink/15 px-4 py-3">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col items-start gap-1">
               <FirmMark profile={firm} compact />
               <Link to={profileUrl(firm.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{firm.name}</Link>
             </div>
@@ -169,7 +169,7 @@ export function ResidentialGuideTable({ firms }: { firms: ArchitectProfile[] }) 
               return (
                 <tr key={firm.slug} className="border-t border-ink/10 align-top">
                   <th scope="row" className="px-2 py-2 font-normal">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col items-start gap-1">
                       <FirmMark profile={firm} compact />
                       <Link to={profileUrl(firm.slug)} className="text-ink hover:underline" style={{ fontSize: 14 }}>{firm.name}</Link>
                     </div>
@@ -222,7 +222,7 @@ export function InteriorGuideTable() {
     <>
       <ul className="mt-8 md:hidden space-y-3">
         <li className="border border-ink/15 px-4 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col items-start gap-1">
             <FirmMark profile={baron} compact />
             <Link to={profileUrl(baron.slug)} className="text-ink" style={{ fontSize: "1.15rem" }}>{baron.name}</Link>
           </div>
@@ -251,7 +251,7 @@ export function InteriorGuideTable() {
           <tbody>
             <tr className="border-t border-ink/10 align-top">
               <th scope="row" className="px-4 py-3 font-normal">
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-start gap-1">
                   <FirmMark profile={baron} compact />
                   <Link to={profileUrl(baron.slug)} className="text-ink hover:underline">{baron.name}</Link>
                 </div>
@@ -358,7 +358,7 @@ function RegistrationLines({ firm }: { firm: ArchitectProfile }) {
 
 function StudioName({ studio }: { studio: InteriorStudio | ResidentialStudio }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col items-start gap-1">
       {studio.markSrc && (
         <img src={studio.markSrc} alt="" className={`${studio.markOnInk ? "bg-ink px-1" : ""} h-6 max-h-[26px] max-w-[4.5rem] w-auto shrink-0 object-contain`} />
       )}
